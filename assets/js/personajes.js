@@ -11,7 +11,7 @@ window.personajes = [
     nacionalidad: "Confidencial",
     ciudadNacimiento: "Confidencial",
     moduloTrabajo: "CONTROL",
-    imagen: "ELCAPITAN.JPG",
+    imagen: "ELCAPITAN.jpg",
     imagenAlt: "Interpretación visual del Capitán",
     descripcionCorta:
       "Máximo responsable de ALÉTHEIA.",
@@ -31,7 +31,7 @@ window.personajes = [
     nacionalidad: "Estados Unidos",
     ciudadNacimiento: "Montana",
     moduloTrabajo: "SEC",
-    imagen: "MARCUS.JPG",
+    imagen: "MARCUS.jpg",
     imagenAlt: "Interpretación visual de Marcus Lowe",
     descripcionCorta:
       "Responsable de la seguridad de ALÉTHEIA.",
@@ -51,7 +51,7 @@ window.personajes = [
     nacionalidad: "Reino Unido",
     ciudadNacimiento: "Londres",
     moduloTrabajo: "CONTROL",
-    imagen: "ROSE.JPG",
+    imagen: "ROSE.jpg",
     imagenAlt: "Interpretación visual de Rose Whitmore",
     descripcionCorta:
       "Primera oficial y mano derecha del capitán.",
@@ -71,7 +71,7 @@ window.personajes = [
     nacionalidad: "España",
     ciudadNacimiento: "Alicante",
     moduloTrabajo: "ALÉTHEIA",
-    imagen: "LEO.JPG",
+    imagen: "LEO.jpg",
     imagenAlt: "Interpretación visual de Leo Sánchez",
     descripcionCorta:
       "Especialista en mantenimiento de sistemas.",
@@ -91,7 +91,7 @@ window.personajes = [
     nacionalidad: "Italia",
     ciudadNacimiento: "Nápoles",
     moduloTrabajo: "AGRO",
-    imagen: "ALYA.JPG",
+    imagen: "ALYA.jpg",
     imagenAlt: "Interpretación visual de Alya D'Maggio",
     descripcionCorta:
       "Especialista en agricultura y producción de alimentos.",
@@ -111,7 +111,7 @@ window.personajes = [
     nacionalidad: "Japón",
     ciudadNacimiento: "Kioto",
     moduloTrabajo: "ALÉTHEIA",
-    imagen: "HARU.JPG",
+    imagen: "HARU.jpg",
     imagenAlt: "Interpretación visual de Haru Akiyama",
     descripcionCorta:
       "Responsable del mantenimiento general de ALÉTHEIA.",
@@ -131,7 +131,7 @@ window.personajes = [
     nacionalidad: "Rusia",
     ciudadNacimiento: "Moscú",
     moduloTrabajo: "CONTROL",
-    imagen: "OLGA.JPG",
+    imagen: "OLGA.jpg",
     imagenAlt: "Interpretación visual de Olga Petrov",
     descripcionCorta:
       "Piloto de operaciones espaciales.",
@@ -151,7 +151,7 @@ window.personajes = [
     nacionalidad: "Canadá",
     ciudadNacimiento: "Toronto",
     moduloTrabajo: "THALARA-01",
-    imagen: "ALAN.JPG",
+    imagen: "ALAN.jpg",
     imagenAlt: "Interpretación visual de Alan Smith",
     descripcionCorta:
       "Dirige la expedición científica sobre Thalara.",
@@ -171,7 +171,7 @@ window.personajes = [
     nacionalidad: "Países Bajos",
     ciudadNacimiento: "Ámsterdam",
     moduloTrabajo: "ZEUS",
-    imagen: "SABINE.JPG",
+    imagen: "SABINE.jpg",
     imagenAlt: "Interpretación visual de Sabine Van Wijngaarden",
     descripcionCorta:
       "Responsable del funcionamiento de los reactores ZEUS.",
@@ -191,7 +191,7 @@ window.personajes = [
     nacionalidad: "Chile",
     ciudadNacimiento: "Santiago de Chile",
     moduloTrabajo: "THALARA-01",
-    imagen: "SIRENA.JPG",
+    imagen: "SIRENA.jpg",
     imagenAlt: "Interpretación visual de Sirena Duarte",
     descripcionCorta:
       "Especialista en geología planetaria.",
@@ -211,7 +211,7 @@ window.personajes = [
     nacionalidad: "Tanzania",
     ciudadNacimiento: "Moshi",
     moduloTrabajo: "SEC",
-    imagen: "BIRUK.JPG",
+    imagen: "BIRUK.jpg",
     imagenAlt: "Interpretación visual de Biruk Juma",
     descripcionCorta:
       "Oficial de seguridad de ALÉTHEIA.",
@@ -231,7 +231,7 @@ window.personajes = [
     nacionalidad: "Irlanda",
     ciudadNacimiento: "Dublín",
     moduloTrabajo: "OBSERVATORIO",
-    imagen: "CORBAN.JPG",
+    imagen: "CORBAN.jpg",
     imagenAlt: "Interpretación visual de Patrick Corban",
     descripcionCorta:
       "Responsable del Observatorio Astronómico.",
@@ -251,7 +251,7 @@ window.personajes = [
     nacionalidad: "Suecia",
     ciudadNacimiento: "Estocolmo",
     moduloTrabajo: "HOSPITAL",
-    imagen: "CLARSSON.JPG",
+    imagen: "CLARSSON.jpg",
     imagenAlt: "Interpretación visual de Lars Clarsson",
     descripcionCorta:
       "Responsable del Hospital de ALÉTHEIA.",
@@ -271,7 +271,7 @@ window.personajes = [
     nacionalidad: "Ucrania",
     ciudadNacimiento: "Kiev",
     moduloTrabajo: "CONTROL",
-    imagen: "ANNA.JPG",
+    imagen: "ANNA.jpg",
     imagenAlt: "Interpretación visual de Anna Kovalenco",
     descripcionCorta:
       "Representante de la Agencia Espacial en ALÉTHEIA.",
@@ -291,7 +291,7 @@ window.personajes = [
     nacionalidad: "Estados Unidos",
     ciudadNacimiento: "Nueva York",
     moduloTrabajo: "CONTROL",
-    imagen: "AUDREY.JPG",
+    imagen: "AUDREY.jpg",
     imagenAlt: "Interpretación visual de Audrey Johnson",
     descripcionCorta:
       "Piloto de operaciones espaciales.",
@@ -311,7 +311,7 @@ window.personajes = [
     nacionalidad: "Francia",
     ciudadNacimiento: "Millau",
     moduloTrabajo: "GRANJA",
-    imagen: "JEANPIERRE.JPG",
+    imagen: "JEANPIERRE.jpg",
     imagenAlt: "Interpretación visual de Jean-Pierre Bernard",
     descripcionCorta:
       "Responsable de los ecosistemas de ALÉTHEIA.",
@@ -331,7 +331,7 @@ window.personajes = [
     nacionalidad: "Italia",
     ciudadNacimiento: "Trento",
     moduloTrabajo: "SEC",
-    imagen: "GIULIA.JPG",
+    imagen: "GIULIA.jpg",
     imagenAlt: "Interpretación visual de Giulia Bellini",
     descripcionCorta:
       "Una de las integrantes más valiosas del departamento de Seguridad.",
@@ -351,7 +351,7 @@ window.personajes = [
     nacionalidad: "India",
     ciudadNacimiento: "Bengaluru",
     moduloTrabajo: "PROMETEO",
-    imagen: "KAMAL.JPG",
+    imagen: "KAMAL.jpg",
     imagenAlt: "Interpretación visual de Kamal Nair",
     descripcionCorta:
       "Responsable de PROMETEO y uno de sus principales diseñadores.",
@@ -371,7 +371,7 @@ window.personajes = [
     nacionalidad: "España",
     ciudadNacimiento: "Alicante",
     moduloTrabajo: "LAB-02",
-    imagen: "EDGAR.JPG",
+    imagen: "EDGAR.jpg",
     imagenAlt: "Interpretación visual de Edgar Sánchez",
     descripcionCorta:
       "Brillante especialista en telecomunicaciones y responsable del sistema de comunicaciones de ALÉTHEIA.",
@@ -391,7 +391,7 @@ window.personajes = [
     nacionalidad: "India",
     ciudadNacimiento: "Hyderabad",
     moduloTrabajo: "LAB-01",
-    imagen: "RAHA.JPG",
+    imagen: "RAHA.jpg",
     imagenAlt: "Interpretación visual de Raha Nair",
     descripcionCorta:
       "Especialista en el estudio de tecnología y artefactos extraterrestres.",
@@ -411,7 +411,7 @@ window.personajes = [
     nacionalidad: "Ucrania",
     ciudadNacimiento: "Kiev",
     moduloTrabajo: "THALARA-01",
-    imagen: "AGATHA.JPG",
+    imagen: "AGATHA.jpg",
     imagenAlt: "Interpretación visual de Agatha Kovalenko",
     descripcionCorta:
       "Científica especializada en investigación planetaria y responsable de la Base Thalara-01.",
@@ -431,7 +431,7 @@ window.personajes = [
     nacionalidad: "Ucrania",
     ciudadNacimiento: "Kiev",
     moduloTrabajo: "No aplica",
-    imagen: "FRANCIS.JPG",
+    imagen: "FRANCIS.jpg",
     imagenAlt: "Interpretación visual de Francis Kovalenko",
     descripcionCorta:
       "Hijo de Agatha Kovalenko.",
@@ -451,7 +451,7 @@ window.personajes = [
     nacionalidad: "Reino Unido",
     ciudadNacimiento: "Cambridge",
     moduloTrabajo: "LAB-03",
-    imagen: "PHILLIPS.JPG",
+    imagen: "PHILLIPS.jpg",
     imagenAlt: "Interpretación visual de Elliot Phillips",
     descripcionCorta:
       "Botánico especializado en el estudio de flora extraterrestre.",
@@ -471,7 +471,7 @@ window.personajes = [
     nacionalidad: "España",
     ciudadNacimiento: "Salamanca",
     moduloTrabajo: "LAB-01",
-    imagen: "LIDIA.JPG",
+    imagen: "LIDIA.jpg",
     imagenAlt: "Interpretación visual de Lidia Serrano",
     descripcionCorta:
       "Especialista en lingüística y profesora de idiomas de ALÉTHEIA.",
@@ -491,7 +491,7 @@ window.personajes = [
     nacionalidad: "Thalariana",
     ciudadNacimiento: "Cráter UNO de Thalara",
     moduloTrabajo: "SEC",
-    imagen: "OSCAR2.JPG",
+    imagen: "OSCAR2.jpg",
     imagenAlt: "Interpretación visual de Óscar",
     descripcionCorta:
       "Una de las primeras thalarianas en convivir con la tripulación de ALÉTHEIA.",
@@ -511,7 +511,7 @@ window.personajes = [
     nacionalidad: "Bélgica",
     ciudadNacimiento: "Namur",
     moduloTrabajo: "LAB-03",
-    imagen: "ANDRE.JPG",
+    imagen: "ANDRE.jpg",
     imagenAlt: "Interpretación visual de André Leblanc",
     descripcionCorta:
       "Especialista en genética y uno de los científicos más brillantes de ALÉTHEIA.",
@@ -531,7 +531,7 @@ window.personajes = [
     nacionalidad: "Alemania",
     ciudadNacimiento: "Múnich",
     moduloTrabajo: "COCINA",
-    imagen: "THOMAS.JPG",
+    imagen: "THOMAS.jpg",
     imagenAlt: "Interpretación visual de Thomas Müller",
     descripcionCorta:
       "Responsable de la restauración y del funcionamiento de la cocina principal de ALÉTHEIA.",
@@ -551,7 +551,7 @@ window.personajes = [
     nacionalidad: "Italia",
     ciudadNacimiento: "Nápoles",
     moduloTrabajo: "HOME-05",
-    imagen: "ANGELO.JPG",
+    imagen: "ANGELO.jpg",
     imagenAlt: "Interpretación visual de Angelo D'Maggio",
     descripcionCorta:
       "Propietario de una de las pizzerías más populares de ALÉTHEIA y padre de Alya D'Maggio.",
@@ -571,7 +571,7 @@ window.personajes = [
     nacionalidad: "Corea del Sur",
     ciudadNacimiento: "Busan",
     moduloTrabajo: "THALARA-01",
-    imagen: "MAE.JPG",
+    imagen: "MAE.jpg",
     imagenAlt: "Interpretación visual de la doctora Mae Kim",
     descripcionCorta:
       "Médica destinada a la base Thalara-01.",
@@ -591,7 +591,7 @@ window.personajes = [
     nacionalidad: "Finlandia",
     ciudadNacimiento: "Oulu",
     moduloTrabajo: "OBSERVATORIO",
-    imagen: "MIKAEL.JPG",
+    imagen: "MIKAEL.jpg",
     imagenAlt: "Interpretación visual de Mikael Korhonen",
     descripcionCorta:
       "Astrofísico del Observatorio Astronómico de ALÉTHEIA.",
@@ -611,7 +611,7 @@ window.personajes = [
     nacionalidad: "Japón",
     ciudadNacimiento: "Nagano",
     moduloTrabajo: "SEC",
-    imagen: "AKAMA.JPG",
+    imagen: "AKAMA.jpg",
     imagenAlt: "Interpretación visual de Akama Takahashi",
     descripcionCorta:
       "Sargento del departamento de Seguridad especializado en rescate de montaña.",
@@ -631,7 +631,7 @@ window.personajes = [
     nacionalidad: "Suiza",
     ciudadNacimiento: "Lausana",
     moduloTrabajo: "COCINA",
-    imagen: "ADELE.JPG",
+    imagen: "ADELE.jpg",
     imagenAlt: "Interpretación visual de Adèle Durand",
     descripcionCorta:
       "Panadera de ALÉTHEIA y responsable de una de las panaderías más apreciadas de la nave.",
@@ -651,7 +651,7 @@ window.personajes = [
     nacionalidad: "Rusia",
     ciudadNacimiento: "San Petersburgo",
     moduloTrabajo: "HERMES",
-    imagen: "ALEXEY.JPG",
+    imagen: "ALEXEY.jpg",
     imagenAlt: "Interpretación visual de Alexey Petrov",
     descripcionCorta:
       "Veterano piloto y comandante de la nave HERMES.",
@@ -671,7 +671,7 @@ window.personajes = [
     nacionalidad: "Etiopía",
     ciudadNacimiento: "Adís Abeba",
     moduloTrabajo: "SEC",
-    imagen: "DAWIT.JPG",
+    imagen: "DAWIT.jpg",
     imagenAlt: "Interpretación visual de Dawit Tesfaye",
     descripcionCorta:
       "Especialista de SEC en incendios, rescates industriales y materiales peligrosos.",
@@ -691,7 +691,7 @@ window.personajes = [
     nacionalidad: "Italia",
     ciudadNacimiento: "Nápoles",
     moduloTrabajo: "HOSPITAL",
-    imagen: "ADELINA.JPG",
+    imagen: "ADELINA.jpg",
     imagenAlt: "Interpretación visual de Adelina D'Maggio",
     descripcionCorta:
       "Enfermera del Hospital de ALÉTHEIA y esposa de Angelo D'Maggio.",
@@ -711,7 +711,7 @@ window.personajes = [
     nacionalidad: "Corea del Sur",
     ciudadNacimiento: "Busan",
     moduloTrabajo: "HOSPITAL",
-    imagen: "YOON.JPG",
+    imagen: "YOON.jpg",
     imagenAlt: "Interpretación visual de la doctora Ji-eun Yoon",
     descripcionCorta:
       "Médica del Hospital de ALÉTHEIA, deportista y practicante de judo.",
@@ -733,7 +733,7 @@ window.personajes = [
     nacionalidad: "España",
     ciudadNacimiento: "Sevilla",
     moduloTrabajo: "CONTROL",
-    imagen: "JONAS.JPG",
+    imagen: "JONAS.jpg",
     imagenAlt: "Interpretación visual de Jonás Rivas",
     descripcionCorta:
       "Veterano periodista encargado de los programas de divulgación de ALÉTHEIA.",
@@ -755,7 +755,7 @@ window.personajes = [
     nacionalidad: "Noruega",
     ciudadNacimiento: "Tromsø",
     moduloTrabajo: "THALARA-1",
-    imagen: "EMMA.JPG",
+    imagen: "EMMA.jpg",
     imagenAlt: "Interpretación visual de Emma Solberg",
     descripcionCorta:
       "Especialista en geobotánica y colonización de ecosistemas.",
