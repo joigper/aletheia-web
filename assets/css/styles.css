@@ -1,0 +1,27 @@
+html, body {
+  background-color: #05070a;
+}
+
+.aletheia-details {
+  width: 100%;
+}
+
+.aletheia-details__panel {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: left;
+  line-height: 1.6;
+  background: rgba(4, 10, 18, 0.78);
+  border: 1px solid rgba(110, 190, 220, 0.25);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.detalle-imagen {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
