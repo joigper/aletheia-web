@@ -135,11 +135,45 @@
   display: none;
 }
 
+/* ==================================================   ACCIONES DE LA FICHA   ================================================== */
+
+.ficha-modulo__acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ficha-modulo__mas-imagenes {
+  padding: 7px 14px;
+  border: 1px solid rgba(111, 214, 255, 0.38);
+  border-radius: 8px;
+  background: rgba(12, 17, 24, 0.88);
+  color: #d5dbe2;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.ficha-modulo__mas-imagenes:hover {
+  color: #ffffff;
+  border-color: rgba(111, 214, 255, 0.75);
+}
+
+.ficha-modulo__mas-imagenes[hidden] {
+  display: none;
+}
+
 /* ==================================================   IMAGEN DE LA FICHA   ================================================== */
 
 .ficha-modulo__imagen-wrap {
   width: min(100%, 470px);
   min-width: 0;
+  flex-shrink: 0;
   aspect-ratio: 16 / 10;
   margin: 18px auto 22px;
   overflow: hidden;
@@ -351,7 +385,7 @@
     max-width: none;
     min-height: 0;
     aspect-ratio: 16 / 10;
-    margin: 34px auto 18px;
+    margin: 8px auto 18px;
   }
 }
 
@@ -377,23 +411,29 @@
 
 @media (max-width: 575.98px) {
   .ficha-modulo__cerrar {
-    position: absolute;
-    top: 8px;
-    right: 10px;
-    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    padding: 0;
+    min-width: 82px;
+    min-height: 44px;
+    padding: 0 14px;
     border: 1px solid rgba(111, 214, 255, 0.38);
-    border-radius: 50%;
-    background: rgba(12, 17, 24, 0.85);
+    border-radius: 8px;
+    background: rgba(12, 17, 24, 0.88);
     color: #d5dbe2;
-    font-size: 1.5rem;
-    line-height: 1;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__cerrar:hover {
+    color: #ffffff;
+    border-color: rgba(111, 214, 255, 0.75);
   }
 }
 

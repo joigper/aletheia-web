@@ -642,14 +642,26 @@
 
 </div>
                 <div class="col col-lg-5 explorar-ficha-col"><aside id="ficha-modulo" class="ficha-modulo ficha-modulo--oculta">
-    <button
-        type="button"
-        id="cerrar-ficha-modulo"
-        class="ficha-modulo__cerrar"
-        aria-label="Cerrar ficha"
-    >
-        ×
-    </button>
+
+    <div class="ficha-modulo__acciones">
+        <button
+            type="button"
+            id="modulo-mas-imagenes"
+            class="ficha-modulo__mas-imagenes"
+            hidden
+        >
+            Más imágenes
+        </button>
+
+        <button
+            type="button"
+            id="cerrar-ficha-modulo"
+            class="ficha-modulo__cerrar"
+            aria-label="Cerrar ficha"
+        >
+            CERRAR
+        </button>
+    </div>
 
     <div class="ficha-modulo__imagen-wrap">
         <img
@@ -673,15 +685,8 @@
             id="modulo-descripcion"
             class="ficha-modulo__descripcion"
         ></p>
-        <button
-    type="button"
-    id="modulo-mas-imagenes"
-    class="ficha-modulo__mas-imagenes"
-    hidden
->
-    Más imágenes
-</button>
     </div>
+
 </aside></div>
             </div>
         </section>
