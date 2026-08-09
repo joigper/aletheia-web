@@ -281,9 +281,16 @@ L1_017: {
         L1_078: {
     nombre: "INDUSTRIAL",
     area: "Industria y procesamiento de recursos",
-    imagen: "assets/img/INDUSTRIAL01.jpg",
-    imagenAlt:
-        "Interpretación visual del módulo INDUSTRIAL",
+    imagenes: [
+    {
+        src: "assets/img/INDUSTRIAL01.jpg",
+        alt: "Interpretación visual del módulo INDUSTRIAL"
+    },
+    {
+        src: "assets/img/INDUSTRIAL02.jpg",
+        alt: "Interpretación visual del módulo INDUSTRIAL"
+    },
+],
     descripcion:
         "Gran complejo industrial de ALÉTHEIA formado por dos módulos fusionados. Sus instalaciones están destinadas al procesamiento de minerales y materias primas, así como a la fabricación, reparación y montaje de componentes y equipos para la nave. Dispone de grandes talleres, maquinaria pesada y sistemas especializados de transformación y reciclaje de materiales. Un hangar de carga propio permite a las lanzaderas mineras descargar directamente los recursos obtenidos durante las operaciones de extracción, reduciendo su transporte por otras zonas de ALÉTHEIA."
 },
@@ -299,9 +306,16 @@ L1_017: {
         L1_030: {
     nombre: "HOME-03",
     area: "España",
-    imagen: "assets/img/HOME-03 España.jpg",
-    imagenAlt:
-        "Plaza principal del módulo HOME-03",
+    imagenes: [
+    {
+        src: "assets/img/HOME-03 España.jpg",
+        alt: "Plaza principal del módulo HOME-03"
+    },
+    {
+        src: "assets/img/HOME0302.jpg",
+        alt: "Pasillo del módulo HOME-03"
+    },
+],
     descripcion:
         "HOME-03 recrea la atmósfera de una localidad española para ofrecer a sus habitantes un entorno familiar lejos de la Tierra. Tras la cubierta de acceso, común a todos los módulos HOME, la segunda cubierta se organiza en torno a una plaza inspirada en la arquitectura tradicional española, rodeada de comercios, cafeterías, pequeños restaurantes y espacios de encuentro. Entre ellos destaca el Bar Ramón, uno de los establecimientos más populares de ALÉTHEIA y lugar habitual del capitán durante sus escasos momentos de descanso. A partir de las cubiertas superiores, el módulo adopta una distribución residencial más funcional, similar a la del resto de zonas habitables de la nave."
 },
@@ -396,9 +410,20 @@ L1_061: {
         L1_055: {
     nombre: "HOSPITAL",
     area: "Medicina, investigación y formación",
-    imagen: "assets/img/HOSPITAL.jpg",
-    imagenAlt:
-        "Complejo Hospitalario de ALÉTHEIA",
+    imagenes: [ 
+    {
+        src: "assets/img/HOSPITAL.jpg",
+        alt: "Complejo Hospitalario de ALÉTHEIA"
+    },
+    {
+        src: "assets/img/HOSPITAL02.jpg",
+        alt: "Complejo Hospitalario de ALÉTHEIA"
+    },
+    {
+        src: "assets/img/HOSPITAL03.jpg",
+        alt: "Complejo Hospitalario de ALÉTHEIA"
+    },
+],
     descripcion:
         "El Hospital de ALÉTHEIA ocupa cuatro módulos interconectados que constituyen el único complejo sanitario de la nave. Diseñado para atender a una población de más de quince mil habitantes durante décadas de aislamiento interestelar, reúne todas las especialidades médicas, quirófanos, unidades de cuidados intensivos, laboratorios de investigación, diagnóstico por imagen, rehabilitación, docencia y producción farmacéutica. Más que un hospital convencional, es un centro asistencial, científico y docente concebido para garantizar la salud de generaciones enteras nacidas durante la misión. Bajo la dirección del doctor Lars Clarsson, combina la tecnología médica más avanzada con una atención cercana y profundamente humana, convirtiéndose en uno de los pilares esenciales para la supervivencia y el bienestar de ALÉTHEIA."
 },
@@ -596,19 +621,33 @@ L1_019: {
 L1_031: {
     nombre: "HOME-02",
     area: "China",
-    imagen: "assets/img/HOME02.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-02",
-    descripcion:
+    imagenes: [
+    {
+        src: "assets/img/HOME02.jpg",
+        alt: "Zona residencial de HOME-02"
+    },
+    {
+        src: "assets/img/HOME0202.jpg",
+        alt: "Zona residencial de HOME-02"
+    },
+],
+   descripcion:
         "HOME-02 recrea distintos elementos de la cultura y la arquitectura tradicional china. Como en el resto de módulos HOME, las zonas comunes y comerciales se concentran en las cubiertas inferiores, mientras que las superiores albergan las áreas residenciales."
 },
 
 L1_029: {
     nombre: "HOME-04",
     area: "India",
-    imagen: "assets/img/HOME04.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-04",
+    imagenes: [
+    {
+        src: "assets/img/HOME04.jpg",
+        alt: "Zona residencial de HOME-04"
+    },
+    {
+        src: "assets/img/HOME0402.jpg",
+        alt: "Zona residencial de HOME-04"
+    },
+],
     descripcion:
         "HOME-04 reúne referencias culturales de distintas regiones de la India en sus plazas, comercios y espacios de restauración. El módulo busca conservar parte de la enorme diversidad cultural del país dentro de la vida cotidiana de ALÉTHEIA."
 },
@@ -616,9 +655,16 @@ L1_029: {
 L1_028: {
     nombre: "HOME-05",
     area: "Italia",
-    imagen: "assets/img/HOME05.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-05",
+    imagenes: [
+    {
+        src: "assets/img/HOME05.jpg",
+        alt: "Zona residencial de HOME-05"
+    },
+    {
+        src: "assets/img/HOME0502.jpg",
+        alt: "Zona residencial de HOME-05"
+    },
+],
     descripcion:
         "HOME-05 está inspirado en diferentes regiones de Italia. Una de sus zonas más características es la Plaza Toscana, presidida por una fuente y rodeada de pequeños establecimientos. Entre sus locales se encuentra la conocida Pizzería D'Maggio."
 },
@@ -626,9 +672,16 @@ L1_028: {
 L1_027: {
     nombre: "HOME-06",
     area: "Eslavo oriental",
-    imagen: "assets/img/HOME06.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-06",
+    imagenes: [
+    {
+        src: "assets/img/HOME06.jpg",
+        alt: "Zona residencial de HOME-06"
+    },
+    {
+        src: "assets/img/HOME0602.jpg",
+        alt: "Zona residencial de HOME-06"
+    },
+],
     descripcion:
         "HOME-06 reúne referencias de las culturas eslavas orientales en un entorno concebido para resultar familiar a sus habitantes. Sus espacios públicos combinan arquitectura, gastronomía y elementos tradicionales procedentes de distintas regiones."
 },
@@ -636,9 +689,16 @@ L1_027: {
 L1_026: {
     nombre: "HOME-07",
     area: "Estados Unidos",
-    imagen: "assets/img/HOME07.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-07",
+    imagenes: [
+    {
+        src: "assets/img/HOME07.jpg",
+        alt: "Zona residencial de HOME-07"
+    },
+    {
+        src: "assets/img/HOME0702.jpg",
+        alt: "Zona residencial de HOME-07"
+    },
+],
     descripcion:
         "HOME-07 está dedicado a la cultura estadounidense. Sus espacios comunes reinterpretan distintos ambientes urbanos y residenciales del país, integrando comercios, restauración y zonas de reunión dentro de la estructura del módulo."
 },
@@ -646,9 +706,16 @@ L1_026: {
 L1_025: {
     nombre: "HOME-08",
     area: "Francia",
-    imagen: "assets/img/HOME08.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-08",
+    imagenes: [
+    {
+        src: "assets/img/HOME08.jpg",
+        alt: "Zona residencial de HOME-08"
+    },
+    {
+        src: "assets/img/HOME0802.jpg",
+        alt: "Zona residencial de HOME-08"
+    },
+],
     descripcion:
         "HOME-08 recrea diferentes ambientes de la cultura francesa. Cafeterías, pequeños comercios y espacios públicos ocupan sus primeras cubiertas, concebidas no solo como zonas de servicio, sino también como lugares de convivencia."
 },
@@ -656,9 +723,16 @@ L1_025: {
 L1_024: {
     nombre: "HOME-09",
     area: "México y Centroamérica",
-    imagen: "assets/img/HOME09.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-09",
+    imagenes: [
+    {
+        src: "assets/img/HOME09.jpg",
+        alt: "Zona residencial de HOME-09"
+    },
+    {
+        src: "assets/img/HOME0902.jpg",
+        alt: "Zona residencial de HOME-09"
+    },
+],
     descripcion:
         "HOME-09 reúne referencias culturales de México y distintos países de Centroamérica. Sus zonas comunes utilizan la arquitectura, el color, la vegetación y la gastronomía para conservar parte de la identidad de estas regiones lejos de la Tierra."
 },
@@ -666,9 +740,16 @@ L1_024: {
 L1_023: {
     nombre: "HOME-10",
     area: "Sudamérica",
-    imagen: "assets/img/HOME10.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-10",
+    imagenes: [
+    {
+        src: "assets/img/HOME10.jpg",
+        alt: "Zona residencial de HOME-10"
+    },
+    {
+        src: "assets/img/HOME1002.jpg",
+        alt: "Zona residencial de HOME-10"
+    },
+],
     descripcion:
         "HOME-10 está dedicado a las culturas sudamericanas. En lugar de representar un único país, sus espacios comunes reúnen referencias de distintas regiones del continente a través de la arquitectura, la vegetación, la gastronomía y otros elementos culturales, creando uno de los entornos más diversos del área residencial."
 },
@@ -676,9 +757,16 @@ L1_023: {
 L1_022: {
     nombre: "HOME-11",
     area: "África",
-    imagen: "assets/img/HOME11.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-11",
+    imagenes: [
+    {
+        src: "assets/img/HOME11.jpg",
+        alt: "Zona residencial de HOME-11"
+    },
+    {
+        src: "assets/img/HOME1102.jpg",
+        alt: "Zona residencial de HOME-11"
+    },
+],
     descripcion:
         "HOME-11 reúne referencias de diferentes culturas africanas. Sus espacios públicos incluyen construcciones circulares ricamente ornamentadas y zonas de encuentro inspiradas en diferentes tradiciones arquitectónicas del continente."
 },
@@ -686,9 +774,16 @@ L1_022: {
 L1_021: {
     nombre: "HOME-12",
     area: "Mundo árabe",
-    imagen: "assets/img/HOME12.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-12",
+    imagenes: [
+    {
+        src: "assets/img/HOME12.jpg",
+        alt: "Zona residencial de HOME-12"
+    },
+    {
+        src: "assets/img/HOME1202.jpg",
+        alt: "Zona residencial de HOME-12"
+    },
+],
     descripcion:
         "HOME-12 reúne referencias arquitectónicas y culturales procedentes de diferentes regiones del mundo árabe. Patios, comercios y espacios de reunión conforman un entorno común que refleja la diversidad de sus habitantes."
 },
@@ -696,9 +791,16 @@ L1_021: {
 L1_020: {
     nombre: "HOME-13",
     area: "Corea",
-    imagen: "assets/img/HOME13.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-13",
+    imagenes: [
+    {
+        src: "assets/img/HOME13.jpg",
+        alt: "Zona residencial de HOME-13"
+    },
+    {
+        src: "assets/img/HOME1302.jpg",
+        alt: "Zona residencial de HOME-13"
+    },
+],
     descripcion:
         "HOME-13 está dedicado a la cultura coreana. Como todos los módulos residenciales, se comunica directamente con los HOME contiguos, permitiendo desplazarse entre ellos sin necesidad de regresar a los corredores principales de la cubierta 1."
 },
@@ -706,9 +808,16 @@ L1_020: {
 L1_037: {
     nombre: "HOME-14",
     area: "Nórdico",
-    imagen: "assets/img/HOME14.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-14",
+    imagenes: [
+    {
+        src: "assets/img/HOME14.jpg",
+        alt: "Zona residencial de HOME-14"
+    },
+    {
+        src: "assets/img/HOME1402.jpg",
+        alt: "Zona residencial de HOME-14"
+    },
+],
     descripcion:
         "HOME-14 reúne referencias de las culturas nórdicas. Sus zonas comunes, caracterizadas por casas de madera de colores y espacios abiertos, ofrecen una interpretación de los pequeños núcleos urbanos del norte de Europa."
 },
@@ -716,9 +825,16 @@ L1_037: {
 L1_036: {
     nombre: "HOME-15",
     area: "Europa Central",
-    imagen: "assets/img/HOME15.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-15",
+    imagenes: [
+    {
+        src: "assets/img/HOME15.jpg",
+        alt: "Zona residencial de HOME-15"
+    },
+    {
+        src: "assets/img/HOME1502.jpg",
+        alt: "Zona residencial de HOME-15"
+    },
+],
     descripcion:
         "HOME-15 reúne principalmente referencias de Alemania, Austria, Suiza y otras regiones de Europa Central. La ubicación de los módulos HOME en el tercer anillo los mantiene alejados de las instalaciones más ruidosas y de mayor actividad industrial de ALÉTHEIA."
 },
@@ -726,9 +842,16 @@ L1_036: {
 L1_035: {
     nombre: "HOME-16",
     area: "Británico e irlandés",
-    imagen: "assets/img/HOME16.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-16",
+    imagenes: [
+    {
+        src: "assets/img/HOME16.jpg",
+        alt: "Zona residencial de HOME-16"
+    },
+    {
+        src: "assets/img/HOME1602.jpg",
+        alt: "Zona residencial de HOME-16"
+    },
+],
     descripcion:
         "HOME-16 reúne referencias culturales de Gran Bretaña e Irlanda. La iluminación y climatización de todos los HOME siguen un ciclo de día y noche; durante las horas nocturnas disminuyen la luz y la temperatura y se reducen las operaciones no esenciales."
 },
@@ -736,9 +859,16 @@ L1_035: {
 L1_034: {
     nombre: "HOME-17",
     area: "Sudeste asiático",
-    imagen: "assets/img/HOME17.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-17",
+    imagenes: [
+    {
+        src: "assets/img/HOME17.jpg",
+        alt: "Zona residencial de HOME-17"
+    },
+    {
+        src: "assets/img/HOME1702.jpg",
+        alt: "Zona residencial de HOME-17"
+    },
+],
     descripcion:
         "HOME-17 reúne referencias culturales de diferentes regiones del Sudeste Asiático. Su diseño combina vegetación, zonas comerciales y espacios comunitarios, adaptando elementos tradicionales a las limitaciones de un entorno completamente artificial."
 },
@@ -746,9 +876,16 @@ L1_034: {
 L1_033: {
     nombre: "HOME-18",
     area: "Oceanía y Pacífico",
-    imagen: "assets/img/HOME18.jpg",
-    imagenAlt:
-        "Zona residencial de HOME-18",
+    imagenes: [
+    {
+        src: "assets/img/HOME18.jpg",
+        alt: "Zona residencial de HOME-18"
+    },
+    {
+        src: "assets/img/HOME1802.jpg",
+        alt: "Zona residencial de HOME-18"
+    },
+],
     descripcion:
         "HOME-18 reúne referencias culturales de Australia, Nueva Zelanda y diferentes pueblos del Pacífico. Como medida de emergencia, la cubierta superior de cada módulo HOME dispone de alojamientos colectivos con literas capaces de aumentar temporalmente la capacidad residencial de ALÉTHEIA."
 },        
