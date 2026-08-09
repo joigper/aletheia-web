@@ -353,9 +353,24 @@ L1_017: {
         L1_074: {
     nombre: "SPORT",
     area: "Deporte y actividad física",
-    imagen: "assets/img/SPORT.jpg",
-    imagenAlt:
-        "Interpretación visual del complejo deportivo SPORT",
+    imagenes: [
+    {
+        src: "assets/img/SPORT.jpg",
+        alt: "Interpretación visual del complejo deportivo SPORT"
+    },
+    {
+        src: "assets/img/SPORT02.jpg",
+        alt: "Interpretación visual del complejo deportivo SPORT"
+    },
+    {
+        src: "assets/img/SPORT03.jpg",
+        alt: "Interpretación visual del complejo deportivo SPORT"
+    },
+    {
+        src: "assets/img/SPORT04.jpg",
+        alt: "Interpretación visual del complejo deportivo SPORT"
+    },
+],
     descripcion:
         "Gran complejo deportivo de ALÉTHEIA, formado por cuatro módulos interconectados. Sus instalaciones reúnen gimnasios, salas para actividades dirigidas, pistas deportivas y numerosos espacios destinados al entrenamiento, la competición y el ejercicio cotidiano de la tripulación. SPORT constituye el principal centro de actividad física de la nave y ofrece instalaciones adaptadas tanto a la práctica individual como a los deportes de equipo."
 },
