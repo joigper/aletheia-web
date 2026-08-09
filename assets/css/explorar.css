@@ -239,9 +239,28 @@
 
 /* ==================================================   MÓVIL   ================================================== */
 
+/* ==================================================   MÓVIL   ================================================== */
+
+/* El contenido aprovecha prácticamente todo el ancho */
+
 @media (max-width: 575.98px) {
-  section .row {
-    width: 96%;
+  .explorar-contenedor {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor section .row {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------     ESTADO INICIAL: MAPA     -------------------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .selector-nivel {
+    margin-bottom: 8px;
   }
 }
 
@@ -252,21 +271,136 @@
 }
 
 @media (max-width: 575.98px) {
-  .ficha-modulo {
-    min-height: 0;
-    padding: 15px;
+  .explorar-mapa-col {
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+/* * En móvil queremos el mapa grande, no una miniatura   * reducida al ancho de pantalla. */
+
+@media (max-width: 575.98px) {
+  #mapa-aletheia {
+    width: 100%;
+    height: calc(100vh - 190px);
+    min-height: 500px;
+    max-height: none;
+    overflow: hidden;
   }
 }
 
 @media (max-width: 575.98px) {
-  .ficha-modulo__imagen-wrap, .ficha-modulo__imagen {
-    min-height: 230px;
+  #mapa-aletheia svg {
+    width: auto;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+  }
+}
+
+/* * La ficha permanece oculta mientras estamos   * explorando el mapa. */
+
+@media (max-width: 575.98px) {
+  .explorar-ficha-col {
+    display: none;
+    width: 100%;
+    margin-top: 0;
+    padding: 0;
+  }
+}
+
+/* --------------------------------------------------     ESTADO FICHA ABIERTA     Esta clase la activará explorar.js     -------------------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor.modo-ficha-movil .selector-nivel {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor.modo-ficha-movil .explorar-mapa-col {
+    display: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor.modo-ficha-movil .explorar-ficha-col {
+    display: flex;
+  }
+}
+
+/* --------------------------------------------------     FICHA MÓVIL     -------------------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .ficha-modulo {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    min-height: 0;
+    margin: 0;
+    padding: 16px;
+    overflow: visible;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__imagen-wrap {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
+    margin: 34px auto 18px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__imagen {
+    min-height: 0;
   }
 }
 
 @media (max-width: 575.98px) {
   .ficha-modulo__contenido {
-    padding: 4px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__nombre {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+}
+
+/* * En escritorio sigue oculto.   * En móvil recuperamos el botón que ya existe en HTML. */
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__cerrar {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(111, 214, 255, 0.38);
+    border-radius: 50%;
+    background: rgba(12, 17, 24, 0.85);
+    color: #d5dbe2;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ficha-modulo__cerrar:hover {
+    color: #ffffff;
+    border-color: rgba(111, 214, 255, 0.75);
   }
 }
 

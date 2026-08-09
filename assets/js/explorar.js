@@ -17,6 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const botonNivel1 = document.getElementById("mostrar-nivel-1");
     const botonNivel2 = document.getElementById("mostrar-nivel-2");
+    const explorarContenedor = document.querySelector(
+    ".explorar-contenedor"
+);
+
+const botonCerrarFicha = document.getElementById(
+    "cerrar-ficha-modulo"
+);
 
     if (!svg) {
         console.error("No se encontró el mapa SVG.");
@@ -809,6 +816,19 @@ L1_033: {
             datos,
             "Módulo seleccionado"
         );
+        if (
+    explorarContenedor &&
+    window.matchMedia("(max-width: 575.98px)").matches
+) {
+    explorarContenedor.classList.add(
+        "modo-ficha-movil"
+    );
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
     }
 
     function actualizarBotones(esNivel1) {
@@ -888,6 +908,18 @@ if (botonMasImagenes) {
     botonNivel2.addEventListener("click", () => {
         mostrarNivel(2);
     });
+    if (botonCerrarFicha && explorarContenedor) {
+    botonCerrarFicha.addEventListener("click", () => {
+        explorarContenedor.classList.remove(
+            "modo-ficha-movil"
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+}
 
     svg.setAttribute(
         "preserveAspectRatio",
