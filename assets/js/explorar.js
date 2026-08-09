@@ -81,6 +81,111 @@ const botonCerrarFicha = document.getElementById(
     };
 
     const datosModulos = {
+        L2_001: {
+            nombre: "NEXUS-02",
+            area: "Propulsión y navegación",
+            imagen: "assets/img/NEXUS02.jpg",
+            imagenAlt:
+                "Interpretación visual del módulo NEXUS",
+            descripcion:
+                "Segundo motor gravitatorio de ALÉTHEIA. Su principal función es proporcionar redundancia y permitir la alternancia entre ambos sistemas, de manera que uno pueda enfriarse o permanecer en mantenimiento mientras el otro mantiene la propulsión. El funcionamiento coordinado de los dos NEXUS permite además generar configuraciones gravitatorias más complejas, mejorando considerablemente la capacidad de maniobra. En situaciones excepcionales, ambos pueden trabajar simultáneamente para distribuir enormes cantidades de energía."
+        },
+        L2_002: {
+    nombre: "MÓDULO DE RESERVA",
+    area: "Reserva estructural",
+    imagen: "assets/img/MODULO-VACIO.jpg",
+    imagenAlt:
+        "Interior de un módulo vacío de ALÉTHEIA",
+    descripcion:
+        "Módulo sin asignación, reservado para futuras necesidades de la misión."
+},
+
+L2_004: {
+    nombre: "MÓDULO DE RESERVA",
+    area: "Reserva estructural",
+    imagen: "assets/img/MODULO-VACIO.jpg",
+    imagenAlt:
+        "Interior de un módulo vacío de ALÉTHEIA",
+    descripcion:
+        "Módulo sin asignación, reservado para futuras necesidades de la misión."
+},
+L2_018: {
+    nombre: "HOME-19",
+    area: "Residencial",
+    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagenAlt:
+        "Interpretación visual de un módulo HOME del Nivel 2",
+    descripcion:
+        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+},
+        L2_008: {
+    nombre: "ALMACÉN 04",
+    area: "Logística y mantenimiento",
+    imagen: "assets/img/ALMACEN04.jpg",
+    imagenAlt:
+        "Interpretación visual del almacén de componentes para lanzaderas",
+    descripcion:
+        "Almacén técnico situado junto al astillero, especializado en componentes y repuestos para lanzaderas. Conserva estructuras completas, motores gravitatorios embalados, sistemas de control, paneles y piezas de recambio suficientes para ensamblar hasta una decena de lanzaderas completas en caso necesario."
+},
+
+L2_017: {
+    nombre: "HOME-20",
+    area: "Residencial",
+    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagenAlt:
+        "Interpretación visual de un módulo HOME del Nivel 2",
+    descripcion:
+        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+},
+
+L2_016: {
+    nombre: "HOME-21",
+    area: "Residencial",
+    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagenAlt:
+        "Interpretación visual de un módulo HOME del Nivel 2",
+    descripcion:
+        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+},
+
+L2_015: {
+    nombre: "HOME-22",
+    area: "Residencial",
+    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagenAlt:
+        "Interpretación visual de un módulo HOME del Nivel 2",
+    descripcion:
+        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+},
+
+L2_014: {
+    nombre: "HOME-23",
+    area: "Residencial",
+    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagenAlt:
+        "Interpretación visual de un módulo HOME del Nivel 2",
+    descripcion:
+        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+},
+L2_005: {
+    nombre: "MÓDULO DE RESERVA",
+    area: "Reserva estructural",
+    imagen: "assets/img/MODULO-VACIO.jpg",
+    imagenAlt:
+        "Interior de un módulo vacío de ALÉTHEIA",
+    descripcion:
+        "Módulo sin asignación, reservado para futuras necesidades de la misión."
+},
+
+L2_007: {
+    nombre: "MÓDULO DE RESERVA",
+    area: "Reserva estructural",
+    imagen: "assets/img/MODULO-VACIO.jpg",
+    imagenAlt:
+        "Interior de un módulo vacío de ALÉTHEIA",
+    descripcion:
+        "Módulo sin asignación, reservado para futuras necesidades de la misión."
+},    
         L1_001: {
             nombre: "NEXUS",
             area: "Propulsión y navegación",
@@ -100,6 +205,43 @@ const botonCerrarFicha = document.getElementById(
            descripcion:
                 "Uno de los ocho reactores de fusión de ALÉTHEIA. Su ubicación en el primer anillo permite que las líneas de distribución energética de mayor capacidad alimenten directamente al motor gravitatorio NEXUS, minimizando pérdidas y garantizando el suministro al sistema más exigente de la nave."
         },
+     L2_006: {
+    nombre: "ZEUS-07",
+    area: "Reactor de fusión",
+    imagen: "assets/img/ZEUS07.jpg",
+    imagenAlt:
+        "Interpretación visual del módulo ZEUS",
+    descripcion:
+        "Uno de los ocho reactores de fusión de ALÉTHEIA. ZEUS-07 fue incorporado a la nave tras la primera misión, como parte de la ampliación de su capacidad energética. A diferencia de los seis reactores originales, se encuentra instalado en el Nivel 2."
+},
+
+L2_003: {
+    nombre: "ZEUS-08",
+    area: "Reactor de fusión",
+    imagen: "assets/img/ZEUS08.jpg",
+    imagenAlt:
+        "Interpretación visual del módulo ZEUS",
+    descripcion:
+        "Uno de los ocho reactores de fusión de ALÉTHEIA. ZEUS-08 fue incorporado a la nave tras la primera misión, como parte de la ampliación de su capacidad energética. A diferencia de los seis reactores originales, se encuentra instalado en el Nivel 2."
+},
+        L2_011: {
+    nombre: "ARK",
+    area: "Reserva genética",
+    imagen: "assets/img/ARK.jpg",
+    imagenAlt:
+        "Instalaciones criogénicas del módulo ARK",
+    descripcion:
+        "ARK constituye una reserva genética de la biodiversidad terrestre y uno de los grandes planes de contingencia de la misión. Sus cámaras criogénicas conservan material genético de miles de especies animales y vegetales, mientras varias cubiertas albergan los sistemas necesarios para mantenerlas durante décadas. El acceso está estrictamente restringido y, salvo operaciones de mantenimiento, el módulo permanece cerrado."
+},
+        L2_012: {
+    nombre: "O2",
+    area: "Reserva atmosférica",
+    imagen: "assets/img/O2.jpg",
+    imagenAlt:
+        "Interpretación visual del módulo O2",
+    descripcion:
+        "Reserva estratégica de oxígeno de ALÉTHEIA. Compensa los picos de consumo que los sistemas de regeneración atmosférica no pueden cubrir de forma inmediata y proporciona una reserva ante pérdidas graves de atmósfera. Su ubicación junto a ULL PRIMARIO le proporciona acceso directo a la red general de la nave, permitiendo distribuir rápidamente grandes cantidades de oxígeno a cualquiera de sus niveles."
+},
         L1_005: {
     nombre: "ZEUS-02",
     area: "Reactor de fusión",
@@ -161,6 +303,15 @@ const botonCerrarFicha = document.getElementById(
         "Instalaciones del módulo ULL Primario",
     descripcion:
         "ULL Primario constituye el principal nodo de intercambio térmico de ALÉTHEIA y el único que comunica directamente los niveles 1 y 2. En su interior, enormes intercambiadores transfieren la energía procedente del circuito secundario de agua hacia la red principal de amoniaco que recorre la cubierta 0, completamente aislada del resto de la nave. Gigantescos depósitos, bombas de gran caudal y sistemas de regulación garantizan un flujo continuo entre ambos circuitos, permitiendo distribuir la energía térmica con la máxima seguridad sin que el amoniaco llegue nunca a las zonas habitables."
+},
+        L2_013: {
+    nombre: "ULL PRIMARIO NIVEL 2",
+    area: "Transferencia térmica",
+    imagen: "assets/img/ULLPRIMARIONIVEL2.jpg",
+    imagenAlt:
+        "Gran pozo vertical e instalaciones del módulo ULL Primario",
+    descripcion:
+        "ULL Primario es una de las mayores instalaciones técnicas de ALÉTHEIA y se extiende verticalmente a través de los niveles 1 y 2, formando un único espacio industrial de casi cien metros de altura. A diferencia de los módulos convencionales, carece de cubiertas interiores continuas: enormes conducciones, pasarelas de mantenimiento e intercambiadores atraviesan el gran pozo central y conectan directamente ambos niveles. En esta zona se encuentran también los gigantescos depósitos que almacenan el amoniaco del circuito primario, con capacidades de varios millones de litros, junto con los sistemas de bombeo y regulación encargados de mantener estable la transferencia térmica de la nave."
 },
         L1_009: {
     nombre: "ULL-02",
@@ -436,6 +587,15 @@ L1_061: {
     descripcion:
         "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. A diferencia del Hangar 1-1, incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
 },
+        L2_019: {
+    nombre: "HANGAR 2-01",
+    area: "Operaciones de vuelo",
+    imagen: "assets/img/HANGAR0201.jpg",
+    imagenAlt:
+        "Hangar estándar de ALÉTHEIA",
+    descripcion:
+        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. Incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
+},
         L1_063: {
     nombre: "HANGAR 1-2",
     area: "Operaciones de vuelo",
@@ -444,6 +604,15 @@ L1_061: {
         "Hangar estándar de ALÉTHEIA",
     descripcion:
         "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. A diferencia del Hangar 1-1, incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
+},
+        L2_009: {
+    nombre: "ASTILLERO",
+    area: "Mantenimiento y reparación",
+    imagen: "assets/img/ASTILLERO.jpg",
+    imagenAlt:
+        "Astillero de lanzaderas de ALÉTHEIA",
+    descripcion:
+        "Instalación formada por dos módulos fusionados y destinada a las reparaciones de gran envergadura de las lanzaderas de ALÉTHEIA. Mientras los hangares se ocupan del mantenimiento habitual, el astillero permite desmontar estructuras, sustituir sistemas completos y realizar intervenciones que requieren dejar una aeronave fuera de servicio durante periodos prolongados."
 },
         L1_040: {
     nombre: "HANGAR TORO",
