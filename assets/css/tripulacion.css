@@ -49,7 +49,7 @@
   font-size: 13px;
 }
 
-/* =========================================   FICHA DE TRIPULACIÓN   ========================================= */
+/* =========================================   FICHA DE TRIPULACIÓN   ========================================= */
 
 #ficha-personaje {
   min-height: 700px;
@@ -293,5 +293,56 @@
 
 #lista-personajes::-webkit-scrollbar-thumb:hover {
   background: rgba(111, 214, 255, 0.7);
+}
+
+/* =========================================   CONTROL DE RETRATOS   ========================================= */
+
+.control-retratos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  max-width: 900px;
+  margin: 0 auto 18px;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(17, 24, 34, 0.88);
+  border: 1px solid rgba(111, 214, 255, 0.18);
+  border-radius: 10px;
+}
+
+.control-retratos__texto {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.control-retratos__boton {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  color: #ffffff;
+  background: rgba(111, 214, 255, 0.12);
+  border: 1px solid rgba(111, 214, 255, 0.55);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.control-retratos__boton:hover, .control-retratos__boton:focus-visible {
+  background: rgba(111, 214, 255, 0.2);
+  border-color: rgba(111, 214, 255, 0.85);
+}
+
+.personaje-ficha__sin-imagen--oculto {
+  color: rgba(255, 255, 255, 0.3);
+  border-style: solid;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+@media (max-width: 767.98px) {
+  .control-retratos {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
