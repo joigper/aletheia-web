@@ -25,3 +25,22 @@ html, body {
   margin-bottom: 20px;
 }
 
+.boton-otras-obras {
+  padding: 9px 20px;
+  border: 1px solid rgba(111, 214, 255, 0.45);
+  border-radius: 6px;
+  background: linear-gradient( 135deg, rgba(111, 214, 255, 0.10), rgba(17, 24, 34, 0.65) );
+  color: #d5e8f2;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.boton-otras-obras:hover {
+  border-color: rgba(111, 214, 255, 0.85);
+  background: linear-gradient( 135deg, rgba(111, 214, 255, 0.18), rgba(17, 24, 34, 0.85) );
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
