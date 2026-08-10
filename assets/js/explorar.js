@@ -182,9 +182,16 @@ L2_015: {
 L2_014: {
     nombre: "HOME-23",
     area: "Residencial",
-    imagen: "assets/img/HOME2301.jpg",
-    imagenAlt:
-        "Interpretación visual de un módulo HOME del Nivel 2",
+    imagenes: [
+    {
+        src: "assets/img/HOME2301.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+    {
+        src: "assets/img/HOME2302.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+],    
     descripcion:
         "No todo el alojamiento de ALÉTHEIA se concentra en los módulos HOME. CONTROL y SEC disponen cada uno de una cubierta destinada a camarotes para parte de su personal. El complejo HOSPITAL, formado por cuatro módulos, reserva igualmente una cubierta de uno de ellos para alojamiento. Estas áreas residenciales utilizan el mismo sistema de camarotes y ofrecen condiciones de habitabilidad equivalentes a las de los módulos HOME."
 },
