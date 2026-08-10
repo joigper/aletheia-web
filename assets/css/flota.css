@@ -261,3 +261,334 @@
   }
 }
 
+/* =========================================   NAVEGACIÓN MÓVIL DE FLOTA   ========================================= */
+
+/* Estado inicial: lista a pantalla completa */
+
+@media (max-width: 575.98px) {
+  .flota-lista-col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #lista-naves {
+    width: 100%;
+    min-height: auto;
+  }
+}
+
+/* La ficha inicialmente no aparece */
+
+@media (max-width: 575.98px) {
+  .flota-ficha-col {
+    display: none;
+  }
+}
+
+/* Al seleccionar una nave desaparece la lista */
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil .flota-lista-col {
+    display: none;
+  }
+}
+
+/* La ficha ocupa TODO el ancho */
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil .flota-ficha-col {
+    display: block;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #ficha-nave {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha {
+    width: 100%;
+    min-height: auto;
+    padding: 16px;
+  }
+}
+
+/* =========================================   BOTÓN CERRAR FICHA   Oculto en escritorio   ========================================= */
+
+/* =========================================   BOTÓN CERRAR FICHA   ========================================= */
+
+.nave-ficha__cerrar {
+  display: none;
+}
+
+/* =========================================   FLOTA - PRESENTACIÓN MÓVIL   ========================================= */
+
+/* La fila principal utiliza todo el ancho */
+
+@media (max-width: 575.98px) {
+  .flota-contenido {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* PANTALLA DE SELECCIÓN */
+
+@media (max-width: 575.98px) {
+  .flota-lista-col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .flota-ficha-col {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #lista-naves {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-lista__boton {
+    width: 100% !important;
+  }
+}
+
+/* PANTALLA DE FICHA */
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil .flota-lista-col {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil .flota-ficha-col {
+    display: block !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #ficha-nave {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    padding: 16px;
+  }
+}
+
+/* BOTÓN CERRAR */
+
+@media (max-width: 575.98px) {
+  .nave-ficha__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 0 14px;
+    border: 1px solid rgba(111, 214, 255, 0.38);
+    border-radius: 8px;
+    background: rgba(12, 17, 24, 0.88);
+    color: #d5dbe2;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+}
+
+/* =========================================   CORRECCIÓN COLUMNAS FLOTA EN MÓVIL   ========================================= */
+
+/* Columna que contiene la lista */
+
+@media (max-width: 575.98px) {
+  .flota-contenido > div:has( > #lista-naves) {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Columna que contiene la ficha */
+
+@media (max-width: 575.98px) {
+  .flota-contenido > div:has( > #ficha-nave) {
+    display: none !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Cuando abrimos una ficha */
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil > div:has( > #lista-naves) {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .flota-contenido.modo-ficha-movil > div:has( > #ficha-nave) {
+    display: block !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* =========================================   FLOTA - ANCHO DE ESCRITORIO   ========================================= */
+
+.flota-contenedor {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: clamp(16px, 2vw, 40px) !important;
+  padding-right: clamp(16px, 2vw, 40px) !important;
+}
+
+.flota-contenido {
+  width: 100%;
+  max-width: none;
+}
+
+/* =========================================   FLOTA - ESCRITORIO A ANCHO COMPLETO   ========================================= */
+
+/* Localizamos directamente el container que contiene FLOTA */
+
+body > .container:has(#lista-naves) {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: clamp(16px, 2vw, 40px) !important;
+  padding-right: clamp(16px, 2vw, 40px) !important;
+}
+
+/* La fila de lista + ficha utiliza todo ese espacio */
+
+body > .container:has(#lista-naves) .flota-contenido {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* =========================================   FLOTA - DISTRIBUCIÓN EN PC   ========================================= */
+
+/* Lista algo más estrecha */
+
+@media (min-width: 576px) {
+  .flota-contenido > div:has( > #lista-naves) {
+    flex: 0 0 22% !important;
+    width: 22% !important;
+    max-width: 22% !important;
+  }
+}
+
+/* La ficha aprovecha el resto */
+
+@media (min-width: 576px) {
+  .flota-contenido > div:has( > #ficha-nave) {
+    flex: 0 0 78% !important;
+    width: 78% !important;
+    max-width: 78% !important;
+  }
+}
+
+@media (min-width: 576px) {
+  #lista-naves, #ficha-nave {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* =========================================   FLOTA - CABECERA MÓVIL   ========================================= */
+
+/* Fila superior de FLOTA */
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-naves) section > .row:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px 8px 20px !important;
+  }
+}
+
+/* Título: ocupa las dos columnas */
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-naves) section > .row:first-child > .col:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+}
+
+/* Cada botón ocupa una celda */
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-naves) section > .row:first-child > .col {
+    width: 100%;
+    padding: 0;
+  }
+}
+
+/* Centramos los botones */
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-naves) section > .row:first-child .aletheia-galaxy-button {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-naves) section > .row:first-child .galaxy-trigger {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.78rem;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+

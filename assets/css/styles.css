@@ -44,3 +44,104 @@ html, body {
   transform: translateY(-1px);
 }
 
+/* =========================================   PÁGINA PRINCIPAL - BLOQUES MÓVILES   ========================================= */
+
+/* Cada bloque pasa a una sola columna */
+
+@media (max-width: 575.98px) {
+  .inicio-bloque {
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-bloque > .col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+}
+
+/* Primera sección:     imagen arriba, texto debajo */
+
+@media (max-width: 575.98px) {
+  .inicio-bloque-1 > .col:first-child {
+    order: 1;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-bloque-1 > .col:last-child {
+    order: 2;
+  }
+}
+
+/* Segunda sección:     vídeo arriba, texto debajo */
+
+@media (max-width: 575.98px) {
+  .inicio-bloque-2 > .col:first-child {
+    order: 2;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-bloque-2 > .col:last-child {
+    order: 1;
+  }
+}
+
+/* Imágenes y vídeo ocupan todo el ancho disponible */
+
+@media (max-width: 575.98px) {
+  .inicio-bloque img, .inicio-bloque video {
+    width: 100% !important;
+    height: auto !important;
+    max-width: none !important;
+  }
+}
+
+/* Un poco de separación entre visual y texto */
+
+@media (max-width: 575.98px) {
+  .inicio-bloque > .col {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+/* =========================================   PÁGINA PRINCIPAL - CUBIERTAS EN MÓVIL   ========================================= */
+
+@media (max-width: 575.98px) {
+  .inicio-cubiertas {
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-cubiertas > .col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-top: 12px;
+    padding-bottom: 18px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-cubiertas img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .inicio-cubiertas .aletheia-galaxy-button {
+    margin-top: 8px;
+  }
+}
+

@@ -52,11 +52,7 @@ window.naves = [
             {
                 src: "assets/img/MINERA01.jpg",
                 alt: "Lanzadera minera de ALÉTHEIA"
-            },
-            {
-                src: "assets/img/MINERA02.jpg",
-                alt: "Lanzadera minera durante una operación de extracción"
-            }
+            },            
         ],
 
         descripcion:
@@ -113,10 +109,6 @@ window.naves = [
                 src: "assets/img/HERMES01.jpg",
                 alt: "Nave correo HERMES"
             },
-            {
-                src: "assets/img/HERMES02.jpg",
-                alt: "Interior de HERMES"
-            }
         ],
 
         descripcion:
@@ -143,10 +135,6 @@ window.naves = [
                 src: "assets/img/TORO01.jpg",
                 alt: "Transbordador pesado TORO"
             },
-            {
-                src: "assets/img/TORO02.jpg",
-                alt: "TORO durante una operación de carga"
-            }
         ],
 
         descripcion:
@@ -173,10 +161,6 @@ window.naves = [
                 src: "assets/img/PRAETORIAE01.jpg",
                 alt: "Nave PRAETORIAE"
             },
-            {
-                src: "assets/img/PRAETORIAE02.jpg",
-                alt: "Estructura modular de PRAETORIAE"
-            }
         ],
 
         descripcion:

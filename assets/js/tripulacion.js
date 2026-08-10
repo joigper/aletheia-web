@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const listaPersonajes = document.getElementById("lista-personajes");
     const fichaPersonaje = document.getElementById("ficha-personaje");
+    const tripulacionContenido = document.querySelector(
+    ".tripulacion-contenido"
+);
     const botonRetratos = document.getElementById("toggle-retratos");
 
     let retratosVisibles = false;
@@ -67,6 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 data-departamento="${personaje.departamento || "general"}"
             >
                 <header class="personaje-ficha__cabecera">
+                    <button
+                    id="cerrar-ficha-personaje"
+                    class="personaje-ficha__cerrar"
+                    type="button"
+                    >
+                    Cerrar
+                    </button>
                     <div>
                         <p class="personaje-ficha__registro">
                             ALÉTHEIA · REGISTRO DE TRIPULACIÓN
@@ -126,6 +136,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 </footer>
             </article>
         `;
+        const botonCerrarFicha = document.getElementById(
+    "cerrar-ficha-personaje"
+);
+
+if (botonCerrarFicha) {
+    botonCerrarFicha.addEventListener("click", () => {
+        tripulacionContenido.classList.remove(
+            "modo-ficha-movil"
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+}
 
         document
             .querySelectorAll(".personaje-lista__boton")
@@ -179,8 +205,22 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         boton.addEventListener("click", () => {
-            mostrarFicha(personaje);
+    mostrarFicha(personaje);
+
+    if (
+        tripulacionContenido &&
+        window.matchMedia("(max-width: 575.98px)").matches
+    ) {
+        tripulacionContenido.classList.add(
+            "modo-ficha-movil"
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
+    }
+});
 
         listaPersonajes.appendChild(boton);
     });

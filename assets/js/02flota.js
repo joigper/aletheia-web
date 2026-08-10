@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const listaNaves = document.getElementById("lista-naves");
     const fichaNave = document.getElementById("ficha-nave");
+    const flotaContenido = document.querySelector(".flota-contenido");
 
     if (!listaNaves || !fichaNave) {
         console.error("No se encontraron #lista-naves o #ficha-nave.");
@@ -53,6 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="nave-ficha">
 
             <header class="nave-ficha__cabecera">
+               <button
+                id="cerrar-ficha-nave"
+                class="nave-ficha__cerrar"
+                type="button"
+                >
+                Cerrar 
+                </button>
                 <div>
                     <p class="nave-ficha__registro">
                         ALÉTHEIA · REGISTRO DE FLOTA
@@ -128,6 +136,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </article>
     `;
+    const botonCerrarFicha = document.getElementById(
+    "cerrar-ficha-nave"
+);
+
+if (botonCerrarFicha) {
+    botonCerrarFicha.addEventListener("click", () => {
+        flotaContenido.classList.remove(
+            "modo-ficha-movil"
+        );
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+}
 
     const botonMasImagenes = document.getElementById(
         "nave-mas-imagenes"
@@ -182,8 +206,20 @@ document.addEventListener("DOMContentLoaded", () => {
 `;
 
         boton.addEventListener("click", () => {
-            mostrarFicha(nave);
+    mostrarFicha(nave);
+
+    if (
+        flotaContenido &&
+        window.matchMedia("(max-width: 575.98px)").matches
+    ) {
+        flotaContenido.classList.add("modo-ficha-movil");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
         });
+    }
+});
 
         listaNaves.appendChild(boton);
     });

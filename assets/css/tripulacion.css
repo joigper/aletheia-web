@@ -346,3 +346,156 @@
   }
 }
 
+/* =========================================   TRIPULACIÓN - CABECERA MÓVIL   ========================================= */
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-personajes) section > .row:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px 8px 20px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-personajes) section > .row:first-child > .col:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-personajes) section > .row:first-child > .col {
+    width: 100%;
+    padding: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-personajes) section > .row:first-child .aletheia-galaxy-button {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body > .container:has(#lista-personajes) section > .row:first-child .galaxy-trigger {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.78rem;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* =========================================   TRIPULACIÓN - NAVEGACIÓN MÓVIL   ========================================= */
+
+/* En PC el botón cerrar no se muestra */
+
+.personaje-ficha__cerrar {
+  display: none;
+}
+
+@media (max-width: 575.98px) {
+  .tripulacion-contenido {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* -----------------------------------------     ESTADO INICIAL: LISTA DE PERSONAJES     ----------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .tripulacion-lista-col {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .tripulacion-ficha-col {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #lista-personajes {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .personaje-lista__boton {
+    width: 100% !important;
+  }
+}
+
+/* -----------------------------------------     ESTADO: FICHA ABIERTA     ----------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .tripulacion-contenido.modo-ficha-movil .tripulacion-lista-col {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .tripulacion-contenido.modo-ficha-movil .tripulacion-ficha-col {
+    display: block !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #ficha-personaje {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .personaje-ficha {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    padding: 16px;
+  }
+}
+
+/* -----------------------------------------     BOTÓN CERRAR     ----------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .personaje-ficha__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 0 14px;
+    border: 1px solid rgba(111, 214, 255, 0.38);
+    border-radius: 8px;
+    background: rgba(12, 17, 24, 0.88);
+    color: #d5dbe2;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+}
+
