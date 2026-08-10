@@ -1,0 +1,263 @@
+#lista-naves {
+  background: #111822;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 15px;
+  min-height: 700px;
+}
+
+.nave-lista__boton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  background: #1b2432;
+  border: none;
+  border-left: 5px solid #5f6fff;
+  color: white;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.nave-lista__icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  color: #6fd6ff;
+  font-size: 28px;
+}
+
+.nave-lista__nombre {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nave-lista__boton:hover {
+  background: #263247;
+}
+
+.nave-lista__boton.is-active {
+  background: #33435d;
+  border-left: 5px solid #6fd6ff;
+}
+
+.nave-lista__nombre {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nave-lista__icono img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================================   FICHA DE FLOTA   ========================================= */
+
+#ficha-nave {
+  min-height: 700px;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient( 145deg, rgba(18, 29, 43, 0.96), rgba(6, 12, 20, 0.96) );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.nave-ficha {
+  min-height: 700px;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* =========================================   CABECERA   ========================================= */
+
+.nave-ficha__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.nave-ficha__registro {
+  margin: 0 0 0.55rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nave-ficha__nombre {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nave-ficha__tipo {
+  margin: 0.35rem 0 0;
+  color: #6fd6ff;
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+}
+
+.nave-ficha__funcion {
+  margin: 0 0 1.4rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* =========================================   SEPARADORES   ========================================= */
+
+.nave-ficha__separador {
+  width: 100%;
+  height: 1px;
+  margin: 1.5rem 0;
+  background: linear-gradient( 90deg, #6fd6ff, rgba(255, 255, 255, 0.04) );
+}
+
+/* =========================================   DATOS TÉCNICOS   ========================================= */
+
+.nave-ficha__datos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0 0 1.5rem;
+}
+
+.nave-ficha__dato {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid #6fd6ff;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.nave-ficha__dato dt {
+  margin-bottom: 0.3rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.nave-ficha__dato dd {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+/* =========================================   IMAGEN   ========================================= */
+
+.nave-ficha__imagen-wrap {
+  width: min(100%, 720px);
+  aspect-ratio: 16 / 9;
+  margin: 1.5rem auto 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: #0c1118;
+}
+
+.nave-ficha__imagen {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* =========================================   BOTÓN MÁS IMÁGENES   ========================================= */
+
+.nave-ficha__acciones {
+  display: flex;
+  justify-content: flex-end;
+  width: min(100%, 720px);
+  margin: 10px auto 0;
+}
+
+.nave-ficha__mas-imagenes {
+  padding: 7px 14px;
+  border: 1px solid rgba(111, 214, 255, 0.38);
+  border-radius: 8px;
+  background: rgba(12, 17, 24, 0.88);
+  color: #d5dbe2;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.nave-ficha__mas-imagenes:hover {
+  color: #ffffff;
+  border-color: rgba(111, 214, 255, 0.75);
+}
+
+/* =========================================   DESCRIPCIÓN   ========================================= */
+
+.nave-ficha__descripcion {
+  max-width: 900px;
+}
+
+.nave-ficha__descripcion p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.75;
+}
+
+/* =========================================   PIE   ========================================= */
+
+.nave-ficha__pie {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* =========================================   TABLET / MÓVIL   ========================================= */
+
+@media (max-width: 991.98px) {
+  .nave-ficha__datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha__datos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha__nombre {
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha__pie {
+    text-align: left;
+  }
+}
+
