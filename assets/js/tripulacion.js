@@ -70,14 +70,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 data-departamento="${personaje.departamento || "general"}"
             >
                 <header class="personaje-ficha__cabecera">
-                    <button
-                    id="cerrar-ficha-personaje"
-                    class="personaje-ficha__cerrar"
-                    type="button"
-                    >
-                    Cerrar
-                    </button>
-                    <div>
+
+    <div class="personaje-ficha__nav-movil">
+
+        <button
+            id="anterior-ficha-personaje"
+            class="personaje-ficha__nav-boton"
+            type="button"
+        >
+            Anterior
+        </button>
+
+        <button
+            id="siguiente-ficha-personaje"
+            class="personaje-ficha__nav-boton"
+            type="button"
+        >
+            Siguiente
+        </button>
+
+        <button
+            id="cerrar-ficha-personaje"
+            class="personaje-ficha__cerrar"
+            type="button"
+        >
+            Cerrar
+        </button>
+
+    </div>
+
+    <div>
                         <p class="personaje-ficha__registro">
                             ALÉTHEIA · REGISTRO DE TRIPULACIÓN
                         </p>
@@ -140,20 +162,176 @@ document.addEventListener("DOMContentLoaded", () => {
     "cerrar-ficha-personaje"
 );
 
-if (botonCerrarFicha) {
-    botonCerrarFicha.addEventListener("click", () => {
-        tripulacionContenido.classList.remove(
-            "modo-ficha-movil"
-        );
+const botonAnteriorFicha = document.getElementById(
+    "anterior-ficha-personaje"
+);
 
+const botonSiguienteFicha = document.getElementById(
+    "siguiente-ficha-personaje"
+);
+
+
+function navegarFicha(direccion) {
+
+    const indiceActual = personajesOrdenados.findIndex(
+        (item) => item.id === personajeActual?.id
+    );
+
+    if (indiceActual === -1) return;
+
+    const total = personajesOrdenados.length;
+
+    const nuevoIndice =
+        (indiceActual + direccion + total) % total;
+
+    mostrarFicha(
+        personajesOrdenados[nuevoIndice]
+    );
+
+    if (
+        window.matchMedia(
+            "(max-width: 575.98px)"
+        ).matches
+    ) {
         window.scrollTo({
             top: 0,
             behavior: "smooth"
         });
-    });
+    }
 }
 
-        document
+
+if (botonAnteriorFicha) {
+
+    botonAnteriorFicha.addEventListener(
+        "click",
+        () => {
+            navegarFicha(-1);
+        }
+    );
+
+}
+
+
+if (botonSiguienteFicha) {
+
+    botonSiguienteFicha.addEventListener(
+        "click",
+        () => {
+            navegarFicha(1);
+        }
+    );
+
+}
+
+
+if (botonCerrarFicha) {
+
+    botonCerrarFicha.addEventListener(
+        "click",
+        () => {
+
+            tripulacionContenido.classList.remove(
+                "modo-ficha-movil"
+            );
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+
+}
+        const fichaActiva =
+    fichaPersonaje.querySelector(
+        ".personaje-ficha"
+    );
+
+if (fichaActiva) {
+
+    let inicioX = 0;
+    let inicioY = 0;
+    let seguimientoTactil = false;
+
+
+    fichaActiva.addEventListener(
+        "touchstart",
+        (evento) => {
+
+            if (
+                !window.matchMedia(
+                    "(max-width: 575.98px)"
+                ).matches
+            ) {
+                return;
+            }
+
+            const toque =
+                evento.changedTouches[0];
+
+            inicioX = toque.clientX;
+            inicioY = toque.clientY;
+
+            seguimientoTactil = true;
+
+        },
+        { passive: true }
+    );
+
+
+    fichaActiva.addEventListener(
+        "touchend",
+        (evento) => {
+
+            if (!seguimientoTactil) return;
+
+            seguimientoTactil = false;
+
+            const toque =
+                evento.changedTouches[0];
+
+            const desplazamientoX =
+                toque.clientX - inicioX;
+
+            const desplazamientoY =
+                toque.clientY - inicioY;
+
+            const umbral = 60;
+
+
+            /*
+             * Ignoramos movimientos pequeños
+             * y desplazamientos principalmente
+             * verticales.
+             */
+            if (
+                Math.abs(desplazamientoX) < umbral ||
+                Math.abs(desplazamientoX) <=
+                    Math.abs(desplazamientoY)
+            ) {
+                return;
+            }
+
+
+            /*
+             * Deslizar hacia la izquierda:
+             * siguiente personaje.
+             *
+             * Deslizar hacia la derecha:
+             * personaje anterior.
+             */
+            navegarFicha(
+                desplazamientoX < 0 ? 1 : -1
+            );
+
+        },
+        { passive: true }
+    );
+
+}
+      document
             .querySelectorAll(".personaje-lista__boton")
             .forEach((boton) => {
                 boton.classList.toggle(
