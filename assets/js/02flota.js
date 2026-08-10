@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const listaNaves = document.getElementById("lista-naves");
     const fichaNave = document.getElementById("ficha-nave");
     const flotaContenido = document.querySelector(".flota-contenido");
+    let naveActual = null;
 
     if (!listaNaves || !fichaNave) {
         console.error("No se encontraron #lista-naves o #ficha-nave.");
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function mostrarFicha(nave) {
+        naveActual = nave;
     let indiceImagen = 0;
 
     const imagenes = Array.isArray(nave.imagenes)
@@ -54,14 +56,36 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="nave-ficha">
 
             <header class="nave-ficha__cabecera">
-               <button
-                id="cerrar-ficha-nave"
-                class="nave-ficha__cerrar"
-                type="button"
-                >
-                Cerrar 
-                </button>
-                <div>
+
+    <div class="nave-ficha__nav-movil">
+
+        <button
+            id="anterior-ficha-nave"
+            class="nave-ficha__nav-boton"
+            type="button"
+        >
+            Anterior
+        </button>
+
+        <button
+            id="siguiente-ficha-nave"
+            class="nave-ficha__nav-boton"
+            type="button"
+        >
+            Siguiente
+        </button>
+
+        <button
+            id="cerrar-ficha-nave"
+            class="nave-ficha__cerrar"
+            type="button"
+        >
+            Cerrar
+        </button>
+
+    </div>
+
+    <div>
                     <p class="nave-ficha__registro">
                         ALÉTHEIA · REGISTRO DE FLOTA
                     </p>
@@ -78,49 +102,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="nave-ficha__separador"></div>
 
-            <p class="nave-ficha__funcion">
-                ${nave.funcion || ""}
-            </p>
+<p class="nave-ficha__funcion">
+    ${nave.funcion || ""}
+</p>
 
-            <dl class="nave-ficha__datos">
+${imagenHtml}
 
-                <div class="nave-ficha__dato">
-                    <dt>Longitud</dt>
-                    <dd>${nave.longitud || "No indicada"}</dd>
-                </div>
+<div class="nave-ficha__acciones">
+    ${botonImagenesHtml}
+</div>
 
-                <div class="nave-ficha__dato">
-                    <dt>Anchura</dt>
-                    <dd>${nave.anchura || "No indicada"}</dd>
-                </div>
+<div class="nave-ficha__separador"></div>
 
-                <div class="nave-ficha__dato">
-                    <dt>Capacidad</dt>
-                    <dd>${nave.capacidad || "No indicada"}</dd>
-                </div>
+<dl class="nave-ficha__datos">
 
-                <div class="nave-ficha__dato">
-                    <dt>Unidades</dt>
-                    <dd>${nave.unidades || "No indicado"}</dd>
-                </div>
+    <div class="nave-ficha__dato">
+        <dt>Longitud</dt>
+        <dd>${nave.longitud || "No indicada"}</dd>
+    </div>
 
-                <div class="nave-ficha__dato">
-                    <dt>Capacidad de salto</dt>
-                    <dd>${nave.salto || "No indicada"}</dd>
-                </div>
+    <div class="nave-ficha__dato">
+        <dt>Anchura</dt>
+        <dd>${nave.anchura || "No indicada"}</dd>
+    </div>
 
-                <div class="nave-ficha__dato">
-                    <dt>Alojamiento</dt>
-                    <dd>${nave.hangar || "No indicado"}</dd>
-                </div>
+    <div class="nave-ficha__dato">
+        <dt>Capacidad</dt>
+        <dd>${nave.capacidad || "No indicada"}</dd>
+    </div>
 
-            </dl>
+    <div class="nave-ficha__dato">
+        <dt>Unidades</dt>
+        <dd>${nave.unidades || "No indicado"}</dd>
+    </div>
 
-            ${imagenHtml}
+    <div class="nave-ficha__dato">
+        <dt>Capacidad de salto</dt>
+        <dd>${nave.salto || "No indicada"}</dd>
+    </div>
 
-            <div class="nave-ficha__acciones">
-                ${botonImagenesHtml}
-            </div>
+    <div class="nave-ficha__dato">
+        <dt>Alojamiento</dt>
+        <dd>${nave.hangar || "No indicado"}</dd>
+    </div>
+
+</dl>
 
             <div class="nave-ficha__separador"></div>
 
@@ -136,21 +162,176 @@ document.addEventListener("DOMContentLoaded", () => {
 
         </article>
     `;
-    const botonCerrarFicha = document.getElementById(
+        
+    const botonAnteriorFicha = document.getElementById(
+    "anterior-ficha-nave"
+);
+
+const botonSiguienteFicha = document.getElementById(
+    "siguiente-ficha-nave"
+);
+
+const botonCerrarFicha = document.getElementById(
     "cerrar-ficha-nave"
 );
 
-if (botonCerrarFicha) {
-    botonCerrarFicha.addEventListener("click", () => {
-        flotaContenido.classList.remove(
-            "modo-ficha-movil"
-        );
 
+function navegarFicha(direccion) {
+
+    const indiceActual = naves.findIndex(
+        (item) => item.id === naveActual?.id
+    );
+
+    if (indiceActual === -1) return;
+
+    const total = naves.length;
+
+    const nuevoIndice =
+        (indiceActual + direccion + total) % total;
+
+    mostrarFicha(
+        naves[nuevoIndice]
+    );
+
+    if (
+        window.matchMedia(
+            "(max-width: 575.98px)"
+        ).matches
+    ) {
         window.scrollTo({
             top: 0,
             behavior: "smooth"
         });
-    });
+    }
+}
+
+
+if (botonAnteriorFicha) {
+    botonAnteriorFicha.addEventListener(
+        "click",
+        () => {
+            navegarFicha(-1);
+        }
+    );
+}
+
+
+if (botonSiguienteFicha) {
+    botonSiguienteFicha.addEventListener(
+        "click",
+        () => {
+            navegarFicha(1);
+        }
+    );
+}
+
+
+if (botonCerrarFicha) {
+    botonCerrarFicha.addEventListener(
+        "click",
+        () => {
+
+            flotaContenido.classList.remove(
+                "modo-ficha-movil"
+            );
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+}
+
+
+/* =========================================
+   GESTO LATERAL EN MÓVIL
+   ========================================= */
+
+const fichaActiva =
+    fichaNave.querySelector(
+        ".nave-ficha"
+    );
+
+if (fichaActiva) {
+
+    let inicioX = 0;
+    let inicioY = 0;
+    let seguimientoTactil = false;
+
+
+    fichaActiva.addEventListener(
+        "touchstart",
+        (evento) => {
+
+            if (
+                !window.matchMedia(
+                    "(max-width: 575.98px)"
+                ).matches
+            ) {
+                return;
+            }
+
+            const toque =
+                evento.changedTouches[0];
+
+            inicioX = toque.clientX;
+            inicioY = toque.clientY;
+
+            seguimientoTactil = true;
+
+        },
+        { passive: true }
+    );
+
+
+    fichaActiva.addEventListener(
+        "touchend",
+        (evento) => {
+
+            if (!seguimientoTactil) return;
+
+            seguimientoTactil = false;
+
+            const toque =
+                evento.changedTouches[0];
+
+            const desplazamientoX =
+                toque.clientX - inicioX;
+
+            const desplazamientoY =
+                toque.clientY - inicioY;
+
+            const umbral = 60;
+
+
+            /*
+             * Ignoramos movimientos pequeños
+             * y desplazamientos principalmente
+             * verticales.
+             */
+            if (
+                Math.abs(desplazamientoX) < umbral ||
+                Math.abs(desplazamientoX) <=
+                    Math.abs(desplazamientoY)
+            ) {
+                return;
+            }
+
+
+            /*
+             * Izquierda = siguiente.
+             * Derecha = anterior.
+             */
+            navegarFicha(
+                desplazamientoX < 0 ? 1 : -1
+            );
+
+        },
+        { passive: true }
+    );
+
 }
 
     const botonMasImagenes = document.getElementById(

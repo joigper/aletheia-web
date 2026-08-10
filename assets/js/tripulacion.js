@@ -189,15 +189,24 @@ function navegarFicha(direccion) {
     );
 
     if (
-        window.matchMedia(
-            "(max-width: 575.98px)"
-        ).matches
-    ) {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
+    window.matchMedia(
+        "(max-width: 575.98px)"
+    ).matches
+) {
+    requestAnimationFrame(() => {
+        const navegacionFicha =
+            document.querySelector(
+                ".personaje-ficha__nav-movil"
+            );
+
+        if (navegacionFicha) {
+            navegacionFicha.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    });
+}
 }
 
 

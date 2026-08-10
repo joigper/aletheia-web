@@ -592,3 +592,89 @@ body > .container:has(#lista-naves) .flota-contenido {
   }
 }
 
+/* =========================================   FLOTA - ANTERIOR / SIGUIENTE EN MÓVIL   ========================================= */
+
+/* En escritorio no aparece la navegación móvil */
+
+.nave-ficha__nav-movil, .nave-ficha__nav-boton {
+  display: none;
+}
+
+/* =========================================   MÓVIL   ========================================= */
+
+/* * La cabecera se coloca en vertical:   * controles arriba, nombre debajo. */
+
+@media (max-width: 575.98px) {
+  .nave-ficha__cabecera {
+    display: block;
+  }
+}
+
+/* * Anterior | Siguiente | Cerrar */
+
+@media (max-width: 575.98px) {
+  .nave-ficha__nav-movil {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha__nav-boton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid rgba(111, 214, 255, 0.38);
+    border-radius: 8px;
+    background: rgba(12, 17, 24, 0.88);
+    color: #d5dbe2;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
+
+/* * Sobrescribimos únicamente el margen   * del botón Cerrar que ya existía. */
+
+@media (max-width: 575.98px) {
+  .nave-ficha__cerrar {
+    flex: 0 0 auto;
+    min-width: 76px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .nave-ficha__nav-boton:active, .nave-ficha__cerrar:active {
+    background: rgba(111, 214, 255, 0.16);
+  }
+}
+
+/* =========================================   MÓVILES MUY ESTRECHOS   ========================================= */
+
+@media (max-width: 360px) {
+  .nave-ficha__nav-boton, .nave-ficha__cerrar {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+  }
+}
+
+@media (max-width: 360px) {
+  .nave-ficha__cerrar {
+    min-width: 68px;
+  }
+}
+
