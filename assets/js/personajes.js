@@ -764,6 +764,26 @@ window.personajes = [
       "Geobotánica noruega especializada en la interacción entre suelos, minerales, microorganismos y vegetación. Forma parte del equipo científico permanente de Thalara junto a Agatha Kovalenko, Alya D'Maggio y Sirena Duarte. Su trabajo consiste en evaluar la evolución natural del planeta, identificar zonas aptas para la recuperación ecológica y estudiar cómo la geología condiciona el desarrollo de nuevas comunidades vegetales. Disfruta del trabajo de campo y suele pasar días enteros recorriendo el terreno para recoger muestras y cartografiar ecosistemas emergentes.",
 
     retratoDisponible: true
-}
+},
+{
+    id: "ramon",
+    orden: 40,
+    categoria: "secundario",
+    primeraAparicion: 1,
+    nombre: "Ramón",
+    apellidos: "Santamaría",
+    cargo: "Propietario del Bar Ramón",
+    departamento: "Restauración",
+    nacionalidad: "España",
+    ciudadNacimiento: "Valencia",
+    moduloTrabajo: "HOME",
+    imagen: "RAMON.jpg",
+    imagenAlt: "Interpretación visual de Ramón",
+    descripcionCorta:
+      "Propietario del Bar Ramón y antiguo chef de tres estrellas Michelin.",
+    descripcionLarga:
+      "Durante años dirigió en Valencia un prestigioso restaurante que llegó a obtener tres estrellas Michelin. Cansado de la presión de la alta cocina y de la exposición que acompañaba al éxito, decidió abandonar aquel mundo y solicitar una plaza en ALÉTHEIA. Ahora dirige un pequeño bar donde ha recuperado el placer de cocinar sin más pretensiones que hacer disfrutar a sus clientes. Sus paellas son especialmente apreciadas por la tripulación y el capitán es uno de sus clientes habituales.",
+    retratoDisponible: true
+},
 
 ];

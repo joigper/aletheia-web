@@ -129,43 +129,64 @@ L2_018: {
 },
 
 L2_017: {
-    nombre: "HOME-20",
-    area: "Residencial",
-    imagen: "assets/img/HOME-NIVEL2.jpg",
-    imagenAlt:
-        "Interpretación visual de un módulo HOME del Nivel 2",
-    descripcion:
-        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+nombre: "HOME-20",
+area: "Residencial · Estructura",
+imagenes: [
+    {
+        src: "assets/img/HOME2001.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+    {
+        src: "assets/img/HOME2002.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+],    
+descripcion:
+"Como todos los módulos de ALÉTHEIA, los HOME son prismas hexagonales regulares de 50 metros de lado y 50 metros de altura. Las cubiertas comunes 0 y 1 ocupan los primeros 10 metros, dejando aproximadamente 40 metros de altura útil, distribuidos en ocho cubiertas de unos 6.500 m² cada una. En los HOME del Nivel 1, cinco de estas cubiertas están destinadas a viviendas, mientras que otras dos forman una gran plaza temática de doble altura; la última se reserva para alojamiento colectivo. Los HOME del Nivel 2 prescinden de la plaza temática y disponen así de siete cubiertas residenciales y una de alojamiento colectivo."
 },
+
 
 L2_016: {
     nombre: "HOME-21",
     area: "Residencial",
-    imagen: "assets/img/HOME-NIVEL2.jpg",
-    imagenAlt:
-        "Interpretación visual de un módulo HOME del Nivel 2",
+    imagenes: [
+    {
+        src: "assets/img/HOME2101.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+    {
+        src: "assets/img/HOME2102.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+], 
     descripcion:
-        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+        "Los camarotes de ALÉTHEIA utilizan un sistema panelizable que permite adaptar el espacio a las necesidades de sus ocupantes. La unidad básica dispone de 30 m² y puede combinarse para formar viviendas de 60, 90 o 120 m² según el tamaño de la unidad familiar. La cubierta superior de cada HOME está destinada a barracones de emergencia, preparados para proporcionar alojamiento colectivo cuando circunstancias excepcionales obligan a aumentar temporalmente la capacidad residencial de la nave."
 },
 
 L2_015: {
     nombre: "HOME-22",
     area: "Residencial",
-    imagen: "assets/img/HOME-NIVEL2.jpg",
-    imagenAlt:
-        "Interpretación visual de un módulo HOME del Nivel 2",
+    imagenes: [
+    {
+        src: "assets/img/HOME2201.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+    {
+        src: "assets/img/HOME2202.jpg",
+        alt: "Interpretación visual de un módulo HOME del Nivel 2"
+    },
+],     
     descripcion:
-        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+        "La capacidad máxima teórica de ALÉTHEIA se estima en unas 80.000 personas, utilizando todos los camarotes disponibles y las plazas de emergencia. Esta cifra representa un límite, no una población sostenible a largo plazo. Con una ocupación semejante, los sistemas de regeneración de aire, tratamiento de aguas, gestión de residuos y otros servicios esenciales trabajarían cerca de su capacidad máxima y comenzarían a producirse fallos. Incluso disponiendo cada ocupante de una cama, la densidad de población provocaría además una considerable sensación de hacinamiento."
 },
-
 L2_014: {
     nombre: "HOME-23",
     area: "Residencial",
-    imagen: "assets/img/HOME-NIVEL2.jpg",
+    imagen: "assets/img/HOME2301.jpg",
     imagenAlt:
         "Interpretación visual de un módulo HOME del Nivel 2",
     descripcion:
-        "Módulo residencial destinado íntegramente a camarotes. A diferencia de los HOME del Nivel 1, no dispone de una segunda planta dedicada a una plaza temática. Sus instalaciones mantienen el mismo nivel de espacio y comodidad, pero carecen de una identidad propia: los HOME del Nivel 2 comparten una distribución y un diseño prácticamente idénticos."
+        "No todo el alojamiento de ALÉTHEIA se concentra en los módulos HOME. CONTROL y SEC disponen cada uno de una cubierta destinada a camarotes para parte de su personal. El complejo HOSPITAL, formado por cuatro módulos, reserva igualmente una cubierta de uno de ellos para alojamiento. Estas áreas residenciales utilizan el mismo sistema de camarotes y ofrecen condiciones de habitabilidad equivalentes a las de los módulos HOME."
 },
 L2_005: {
     nombre: "MÓDULO DE RESERVA",
