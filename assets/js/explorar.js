@@ -390,6 +390,10 @@ L1_017: {
         src: "assets/img/panaderia.jpg",
         alt: "Cocina principal de ALÉTHEIA"
     },
+    {
+        src: "assets/img/COCINA02.jpg",
+        alt: "Cocina principal de ALÉTHEIA"
+    },
 ],
     descripcion:
         "Dirigida por Thomas Müller, la Cocina constituye el principal centro de producción alimentaria de ALÉTHEIA. Cada día elabora miles de menús equilibrados para toda la tripulación a partir de las preferencias registradas previamente por cada usuario mediante la aplicación personal de la nave, optimizando la producción y reduciendo al mínimo el desperdicio de alimentos. Las raciones que no llegan a consumirse son ultracongeladas y envasadas para su posterior distribución, permitiendo que cualquier tripulante pueda disponer de ellas en otro momento sin que se desperdicie comida."
@@ -397,9 +401,20 @@ L1_017: {
         L1_066: {
     nombre: "WASTE",
     area: "Recuperación y tratamiento",
-    imagen: "assets/img/WASTE.jpg",
-    imagenAlt:
-        "Instalaciones del módulo WASTE",
+               imagenes: [
+    {
+        src: "assets/img/WASTE.jpg",
+        alt: "Instalaciones del módulo WASTE"
+    },
+    {
+        src: "assets/img/WASTE02.jpg",
+        alt: "Instalaciones del módulo WASTE"
+    },
+                   {
+        src: "assets/img/WASTE03.jpg",
+        alt: "Instalaciones del módulo WASTE"
+    },
+],    
     descripcion:
         "El módulo WASTE alberga la principal planta de recuperación y tratamiento de aguas de ALÉTHEIA. En sus instalaciones se procesan las aguas grises y negras generadas por toda la nave mediante sistemas de filtración, depuración biológica, ultrafiltración y esterilización, permitiendo reincorporarlas al ciclo hídrico con total seguridad. Considerado uno de los departamentos más críticos de la misión, su funcionamiento continuo garantiza el abastecimiento de agua y la estabilidad sanitaria de una ciudad espacial de más de quince mil habitantes."
 },
@@ -528,10 +543,17 @@ L1_017: {
         L1_088: {
     nombre: "OCIO",
     area: "Comercio, restauración y servicios",
-    imagen: "assets/img/OCIO.jpg",
-    imagenAlt:
-        "Avenida comercial principal del módulo OCIO de ALÉTHEIA",
-    descripcion:
+            imagenes: [
+    {
+        src: "assets/img/OCIO.jpg",
+        alt: "Avenida comercial principal del módulo OCIO de ALÉTHEIA"
+    },
+    {
+        src: "assets/img/OCIO02.jpg",
+        alt: "Avenida comercial principal del módulo OCIO de ALÉTHEIA"
+    },
+],
+        descripcion:
         "El complejo OCIO ocupa cuatro módulos comunicados y constituye la principal zona comercial y de entretenimiento de ALÉTHEIA. Su interior se organiza alrededor de una gran avenida peatonal abierta, flanqueada por varios niveles de balcones, escaleras mecánicas, zonas de descanso y grandes maceteros con vegetación ornamental. A lo largo del recorrido se distribuyen tiendas, peluquerías, cafeterías, restaurantes y numerosos servicios destinados a la vida cotidiana de la tripulación. Su diseño reproduce la atmósfera de un elegante centro comercial terrestre y ofrece un espacio luminoso y animado donde pasear, reunirse o desconectar de las instalaciones técnicas de la nave."
 },
         L1_049: {
@@ -696,9 +718,16 @@ L1_061: {
         L1_080: {
     nombre: "OBSERVATORIO",
     area: "Astronomía y observación espacial",
-    imagen: "assets/img/OBSERVATORIO.jpg",
-    imagenAlt:
-        "Interior del módulo OBSERVATORIO de ALÉTHEIA",
+    imagenes: [
+    {
+        src: "assets/img/OBSERVATORIO.jpg",
+        alt: "Interior del módulo OBSERVATORIO de ALÉTHEIA"
+    },
+    {
+        src: "assets/img/OBSERVATORIO02.jpg",
+        alt: "Interior del módulo OBSERVATORIO de ALÉTHEIA"
+    },
+],    
     descripcion:
         "El módulo OBSERVATORIO no cuenta con ventanales ni cúpulas transparentes: toda la observación se realiza mediante telescopios, sensores, espectrómetros y captadores conectados a una extensa red de estaciones de trabajo. En el centro se encuentra «El Coloso», el mayor telescopio óptico construido por la humanidad. Su enorme espejo primario permanece prácticamente inmóvil y solo admite ajustes mínimos; para dirigirlo hacia una nueva región del firmamento es la propia ALÉTHEIA la que debe modificar con precisión su orientación."
 },
