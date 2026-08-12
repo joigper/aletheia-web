@@ -145,3 +145,17 @@ html, body {
   }
 }
 
+.amazon-aviso {
+  display: flex;
+  align-items: center;
+  /*justify-content: center;*/
+  gap: 8px;
+}
+
+.amazon-aviso img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
