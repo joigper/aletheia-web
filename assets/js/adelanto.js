@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const botonMenos = document.getElementById("lector-menos");
     const botonMas = document.getElementById("lector-mas");
     const indicador = document.getElementById("lector-pagina");
+    const finAdelanto = document.querySelector(".capitulo-aletheia__fin");
 
     if (
         !texto ||
@@ -98,6 +99,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         botonSiguiente.disabled =
             paginaActual === paginas.length - 1;
+        // El final del adelanto solo aparece en la última página
+if (finAdelanto) {
+    finAdelanto.style.display =
+        paginaActual === paginas.length - 1
+            ? "block"
+            : "none";
+}
     }
 
     function cambiarPagina(direccion) {
