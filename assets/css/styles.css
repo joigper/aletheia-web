@@ -145,17 +145,13 @@ html, body {
   }
 }
 
-.amazon-aviso {
-  display: flex;
-  align-items: center;
-  /*justify-content: center;*/
-  gap: 8px;
-}
+/* =========================================   PORTADA - TÍTULO EN MÓVIL   ========================================= */
 
-.amazon-aviso img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  flex-shrink: 0;
+@media (max-width: 575.98px) {
+  .aletheia-hero__titulo {
+    font-size: clamp(42px, 15vw, 72px) !important;
+    line-height: 1;
+    max-width: 100%;
+  }
 }
 
