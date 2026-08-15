@@ -175,3 +175,10 @@ html, body {
   }
 }
 
+@media (max-width: 575.98px) {
+  .aletheia-hero__botones-fila .aletheia-galaxy-button .galaxy-trigger {
+    font-size: 0.88rem;
+    padding: 0.7em 0.95em;
+  }
+}
+
