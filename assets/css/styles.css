@@ -155,3 +155,23 @@ html, body {
   }
 }
 
+/* =========================================   PORTADA - BOTONES EN MÓVIL   ========================================= */
+
+@media (max-width: 575.98px) {
+  .aletheia-hero__botones-fila {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    padding-top: 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .aletheia-hero__botones-fila > .col {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0;
+  }
+}
+
