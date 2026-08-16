@@ -182,3 +182,17 @@ html, body {
   }
 }
 
+.contacto-campo {
+  background-color: #080d16;
+  border: 1px solid #39475a;
+  color: #ffffff;
+  border-radius: 4px;
+}
+
+.contacto-campo:focus {
+  background-color: #080d16;
+  border-color: #6c8fb3;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(108, 143, 179, 0.25);
+}
+
