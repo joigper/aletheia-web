@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Ocultamos el formulario y mostramos la confirmación.
             form.classList.add("d-none");
             capitan.classList.remove("d-none");
+            capitan.classList.add("d-block");
             mensajeExito.classList.remove("d-none");
 
         } catch (error) {
