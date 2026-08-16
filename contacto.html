@@ -84,9 +84,11 @@
                 <p style="color: var(--bs-light);font-family: 'Exo 2', sans-serif;">Si varios lectores muestran interés por un mismo tema, intentaré desarrollar esa información e incorporarla a la web.</p>
             </div>
             <div class="col ps-5" style="border-color: rgb(213, 232, 242);border-top-color: rgb(213,;border-right-color: 232,;border-bottom-color: 242);border-left-color: 232,;">
-                <form class="w-100" action="https://formspree.io/f/moeanoaz" method="post"><label class="form-label text-light mb-2">Nombre o alias</label><input class="form-control mb-4 contacto-campo" type="text" name="name" required="" maxlength="100"><label class="form-label text-light mb-2">Correo electrónico</label><input class="form-control mb-2 contacto-campo" type="email" name="email" required="" maxlength="254">
-                    <p class="small text-secondary mb-4" style="color: var(--bs-light);font-family: 'Exo 2', sans-serif;">Tu dirección de correo se utilizará únicamente para responder a tu mensaje. No se incorporará a ninguna lista de distribución ni se utilizará con fines comerciales.</p><label class="form-label text-light mb-2">Mensaje</label><textarea class="form-control contacto-campo" rows="6" name="message" required="" maxlength="5000"></textarea><input class="form-control d-none" type="text" name="_gotcha"><button class="btn btn-primary float-end mt-4" data-bss-hover-animate="pulse" type="submit" style="border-color: rgb(213,232,242);border-top-color: rgb(255,;border-right-color: 255,;border-bottom-color: 255);border-left-color: 255,;background: var(--bs-focus-ring-color);">Enviar</button>
-                </form>
+                <form class="w-100" id="contacto-form" action="https://formspree.io/f/moeanoaz" method="post"><label class="form-label text-light mb-2" style="font-family: 'Exo 2', sans-serif;">Nombre o alias</label><input class="form-control mb-4 contacto-campo" type="text" name="name" required="" maxlength="100" style="font-family: 'Exo 2', sans-serif;"><label class="form-label text-light mb-2" style="font-family: 'Exo 2', sans-serif;">Correo electrónico</label><input class="form-control mb-2 contacto-campo" type="email" name="email" required="" maxlength="254" style="font-family: 'Exo 2', sans-serif;">
+                    <p class="small text-secondary mb-4" style="color: var(--bs-light);font-family: 'Exo 2', sans-serif;">Tu dirección de correo se utilizará únicamente para responder a tu mensaje. No se incorporará a ninguna lista de distribución ni se utilizará con fines comerciales.</p><label class="form-label text-light mb-2" style="font-family: 'Exo 2', sans-serif;">Mensaje</label><textarea class="form-control contacto-campo" rows="6" name="message" required="" maxlength="5000" style="font-family: 'Exo 2', sans-serif;"></textarea><input class="form-control d-none" type="text" name="_gotcha"><button class="btn btn-primary float-end mt-4" data-bss-hover-animate="pulse" type="submit" style="border-color: rgb(213,232,242);border-top-color: rgb(255,;border-right-color: 255,;border-bottom-color: 255);border-left-color: 255,;background: var(--bs-focus-ring-color);font-family: 'Exo 2', sans-serif;">Enviar</button>
+                    <p class="d-none" id="contacto-error" style="font-family: 'Exo 2', sans-serif;color: var(--bs-light);">No se ha podido enviar el mensaje. Inténtalo de nuevo.</p>
+                </form><img class="img-fluid d-none" width="656" height="600" id="contacto-capitan" src="assets/img/CAPITANSALUDO.png">
+                <p class="d-none" id="contacto-exito" style="font-family: 'Exo 2', sans-serif;color: var(--bs-light);">Gracias por escribirme. MENSAJE RECIBIDO.</p>
             </div>
         </div>
         <div class="mt-4" style="width: 100%;height: 1px;background: #3a3a3a;"></div>
@@ -98,6 +100,7 @@
     <script src="assets/js/bs-init.js"></script>
     <script src="assets/js/01naves.js"></script>
     <script src="assets/js/02flota.js"></script>
+    <script src="assets/js/contacto.js"></script>
     <script src="assets/js/explorar.js"></script>
     <script src="assets/js/galaxy-button.js"></script>
     <script src="assets/js/personajes.js"></script>
