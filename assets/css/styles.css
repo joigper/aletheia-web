@@ -196,3 +196,9 @@ html, body {
   box-shadow: 0 0 8px rgba(108, 143, 179, 0.25);
 }
 
+#contacto-capitan {
+  width: 60%;
+  max-width: 450px;
+  height: auto;
+}
+
