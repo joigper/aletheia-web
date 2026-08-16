@@ -204,8 +204,10 @@ html, body {
 
 /* =========================================   CONTACTO - MÓVIL   ========================================= */
 
-@media (max-width: 575.98px) {
-  .contacto-contenido > .col {
+/* =========================================   CONTACTO - TABLET Y MÓVIL   ========================================= */
+
+@media (max-width: 767.98px) {
+  .contacto-contenido > .col-12 {
     padding-left: 12px !important;
     padding-right: 12px !important;
   }
