@@ -33,17 +33,17 @@
   </div>
 </div>
         <div class="container z-1" style="height: 100%;position: relative;">
-            <div class="row" style="height: 100%;">
+            <div class="row aletheia-hero__fila" style="height: 100%;">
                 <div class="col col-lg-9 offset-lg-0 flex-column justify-content-center" style="display: flex;position: static;height: 100vh;text-align: left;background: url(&quot;assets\img\emblema.png&quot;);">
                     <div class="row">
                         <div class="col">
                             <div>
-                                <h1 class="mb-3" style="font-family: Tektur, serif;font-size: 100px;color: var(--bs-light-bg-subtle);font-weight: bold;text-shadow: 0px 0px 5px;position: static;display: flex;text-align: left;">ALÉTHEIA</h1>
+                                <h1 class="mb-3 aletheia-hero__titulo" style="font-family: Tektur, serif;font-size: 100px;color: var(--bs-light-bg-subtle);font-weight: bold;text-shadow: 0px 0px 5px;position: static;display: flex;text-align: left;">ALÉTHEIA</h1>
                                 <p style="font-family: Tektur, serif;color: var(--bs-light-bg-subtle);font-size: 22px;">La mayor expedición científica jamás emprendida por la humanidad.</p>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row aletheia-hero__botones-fila">
                         <div class="col"><div class="aletheia-galaxy-button">
   <a href="explorar.html" class="galaxy-trigger">
     <span class="spark"></span>
@@ -126,7 +126,7 @@
 </div></div>
                         <div class="col"></div>
                     </div>
-                    <div class="row" style="padding-top: 15px;">
+                    <div class="row aletheia-hero__botones-fila" style="padding-top: 15px;">
                         <div class="col"><div class="aletheia-galaxy-button" style="--button-hue:10;">
   <a href="#Saga" class="galaxy-trigger">
     <span class="spark"></span>
@@ -210,11 +210,6 @@
                         <div class="col"></div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="text-end position-relative d-flex justify-content-end align-items-end"><video class="aspect-ratio-16x9 w-50 h-50 align-content-end invisible" loop="" muted="" autoplay="">
-                            <source src="assets/video/Emblema_animado.mp4" type="video/mp4">
-                        </video></div>
-                </div>
             </div>
         </div>
     </section>
@@ -234,7 +229,7 @@
                     <p style="color: rgb(255,255,255);text-align: justify;"><br>Todos los módulos de ALÉTHEIA comparten las mismas dos cubiertas inferiores. La Cubierta 0 es una zona técnica de acceso restringido que alberga los radiadores, las conducciones principales de energía, datos, agua, saneamiento y el circuito primario de refrigeración por amoníaco, completamente aislado de las zonas habitables. Sobre ella se encuentra la Cubierta 1, una planta logística con una disposición radial de pasillos que permite enlazar perfectamente todos los módulos, formando una red continua para el tránsito de personas, vehículos y suministros por toda la nave.<br><br></p>
                 </div>
                 <div class="col flex-column justify-content-center" style="height: auto;min-height: 400px;display: flex;"><video class="aspect-ratio-16x9 w-100 align-items-center align-content-center" autoplay="" muted="" loop="">
-                        <source src="assets\video\modulo.mp4" type="video/mp4">
+                        <source src="assets/video/modulo.mp4" type="video/mp4">
                     </video></div>
             </div>
         </div>
@@ -376,13 +371,13 @@ Esta separación garantiza tanto la eficiencia del sistema como la seguridad de 
             </div>
         </div>
     </section>
-    <section class="pt-5" id="Saga" style="background: url(&quot;assets/img/Vista%20desde%20lejos%20de%20ALETHEIA.jpg&quot;) no-repeat, var(--bs-border-color-translucent);background-size: cover, auto;">
+    <section class="pt-5" id="Saga" style="background: url(&quot;assets/img/ALETHEIAOPENGRAPH.jpg&quot;) no-repeat, var(--bs-border-color-translucent);background-size: cover, auto;">
         <div class="container">
             <div class="row" style="background: var(--bs-border-color-translucent);">
                 <div class="col">
                     <p style="font-family: Tektur, serif;color: rgb(255,255,255);font-weight: bold;font-size: 30px;">Saga ALÉTHEIA</p>
-                    <p style="font-family: 'Exo 2', sans-serif;background: var(--bs-border-color-translucent);color: rgb(255,255,255);font-size: 18px;">Tres novelas publicadas.</p>
-                    <p class="amazon-aviso" style="color: rgb(255,255,255);font-size: 18px;font-family: 'Exo 2', sans-serif;">Haz clic sobre cualquier portada para verla en Amazon.&nbsp;&nbsp;<img src="assets/img/2285069.webp" width="22" height="22"></p>
+                    <p style="font-family: 'Exo 2', sans-serif;background: transparent;color: rgb(255,255,255);font-size: 18px;">Tres novelas publicadas.</p>
+                    <p class="d-flex align-items-center" style="color: rgb(255,255,255);font-size: 18px;font-family: 'Exo 2', sans-serif;">Haz clic sobre cualquier portada para verla en Amazon.&nbsp; &nbsp;<img width="30" height="30" src="assets/img/iconoamazon.webp"></p>
                 </div>
             </div>
             <div class="row" style="background: var(--bs-border-color-translucent);">
@@ -469,7 +464,7 @@ Esta separación garantiza tanto la eficiencia del sistema como la seguridad de 
 </div></div>
             </div>
             <div class="row">
-                <div class="col d-flex justify-content-center" style="padding-bottom: 20px;"><a data-bss-hover-animate="pulse" class="btn boton-otras-obras" href="otrasobras.html">Otras obras del autor</a><a class="ms-5 btn boton-otras-obras" data-bss-hover-animate="pulse" href="ADELANTOALETHEIA4.html">ADELANTO EXCLUSIVO · ALÉTHEIA 4</a></div>
+                <div class="col d-flex justify-content-center flex-wrap gap-4" style="padding-bottom: 20px;"><a data-bss-hover-animate="pulse" class="btn boton-otras-obras" href="otrasobras.html" style="border-color: rgb(213, 232, 242);border-top-color: rgb(213,;border-right-color: 232,;border-bottom-color: 242);border-left-color: 232,;">Otras obras del autor</a><a data-bss-hover-animate="pulse" class="btn boton-otras-obras" href="ADELANTOALETHEIA4.html" style="border-color: rgb(213, 232, 242);border-top-color: rgb(213,;border-right-color: 232,;border-bottom-color: 242);border-left-color: 232,;">ADELANTO EXCLUSIVO · ALÉTHEIA 4</a><a data-bss-hover-animate="pulse" class="btn boton-otras-obras" href="contacto.html" style="border-color: rgb(213, 232, 242);border-top-color: rgb(213,;border-right-color: 232,;border-bottom-color: 242);border-left-color: 232,;">CONTACTO</a></div>
             </div>
             <div class="mt-4" style="width: 100%;height: 1px;background: #3a3a3a;"></div><img src="assets/img/emblema2.jpg" style="color: var(--bs-border-color-translucent);text-align: center;" width="131" height="131">
             <h1 style="font-family: Tektur, serif;font-weight: bold;font-size: 28px;color: rgb(255,255,255);">ALÉTHEIA</h1>
@@ -482,7 +477,7 @@ Esta separación garantiza tanto la eficiencia del sistema como la seguridad de 
     <script src="assets/js/bs-init.js"></script>
     <script src="assets/js/01naves.js"></script>
     <script src="assets/js/02flota.js"></script>
-    <script src="assets/js/adelanto.js"></script>
+    <script src="assets/js/contacto.js"></script>
     <script src="assets/js/explorar.js"></script>
     <script src="assets/js/galaxy-button.js"></script>
     <script src="assets/js/personajes.js"></script>

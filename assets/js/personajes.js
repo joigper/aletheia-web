@@ -771,7 +771,7 @@ window.personajes = [
     categoria: "secundario",
     primeraAparicion: 1,
     nombre: "Ramón",
-    apellidos: "Santamaría",
+    apellidos: "G. Santamaría",
     cargo: "Propietario del Bar Ramón",
     departamento: "Restauración",
     nacionalidad: "España",
