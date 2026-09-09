@@ -189,6 +189,44 @@
   object-position: center;
 }
 
+/* ==================================================
+   VÍDEO DE LA FICHA
+   ================================================== */
+
+.ficha-modulo__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.ficha-modulo__video[hidden] {
+  display: none;
+}
+
+.ficha-modulo__ver-video {
+  padding: 7px 14px;
+  border: 1px solid rgba(111, 214, 255, 0.38);
+  border-radius: 8px;
+  background: rgba(12, 17, 24, 0.88);
+  color: #d5dbe2;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.ficha-modulo__ver-video:hover {
+  color: #ffffff;
+  border-color: rgba(111, 214, 255, 0.75);
+}
+
+.ficha-modulo__ver-video[hidden] {
+  display: none;
+}
+
 /* ==================================================   TEXTO DE LA FICHA   ================================================== */
 
 .ficha-modulo__contenido {
@@ -487,4 +525,3 @@
     padding-right: 8px;
   }
 }
-

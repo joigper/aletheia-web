@@ -701,6 +701,15 @@
 
         <button
             type="button"
+            id="modulo-ver-video"
+            class="ficha-modulo__ver-video"
+            hidden
+        >
+            VER VÍDEO
+        </button>
+
+        <button
+            type="button"
             id="cerrar-ficha-modulo"
             class="ficha-modulo__cerrar"
             aria-label="Cerrar ficha"
@@ -716,6 +725,14 @@
             src=""
             alt=""
         >
+
+        <video
+            id="modulo-video"
+            class="ficha-modulo__video"
+            controls
+            playsinline
+            hidden
+        ></video>
     </div>
 
     <div class="ficha-modulo__contenido">

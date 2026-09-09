@@ -14,6 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const botonMasImagenes = document.getElementById(
     "modulo-mas-imagenes"
     );
+    const botonVerVideo = document.getElementById(
+    "modulo-ver-video"
+    );
+    const videoModulo = document.getElementById(
+    "modulo-video"
+    );
 
     const botonNivel1 = document.getElementById("mostrar-nivel-1");
     const botonNivel2 = document.getElementById("mostrar-nivel-2");
@@ -218,6 +224,7 @@ L2_007: {
             nombre: "NEXUS",
             area: "Propulsión y navegación",
             imagen: "assets/img/NEXUS.jpg",
+            video: "assets/video/NEXUS.mp4",
             imagenAlt:
                 "Interpretación visual del módulo NEXUS",
             descripcion:
@@ -1128,6 +1135,7 @@ L1_033: {
     }
     let imagenesActuales = [];
     let indiceImagenActual = 0;
+    let videoActual = null;
 
     function mostrarDatos(datos, estado) {
     estadoFicha.textContent = estado;
@@ -1146,10 +1154,25 @@ L1_033: {
 
     imagenModulo.src = imagenesActuales[0].src;
     imagenModulo.alt = imagenesActuales[0].alt;
+    imagenModulo.hidden = false;
 
     if (botonMasImagenes) {
         botonMasImagenes.hidden =
             imagenesActuales.length <= 1;
+    }
+
+    if (videoModulo) {
+        videoModulo.pause();
+        videoModulo.removeAttribute("src");
+        videoModulo.load();
+        videoModulo.hidden = true;
+    }
+
+    videoActual = datos.video || null;
+
+    if (botonVerVideo) {
+        botonVerVideo.hidden = !videoActual;
+        botonVerVideo.textContent = "VER VÍDEO";
     }
 
     fichaModulo.classList.remove(
@@ -1279,6 +1302,26 @@ if (botonMasImagenes) {
             imagenesActuales[indiceImagenActual].alt;
     });
 }
+    if (botonVerVideo && videoModulo) {
+        botonVerVideo.addEventListener("click", () => {
+            if (!videoActual) {
+                return;
+            }
+
+            if (videoModulo.hidden) {
+                videoModulo.src = videoActual;
+                imagenModulo.hidden = true;
+                videoModulo.hidden = false;
+                botonVerVideo.textContent = "VER IMAGEN";
+                videoModulo.play().catch(() => {});
+            } else {
+                videoModulo.pause();
+                videoModulo.hidden = true;
+                imagenModulo.hidden = false;
+                botonVerVideo.textContent = "VER VÍDEO";
+            }
+        });
+    }
     botonNivel1.addEventListener("click", () => {
         mostrarNivel(1);
     });
