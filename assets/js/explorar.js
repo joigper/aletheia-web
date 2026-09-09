@@ -20,7 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const videoModulo = document.getElementById(
     "modulo-video"
     );
+    const botonSaberMas = document.createElement("a");
+    botonSaberMas.id = "modulo-saber-mas";
+    botonSaberMas.className =
+        "ficha-modulo__mas-imagenes ficha-modulo__saber-mas";
+    botonSaberMas.textContent = "SABER MÁS";
+    botonSaberMas.hidden = true;
+    botonSaberMas.style.textDecoration = "none";
 
+    if (botonMasImagenes) {
+        botonMasImagenes.insertAdjacentElement(
+            "afterend",
+            botonSaberMas
+        );
+    }
     const botonNivel1 = document.getElementById("mostrar-nivel-1");
     const botonNivel2 = document.getElementById("mostrar-nivel-2");
     const explorarContenedor = document.querySelector(
@@ -403,7 +416,8 @@ L1_017: {
     },
 ],
     descripcion:
-        "Dirigida por Thomas Müller, la Cocina constituye el principal centro de producción alimentaria de ALÉTHEIA. Cada día elabora miles de menús equilibrados para toda la tripulación a partir de las preferencias registradas previamente por cada usuario mediante la aplicación personal de la nave, optimizando la producción y reduciendo al mínimo el desperdicio de alimentos. Las raciones que no llegan a consumirse son ultracongeladas y envasadas para su posterior distribución, permitiendo que cualquier tripulante pueda disponer de ellas en otro momento sin que se desperdicie comida."
+        "Dirigida por Thomas Müller, la Cocina constituye el principal centro de producción alimentaria de ALÉTHEIA. Cada día elabora miles de menús equilibrados para toda la tripulación a partir de las preferencias registradas previamente por cada usuario mediante la aplicación personal de la nave, optimizando la producción y reduciendo al mínimo el desperdicio de alimentos. Las raciones que no llegan a consumirse son ultracongeladas y envasadas para su posterior distribución, permitiendo que cualquier tripulante pueda disponer de ellas en otro momento sin que se desperdicie comida.",
+    enlace: "cocina.html"
 },
         L1_066: {
     nombre: "WASTE",
@@ -1173,6 +1187,13 @@ L1_033: {
     if (botonVerVideo) {
         botonVerVideo.hidden = !videoActual;
         botonVerVideo.textContent = "VER VÍDEO";
+    }
+    botonSaberMas.hidden = !datos.enlace;
+
+    if (datos.enlace) {
+        botonSaberMas.href = datos.enlace;
+    } else {
+        botonSaberMas.removeAttribute("href");
     }
 
     fichaModulo.classList.remove(
