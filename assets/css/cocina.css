@@ -35,3 +35,495 @@
   opacity: 1;
 }
 
+.cocina-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cocina-croquis {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.cocina-intro-media {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  margin: 0 auto;
+  background: #02070d;
+}
+
+.cocina-info {
+  width: 100%;
+  max-width: 600px;
+  min-height: 150px;
+  margin: 1.25rem auto 0;
+  padding: 1.25rem;
+  border: 1px solid rgba(126, 188, 255, 0.35);
+  background: rgba(3, 22, 38, 0.85);
+  color: #d7ebff;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
+}
+
+.cocina-info.cocina-info-activa {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (max-width: 991.98px) {
+  .cocina-croquis {
+    max-width: 430px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-intro-media, .cocina-info {
+    max-width: 560px;
+  }
+}
+
+/* Ajuste de la composición para escritorio */
+
+@media (min-width: 992px) {
+  .cocina-croquis {
+    width: auto;
+    max-width: 100%;
+    max-height: 55vh;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-layout {
+    align-items: flex-start;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-intro {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-info {
+    max-width: 560px;
+  }
+}
+
+/* La imagen final aparece sobre el vídeo sin descubrir el fondo */
+
+#cocina-video {
+  z-index: 1;
+}
+
+.cocina-final {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cocina-intro.intro-finalizada #cocina-video {
+  opacity: 1;
+}
+
+.cocina-intro.intro-finalizada .cocina-final {
+  opacity: 1;
+}
+
+/* Selector superpuesto al croquis */
+
+.cocina-selector {
+  position: relative;
+  width: min(100%, 430px);
+  aspect-ratio: 2 / 3;
+  margin: 0 auto;
+  line-height: 0;
+}
+
+.cocina-selector .cocina-croquis {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  object-fit: contain;
+}
+
+@media (min-width: 992px) {
+  .cocina-selector {
+    width: min(100%, calc(55vh * 2 / 3));
+  }
+}
+
+.cocina-zona {
+  position: absolute;
+  z-index: 3;
+  /*left: 23%;*/
+  /*top: calc(12.5% + var(--nivel-desde-arriba) * 7.5%);*/
+  /*width: 54%;*/
+  /*height: 7.5%;*/
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.interaccion-lista .cocina-zona {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cocina-zona:hover, .cocina-zona:focus-visible, .cocina-zona.activa, .cocina-zona.fijada {
+  outline: none;
+  border-color: rgba(174, 224, 255, 0.95);
+  background: rgba(48, 159, 226, 0.32);
+  box-shadow: 0 0 12px rgba(76, 181, 244, 0.8), inset 0 0 20px rgba(95, 196, 255, 0.3);
+}
+
+.cocina-info-numero, .cocina-info-nombre {
+  display: block;
+  line-height: 1.3;
+}
+
+.cocina-info-numero {
+  margin-bottom: 0.35rem;
+  color: #85cfff;
+  font-family: "Tektur", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.16em;
+}
+
+.cocina-info-nombre {
+  color: #e3f3ff;
+  font-family: "Tektur", sans-serif;
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  font-weight: 500;
+}
+
+@media (min-width: 992px) {
+  .cocina-selector {
+    width: min(100%, calc(55vh * 2 / 3));
+  }
+}
+
+/* Imagen 3D correspondiente a la cubierta señalada */
+
+.cocina-final {
+  transition: opacity 140ms ease;
+}
+
+.cocina-intro.modelo-resaltado .cocina-final {
+  opacity: 1;
+}
+
+/* Transición desde el módulo completo hasta la planta de una cubierta */
+
+.cocina-intro.transicion-cubierta #cocina-video {
+  z-index: 4;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.cocina-intro.transicion-cubierta .cocina-final {
+  opacity: 0;
+}
+
+/* Punto de anclaje para el futuro plano 2D superpuesto. */
+
+.cocina-intro.vista-planta::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Transición desde el módulo completo hasta la planta de una cubierta */
+
+.cocina-intro.transicion-cubierta #cocina-video {
+  z-index: 4;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.cocina-intro.transicion-cubierta .cocina-final {
+  opacity: 0;
+}
+
+/* Punto de anclaje para el futuro plano 2D superpuesto. */
+
+.cocina-intro.vista-planta::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cocina-info-descripcion {
+  margin: 0.8rem 0 0;
+  color: rgba(215, 235, 255, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* Transición desde el módulo completo hasta la planta de una cubierta */
+
+.cocina-intro.transicion-cubierta #cocina-video {
+  z-index: 4;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.cocina-intro.transicion-cubierta .cocina-final {
+  opacity: 0;
+}
+
+/* Punto de anclaje para el futuro plano 2D superpuesto. */
+
+.cocina-intro.vista-planta::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cocina-plano {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: translateY(5%) scale(0.72) rotate(1.5deg);
+  transform-origin: center center;
+  pointer-events: none;
+  transition: opacity 650ms ease;
+  transition: opacity 800ms ease, transform 800ms cubic-bezier(0.22, 0.75, 0.25, 1);
+}
+
+.cocina-intro.plano-visible .cocina-plano {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(0deg);
+}
+
+.cocina-info-descripcion {
+  margin: 0.8rem 0 0;
+  color: rgba(215, 235, 255, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* Aprovechamiento de monitores anchos. Mantiene intacto el diseño normal. */
+
+@media (min-width: 1600px) {
+  body > .container {
+    width: calc(100% - 4rem);
+    max-width: none;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout {
+    display: grid;
+    grid-template-columns: minmax(360px, 430px) minmax(0, 1fr);
+    gap: clamp(1.5rem, 2vw, 2.5rem) !important;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout > [class*="col-"] {
+    width: auto;
+    max-width: none;
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout > .col-lg-5 {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout > .col-lg-7 {
+    display: grid;
+    grid-template-columns: minmax(560px, 700px) minmax(300px, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: clamp(1.5rem, 2vw, 2.5rem);
+    align-items: start;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout .cocina-intro {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout .cocina-info {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    margin: 0.7rem 0 0;
+  }
+}
+
+/* La futura ficha de un punto de interés ocupará esta tercera zona. */
+
+@media (min-width: 1600px) {
+  .cocina-detalle {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout .cocina-intro-media, .cocina-layout .cocina-plano {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    margin: 0;
+    object-fit: contain;
+  }
+}
+
+/* Puntos de interés superpuestos al plano */
+
+.cocina-punto {
+  position: absolute;
+  z-index: 7;
+  left: var(--punto-x);
+  top: var(--punto-y);
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 3px solid #d7f3ff;
+  border-radius: 50%;
+  background: #27c9ff;
+  box-shadow: 0 0 0 5px rgba(39, 201, 255, 0.18), 0 0 18px #27c9ff;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.6);
+  transition: opacity 250ms ease, transform 250ms ease, box-shadow 180ms ease;
+}
+
+.cocina-intro.vista-planta[data-cubierta="2"] .cocina-punto {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+  animation: cocina-punto-pulso 2.2s ease-in-out infinite;
+}
+
+.cocina-punto:hover, .cocina-punto:focus-visible, .cocina-punto.activo {
+  outline: none;
+  box-shadow: 0 0 0 7px rgba(39, 201, 255, 0.3), 0 0 26px #9be9ff;
+}
+
+@keyframes cocina-punto-pulso {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(39, 201, 255, 0.15), 0 0 13px #27c9ff;
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(39, 201, 255, 0.05), 0 0 23px #7fe4ff;
+  }
+}
+
+/* Ficha derecha de un punto de interés */
+
+.cocina-detalle {
+  width: 100%;
+  min-height: 260px;
+  padding: 1.25rem;
+  border: 1px solid rgba(126, 188, 255, 0.35);
+  background: rgba(3, 22, 38, 0.85);
+  color: #d7ebff;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 350ms ease, transform 350ms ease, visibility 350ms;
+}
+
+.cocina-detalle.cocina-detalle-activo {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.cocina-detalle-medio {
+  display: none;
+  width: 100%;
+  margin-bottom: 1rem;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #02070d;
+}
+
+.cocina-detalle-medio.con-medio {
+  display: block;
+}
+
+.cocina-detalle-medio img, .cocina-detalle-medio video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cocina-detalle-cerrar {
+  margin-top: 1rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(133, 207, 255, 0.5);
+  background: transparent;
+  color: #85cfff;
+  font-family: "Tektur", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+}
+
+.cocina-detalle-cerrar:hover, .cocina-detalle-cerrar:focus-visible {
+  border-color: #bde8ff;
+  color: #e3f3ff;
+  outline: none;
+}
+
+@media (max-width: 1599.98px) {
+  .cocina-detalle {
+    max-width: 600px;
+    margin: 1rem auto 0;
+  }
+}
+
