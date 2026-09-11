@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   intro.appendChild(plano);
 
   // Cubiertas con plano funcional disponible.
-  const planosDisponibles = new Set([2, 3]);
+  const planosDisponibles = new Set([2, 3, 6, 7, 8]);
 
   const puntosCubierta2 = [
     {
@@ -80,8 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       x: 50,
       y: 24,
-      titulo: "Hornos y panificación",
-      texto: "Baterías de hornos de gran capacidad permiten elaborar pan, masas y preparaciones horneadas para el servicio diario del módulo. La zona integra amasado, fermentación controlada, horneado y enfriamiento inicial, organizados en líneas que abastecen tanto a la propia Cocina como a los comedores de las cubiertas superiores.",
+      titulo: "Hornos de producción y rosticería",
+      texto: "Una batería de hornos de gran capacidad permite asar de forma continua aves, carnes, pescados, verduras y otras preparaciones que requieren calor seco y circulación uniforme. Los ciclos se coordinan con el ritmo del servicio para suministrar grandes tandas de comida caliente a las áreas de terminación y expedición.",
       medio: {
         tipo: "video",
         src: "assets/img/cocina/cocinac3p01.mp4"
@@ -130,9 +130,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  const puntosCubierta6 = [
+    {
+  x: 58,
+  y: 74,
+  titulo: "Comedor C · sala principal",
+  texto: "El comedor C dispone de 1.000 plazas organizadas en sectores amplios y fácilmente legibles. Su distribución permite atender grandes flujos de comensales sin perder comodidad, manteniendo recorridos claros hacia el núcleo central y los accesos laterales.",
+  medio: {
+    tipo: "video",
+    src: "assets/img/cocina/cocinac6p01.mp4"
+  }
+},
+    {
+      x: 56,
+      y: 40,
+      titulo: "Servicio asistido",
+      texto: "Los mostradores abiertos de la corona de servicio permiten entregar los platos, reponer bandejas y coordinar la salida de carros térmicos sin invadir la sala principal. El personal trabaja desde el interior de esta franja técnica, siempre cerca de cada comedor.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac6p02.jpg",
+        alt: "Mostrador de servicio asistido de los comedores del módulo Cocina"
+      }
+    },
+    {
+      x: 48,
+      y: 37,
+      titulo: "Acceso vertical",
+      texto: "Los grandes ascensores conectan estas cubiertas con el resto del módulo y absorben los momentos de mayor afluencia. Su tamaño permite alternar el transporte de personas con los desplazamientos logísticos de los pequeños vehículos internos, según la necesidad de cada turno.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac6p03.mp4"
+      }
+    },
+    {
+      x: 30,
+      y: 50,
+      titulo: "Accesos laterales y circulación",
+      texto: "Además del paso desde el núcleo central, cada comedor dispone de dos accesos por módulos contiguos. Esta red de entradas reparte las llegadas y salidas de los comensales, evita concentraciones en un único punto y facilita el tránsito hacia HOME, SPORT y las escaleras.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac6p04.jpg",
+        alt: "Comensales saliendo del comedor por una de sus conexiones laterales"
+      }
+    }
+  ];
+
   const puntosPorCubierta = new Map([
     [2, puntosCubierta2],
-    [3, puntosCubierta3]
+    [3, puntosCubierta3],
+    [6, puntosCubierta6]
   ]);
 
   const detalle = document.createElement("aside");
@@ -244,8 +290,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "Ensaladas, platos fríos, postres, panadería, repostería y preparaciones específicas.",
     "Montaje final, mantenimiento de temperatura y expedición hacia los comedores superiores. Actúa como interfaz entre producción y servicio.",
     "Comedores A, B y C. Capacidad conjunta de 3.000 plazas y operación habitual del módulo.",
-    "Comedores D, E y F. Otras 3.000 plazas mantenidas como capacidad de reserva.",
-    "Comedores G, H e I. Otras 3.000 plazas disponibles como capacidad de reserva.",
+    "Comedores D, E y F. Planta preparada para entrar en servicio cuando el crecimiento de ALÉTHEIA requiera ampliar la capacidad de restauración.",
+    "Comedores G, H e I. Planta actualmente sin servicio, reservada para futuras fases de crecimiento del módulo.",
     "Comedores J, K y L en configuración de alta densidad. Capacidad máxima adicional de 6.000 plazas, normalmente en reserva."
   ];
 
