@@ -17,8 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   plano.setAttribute("aria-hidden", "true");
   intro.appendChild(plano);
 
-  // Se añadirán aquí las demás cubiertas cuando tengan su plano terminado.
-  const planosDisponibles = new Set([2]);
+  // Cubiertas con plano funcional disponible.
+  const planosDisponibles = new Set([2, 3]);
 
   const puntosCubierta2 = [
     {
@@ -33,33 +33,107 @@ document.addEventListener("DOMContentLoaded", () => {
 },
     {
       x: 38,
-      y: 69,
-      titulo: "Conservación y descongelación",
-      texto: "Las cámaras de trabajo mantienen únicamente las reservas necesarias para la producción inmediata. La descongelación se realiza de forma controlada y separada del resto de operaciones.",
-      medio: null
-    },
-    {
+  y: 69,
+  titulo: "Conservación y descongelación",
+  texto: "Las cámaras frigoríficas de trabajo mantienen únicamente las reservas necesarias para la producción inmediata, evitando almacenar en COCINA grandes cantidades de alimentos durante largos periodos. Los productos procedentes de ALMACÉN 2 se conservan a la temperatura adecuada y, cuando es necesario, pasan por procesos de descongelación controlada antes de incorporarse a las áreas de preparación. Estas operaciones se realizan en espacios separados para mantener la cadena de frío y las condiciones higiénicas.",
+  medio: {
+    tipo: "imagen",
+    src: "assets/img/cocina/cocinac2p02.jpg",
+    alt: "Zona de conservación y descongelación controlada del módulo Cocina"
+    }
+  },
+  {
       x: 35,
-      y: 31,
-      titulo: "Preparación vegetal",
-      texto: "Área destinada a la selección, lavado, desinfección, pelado y corte de verduras y otros productos vegetales.",
-      medio: null
+  y: 31,
+  titulo: "Preparación vegetal",
+  texto: "Área destinada a la selección, lavado, desinfección, pelado y corte de verduras, frutas y otros productos vegetales. Los procesos se realizan en líneas diferenciadas y parcialmente automatizadas, bajo supervisión del personal de COCINA, antes de que los ingredientes preparados pasen a las áreas de elaboración.",
+  medio: {
+    tipo: "imagen",
+    src: "assets/img/cocina/cocinac2p03.jpg",
+    alt: "Zona de preparación y procesado de productos vegetales del módulo Cocina"
+  }
     },
     {
       x: 66,
       y: 36,
       titulo: "Carnes y pescado",
       texto: "Los productos cárnicos y el pescado se procesan en sectores diferenciados para mantener unas condiciones higiénicas independientes y evitar contaminaciones cruzadas.",
-      medio: null
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac2p04.jpg",
+        alt: "Área separada de procesamiento de carnes y pescado del módulo Cocina"
+      }
     },
     {
       x: 50,
       y: 50,
       titulo: "Circulación vertical y retornos",
       texto: "El núcleo central conecta la cubierta con las plantas superiores mediante montacargas. Los residuos, recipientes y retornos siguen un recorrido separado del flujo de alimentos preparados.",
-      medio: null
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac2p05.mp4"
+      }
     }
   ];
+
+  const puntosCubierta3 = [
+    {
+      x: 50,
+      y: 24,
+      titulo: "Hornos y panificación",
+      texto: "Baterías de hornos de gran capacidad permiten elaborar pan, masas y preparaciones horneadas para el servicio diario del módulo. La zona integra amasado, fermentación controlada, horneado y enfriamiento inicial, organizados en líneas que abastecen tanto a la propia Cocina como a los comedores de las cubiertas superiores.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac3p01.mp4"
+      }
+    },
+    {
+      x: 32,
+      y: 50,
+      titulo: "Marmitas y cocción principal",
+      texto: "Las marmitas de gran capacidad concentran la cocción de caldos, sopas, legumbres, pastas, arroces y otros platos de elaboración continua. Sus controles permiten mantener tiempos y temperaturas constantes mientras el personal supervisa cada lote antes de enviarlo a las áreas de terminación.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac3p02.mp4"
+      }
+    },
+    {
+      x: 68,
+      y: 50,
+      titulo: "Planchas y salteados",
+      texto: "Dos líneas de planchas industriales permiten trabajar simultáneamente carnes, pescados, verduras y preparaciones de acabado rápido. La producción se organiza por tandas y horarios de servicio para entregar cada elaboración en el punto óptimo de cocción a las cubiertas superiores.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac3p03.mp4"
+      }
+    },
+    {
+      x: 39,
+      y: 76,
+      titulo: "Salsas, guarniciones y preparación final",
+      texto: "En esta línea se elaboran y mantienen las salsas, se preparan las guarniciones y se realizan los últimos ajustes de cada plato. Las cubetas térmicas y recipientes de servicio conservan cada componente en condiciones adecuadas hasta su paso a emplatado.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac3p04.jpg",
+        alt: "Zona de salsas, guarniciones y preparación final del módulo Cocina"
+      }
+    },
+    {
+      x: 61,
+      y: 76,
+      titulo: "Emplatado y expedición",
+      texto: "Las elaboraciones terminadas se porcionan y agrupan según el comedor de destino. El equipo coordina el ritmo de salida, carga los carros térmicos y verifica que cada servicio salga completo antes de su distribución vertical hacia las cubiertas de comedores.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac3p05.mp4"
+      }
+    }
+  ];
+
+  const puntosPorCubierta = new Map([
+    [2, puntosCubierta2],
+    [3, puntosCubierta3]
+  ]);
 
   const detalle = document.createElement("aside");
   detalle.className = "cocina-detalle";
@@ -95,42 +169,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  puntosCubierta2.forEach((contenido, indice) => {
-    const punto = document.createElement("button");
-    punto.type = "button";
-    punto.className = "cocina-punto";
-    punto.style.setProperty("--punto-x", `${contenido.x}%`);
-    punto.style.setProperty("--punto-y", `${contenido.y}%`);
-    punto.setAttribute("aria-label", contenido.titulo);
-    punto.addEventListener("click", (evento) => {
-      evento.stopPropagation();
-      intro.querySelectorAll(".cocina-punto").forEach((otro) => {
-        otro.classList.toggle("activo", otro === punto);
+  const mostrarPuntos = (nivel) => {
+    intro.querySelectorAll(".cocina-punto").forEach((punto) => punto.remove());
+
+    const puntos = puntosPorCubierta.get(nivel) || [];
+    puntos.forEach((contenido, indice) => {
+      const punto = document.createElement("button");
+      punto.type = "button";
+      punto.className = "cocina-punto";
+      punto.style.setProperty("--punto-x", `${contenido.x}%`);
+      punto.style.setProperty("--punto-y", `${contenido.y}%`);
+      punto.setAttribute("aria-label", contenido.titulo);
+      punto.addEventListener("click", (evento) => {
+        evento.stopPropagation();
+        intro.querySelectorAll(".cocina-punto").forEach((otro) => {
+          otro.classList.toggle("activo", otro === punto);
+        });
+        detalleReferencia.textContent = `CUBIERTA ${nivel} · PUNTO ${String(indice + 1).padStart(2, "0")}`;
+        detalleTitulo.textContent = contenido.titulo;
+        detalleTexto.textContent = contenido.texto;
+        detalleMedio.replaceChildren();
+        detalleMedio.classList.remove("con-medio");
+
+        if (contenido.medio) {
+          if (contenido.medio.tipo === "video") {
+            const videoDetalle = document.createElement("video");
+            videoDetalle.src = contenido.medio.src;
+            videoDetalle.controls = true;
+            videoDetalle.playsInline = true;
+            videoDetalle.preload = "metadata";
+            detalleMedio.appendChild(videoDetalle);
+          }
+
+          if (contenido.medio.tipo === "imagen") {
+            const imagenDetalle = document.createElement("img");
+            imagenDetalle.src = contenido.medio.src;
+            imagenDetalle.alt = contenido.medio.alt || "";
+            detalleMedio.appendChild(imagenDetalle);
+          }
+
+          detalleMedio.classList.add("con-medio");
+        }
+
+        detalle.classList.add("cocina-detalle-activo");
       });
-      detalleReferencia.textContent = `CUBIERTA 2 · PUNTO ${String(indice + 1).padStart(2, "0")}`;
-      detalleTitulo.textContent = contenido.titulo;
-      detalleTexto.textContent = contenido.texto;
-      detalleMedio.replaceChildren();
-detalleMedio.classList.remove("con-medio");
-
-if (contenido.medio) {
-  if (contenido.medio.tipo === "video") {
-    const videoDetalle = document.createElement("video");
-
-    videoDetalle.src = contenido.medio.src;
-    videoDetalle.controls = true;
-    videoDetalle.playsInline = true;
-    videoDetalle.preload = "metadata";
-
-    detalleMedio.appendChild(videoDetalle);
-    detalleMedio.classList.add("con-medio");
-  }
-}
-
-detalle.classList.add("cocina-detalle-activo");
+      intro.appendChild(punto);
     });
-    intro.appendChild(punto);
-  });
+  };
 
   detalleCerrar.addEventListener("click", cerrarDetalle);
   const modelosCubierta = Array.from(
@@ -155,7 +240,7 @@ detalle.classList.add("cocina-detalle-activo");
     "Área aislada destinada a los sistemas comunes y servicios técnicos del módulo.",
     "Sistemas comunes de apoyo a la producción, distribución y funcionamiento general de COCINA.",
     "Aquí llega el alimento desde el módulo ALMACÉN 2, situado al sur. Lavado, descongelación controlada, limpieza, corte y preparación de verduras, carnes y pescado. Incluye pequeñas cámaras frigoríficas de trabajo, pero no almacenes para varias semanas.",
-    "Grandes zonas de hornos, cocción, planchas y marmitas. Probablemente sea la cubierta visualmente más espectacular para mostrar en vídeo.",
+    "Grandes zonas de hornos, cocción, planchas y marmitas.",
     "Ensaladas, platos fríos, postres, panadería, repostería y preparaciones específicas.",
     "Montaje final, mantenimiento de temperatura y expedición hacia los comedores superiores. Actúa como interfaz entre producción y servicio.",
     "Comedores A, B y C. Capacidad conjunta de 3.000 plazas y operación habitual del módulo.",
@@ -230,6 +315,7 @@ detalle.classList.add("cocina-detalle-activo");
     actualizarFijada();
     mostrarCubierta(nivel);
     cerrarDetalle();
+    mostrarPuntos(nivel);
     intro.dataset.cubierta = nivel;
 
     intro.classList.remove("vista-planta", "plano-visible", "modelo-resaltado");
@@ -260,6 +346,7 @@ detalle.classList.add("cocina-detalle-activo");
 
     cubiertaPendiente = siguiente;
     cerrarDetalle();
+    intro.querySelectorAll(".cocina-punto").forEach((punto) => punto.remove());
     faseTransicion = "salida";
     intro.classList.remove("vista-planta", "plano-visible");
     if (video.currentTime < comienzoRegreso) {
