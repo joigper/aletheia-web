@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   intro.appendChild(plano);
 
   // Cubiertas con plano funcional disponible.
-  const planosDisponibles = new Set([2, 3, 6, 7, 8]);
+  const planosDisponibles = new Set([2, 3, 6, 7, 8, 9]);
 
   const puntosCubierta2 = [
     {
@@ -132,15 +132,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const puntosCubierta6 = [
     {
-  x: 58,
-  y: 74,
-  titulo: "Comedor C · sala principal",
-  texto: "El comedor C dispone de 1.000 plazas organizadas en sectores amplios y fácilmente legibles. Su distribución permite atender grandes flujos de comensales sin perder comodidad, manteniendo recorridos claros hacia el núcleo central y los accesos laterales.",
-  medio: {
-    tipo: "video",
-    src: "assets/img/cocina/cocinac6p01.mp4"
-  }
-},
+      x: 58,
+      y: 74,
+      titulo: "Comedor C · sala principal",
+      texto: "El comedor C dispone de 1.000 plazas organizadas en sectores amplios y fácilmente legibles. Su distribución permite atender grandes flujos de comensales sin perder comodidad, manteniendo recorridos claros hacia el núcleo central y los accesos laterales.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac6p01.mp4"
+      }
+    },
     {
       x: 56,
       y: 40,
@@ -175,10 +175,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  const puntosCubierta9 = [
+    {
+      x: 37,
+      y: 66,
+      titulo: "Comedor de alta densidad",
+      texto: "Esta cubierta funciona como comedor de contingencia para misiones de evacuación o transporte masivo. Mesas corridas, recorridos directos y líneas de reparto autónomas permiten atender a miles de personas por turnos, con un servicio simplificado, seguro y de alta rotación.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac9p01.jpg",
+        alt: "Comedor de alta densidad de ALÉTHEIA"
+      }
+    }
+  ];
+
   const puntosPorCubierta = new Map([
     [2, puntosCubierta2],
     [3, puntosCubierta3],
-    [6, puntosCubierta6]
+    [6, puntosCubierta6],
+    [9, puntosCubierta9]
   ]);
 
   const detalle = document.createElement("aside");
@@ -279,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Comedores A–B–C",
     "Comedores D–E–F",
     "Comedores G–H–I",
-    "Comedores J–K–L · Alta densidad"
+    "Comedores J–K · Alta densidad"
   ];
 
   const descripciones = [
@@ -292,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Comedores A, B y C. Capacidad conjunta de 3.000 plazas y operación habitual del módulo.",
     "Comedores D, E y F. Planta preparada para entrar en servicio cuando el crecimiento de ALÉTHEIA requiera ampliar la capacidad de restauración.",
     "Comedores G, H e I. Planta actualmente sin servicio, reservada para futuras fases de crecimiento del módulo.",
-    "Comedores J, K y L en configuración de alta densidad. Capacidad máxima adicional de 6.000 plazas, normalmente en reserva."
+    "Comedores J y K en configuración de alta densidad. Capacidad máxima adicional de 6.000 plazas, normalmente en reserva."
   ];
 
   const selector = document.createElement("div");
