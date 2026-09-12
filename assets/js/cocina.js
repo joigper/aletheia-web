@@ -18,14 +18,49 @@ document.addEventListener("DOMContentLoaded", () => {
   intro.appendChild(plano);
 
   // Cubiertas con plano funcional disponible.
-  const planosDisponibles = new Set([2, 3, 6, 7, 8, 9]);
+  const planosDisponibles = new Set([1, 2, 3, 4, 6, 7, 8, 9]);
+
+  const puntosCubierta1 = [
+    {
+      x: 50,
+      y: 21,
+      titulo: "Tienda de congelados",
+      texto: "Esta tienda logística reúne alimentos congelados envasados y trazados para la tripulación. Funciona como punto de suministro de proximidad dentro de la red común de pasillos, con conservación autónoma y reposición desde los circuitos internos de ALÉTHEIA.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac1p01.mp4"
+      }
+    },
+    {
+      x: 36,
+      y: 61,
+      titulo: "Frescos de corta duración",
+      texto: "Aquí se distribuyen alimentos listos para consumir con rotación rápida: ensaladas, fruta preparada, gazpachos, postres refrigerados, lácteos y raciones envasadas. Solo llegan productos que permanecieron sin servir y han superado el control de tiempo, temperatura y trazabilidad; nunca sobras de platos individuales.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac1p02.jpg",
+        alt: "Tienda de frescos de corta duración de ALÉTHEIA"
+      }
+    },
+    {
+      x: 64,
+      y: 61,
+      titulo: "Retorno y lavado de envases",
+      texto: "Las bandejas, cubetas y tapas reutilizables regresan por un circuito separado. Se clasifican, pasan por lavado industrial, secado e inspección, y vuelven a los carros limpios para un nuevo servicio. El sistema reduce el uso de plásticos de un solo uso y mantiene separados los flujos sucio y limpio.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac1p03.jpg",
+        alt: "Retorno y lavado industrial de envases reutilizables de ALÉTHEIA"
+      }
+    }
+  ];
 
   const puntosCubierta2 = [
     {
   x: 50,
   y: 84,
   titulo: "Recepción y control",
-  texto: "Los suministros procedentes de ALMACÉN 2 llegan a esta zona para su identificación, inspección y clasificación antes de incorporarse al circuito de preparación. También se reciben aquí las raciones preparadas que finalmente no han sido servidas y continúan siendo aptas para el consumo. Tras su control y envasado, se derivan a los establecimientos de la zona OCIO para su distribución, evitando el acceso de público a las áreas de producción alimentaria.",
+  texto: "Los suministros procedentes de ALMACÉN 2 llegan a esta zona para su identificación, inspección y clasificación antes de incorporarse al circuito de preparación. También se reciben aquí las raciones preparadas que finalmente no han sido servidas y continúan siendo aptas para el consumo. Tras su control y envasado, se derivan a los establecimientos de la cubierta logística 1 para su distribución, manteniendo al público fuera de las áreas de producción alimentaria y reduciendo recorridos innecesarios.",
   medio: {
     tipo: "video",
     src: "assets/img/cocina/cocinac2p01.mp4"
@@ -130,6 +165,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  const puntosCubierta4 = [
+    {
+      x: 37,
+      y: 37,
+      titulo: "Preparación fría",
+      texto: "Esta área produce ensaladas, platos fríos, fruta preparada y salsas para el servicio diario. Sus superficies refrigeradas y cámaras de día mantienen la cadena de frío hasta el momento en que cada elaboración pasa a montaje y expedición.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac4p01.jpg",
+        alt: "Área de preparación fría de ALÉTHEIA"
+      }
+    },
+    {
+      x: 58,
+      y: 25,
+      titulo: "Panadería y masas",
+      texto: "Amasado, fermentación y horneado se concentran en una zona con control propio de temperatura, vapor y extracción. Produce pan, masas y elaboraciones horneadas para los servicios regulares y los menús especiales del módulo.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac4p02.mp4"
+      }
+    },
+    {
+      x: 66,
+      y: 50,
+      titulo: "Repostería y postres",
+      texto: "La producción dulce se organiza por lotes: postres de cuchara, fruta, repostería y raciones refrigeradas. Esta separación permite mantener ritmos y controles específicos sin interferir con la cocina caliente ni con la panadería.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac4p03.jpg",
+        alt: "Área de repostería y postres de ALÉTHEIA"
+      }
+    },
+    {
+      x: 39,
+      y: 70,
+      titulo: "Dietas y alérgenos",
+      texto: "Esta cocina dietética y clínica prepara menús sin gluten y para alergias alimentarias, además de dietas vegetarianas, veganas, religiosas o prescritas por razones médicas: diabética, baja en sal, renal, hipocalórica y de textura modificada. Sus utensilios, superficies, cámaras y circuitos de trabajo son exclusivos para prevenir contaminaciones cruzadas. Desde aquí también se elaboran, sellan y envían las comidas individualizadas destinadas al Hospital ALÉTHEIA.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac4p04.mp4"
+      }
+    },
+    {
+      x: 61,
+      y: 72,
+      titulo: "Acabado frío y expedición",
+      texto: "Aquí se completa el montaje de preparaciones frías, se agrupan las bandejas por destino y se cargan los carros de servicio. La salida conecta directamente con la cubierta 5, donde se coordinan los últimos tiempos de entrega hacia los comedores.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac4p05.jpg",
+        alt: "Acabado frío y expedición de la cubierta 4"
+      }
+    }
+  ];
+
   const puntosCubierta6 = [
     {
       x: 58,
@@ -190,8 +281,10 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const puntosPorCubierta = new Map([
+    [1, puntosCubierta1],
     [2, puntosCubierta2],
     [3, puntosCubierta3],
+    [4, puntosCubierta4],
     [6, puntosCubierta6],
     [9, puntosCubierta9]
   ]);
@@ -285,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   const cubiertas = [
-    "Sistemas comunes",
+    "Red logística común",
     "Sistemas comunes",
     "Recepción y preparación primaria",
     "Cocina caliente",
@@ -299,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const descripciones = [
     "Área aislada destinada a los sistemas comunes y servicios técnicos del módulo.",
-    "Sistemas comunes de apoyo a la producción, distribución y funcionamiento general de COCINA.",
+    "La Cubierta 1 forma parte de la red radial que enlaza los 110 módulos de ALÉTHEIA. Sus corredores permiten el tránsito simultáneo de personas, vehículos eléctricos y suministros, con esclusas que pueden aislar cada unión ante una incidencia. En este módulo, los espacios entre pasillos alojan servicios logísticos de COCINA, pequeños almacenes y apoyo de mantenimiento.",
     "Aquí llega el alimento desde el módulo ALMACÉN 2, situado al sur. Lavado, descongelación controlada, limpieza, corte y preparación de verduras, carnes y pescado. Incluye pequeñas cámaras frigoríficas de trabajo, pero no almacenes para varias semanas.",
     "Grandes zonas de hornos, cocción, planchas y marmitas.",
     "Ensaladas, platos fríos, postres, panadería, repostería y preparaciones específicas.",
@@ -399,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const salirDeCubierta = (siguiente = null) => {
     if (cubiertaEnPlanta === null) {
-      if (siguiente !== null && siguiente >= 2) {
+      if (siguiente !== null && siguiente >= 1) {
         entrarEnCubierta(siguiente);
       }
       return;
@@ -417,8 +510,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const seleccionarCubierta = (nivel) => {
-    // Las cubiertas 0 y 1 conservan el comportamiento informativo sencillo.
-    if (nivel < 2) {
+    // La cubierta 0 conserva el comportamiento informativo sencillo.
+    if (nivel === 0) {
       if (cubiertaEnPlanta !== null) {
         salirDeCubierta(nivel);
       } else {
@@ -524,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
     plano.removeAttribute("src");
     modelo.setAttribute("src", modeloBase);
 
-    if (siguiente !== null && siguiente >= 2) {
+    if (siguiente !== null && siguiente >= 1) {
       requestAnimationFrame(() => entrarEnCubierta(siguiente));
     } else if (siguiente !== null) {
       cubiertaFijada = siguiente;
