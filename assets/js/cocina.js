@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   intro.appendChild(plano);
 
   // Cubiertas con plano funcional disponible.
-  const planosDisponibles = new Set([1, 2, 3, 4, 6, 7, 8, 9]);
+  const planosDisponibles = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
   const puntosCubierta1 = [
     {
@@ -221,6 +221,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
+  const puntosCubierta5 = [
+    {
+      x: 37,
+      y: 49,
+      titulo: "Recepción de producción",
+      texto: "Las elaboraciones procedentes de las cubiertas 2, 3 y 4 llegan en cubetas y carros identificados por lote, destino y ventana de servicio. Antes de pasar al montaje se comprueba su temperatura, integridad y secuencia de entrega para que cada preparación continúe por el circuito correcto.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac5p01.jpg",
+        alt: "Recepción de elaboraciones procedentes de producción en ALÉTHEIA"
+      }
+    },
+    {
+      x: 50,
+      y: 24,
+      titulo: "Montaje final",
+      texto: "En esta línea se combinan los componentes de cada servicio en bandejas reutilizables, se completa la guarnición y se verifica el destino de cada lote. El ritmo está sincronizado con los turnos de los comedores para que las bandejas no esperen más tiempo del necesario.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac5p02.mp4"
+      }
+    },
+    {
+      x: 64,
+      y: 49,
+      titulo: "Conservación térmica",
+      texto: "Carros y armarios térmicos mantienen cada preparación caliente o fría durante la breve espera previa a la salida. No es un almacén: su función es amortiguar los ritmos entre cocina y comedor sin comprometer calidad, temperatura ni trazabilidad.",
+      medio: {
+        tipo: "imagen",
+        src: "assets/img/cocina/cocinac5p03.jpg",
+        alt: "Carros térmicos de conservación temporal en ALÉTHEIA"
+      }
+    },
+    {
+      x: 50,
+      y: 75,
+      titulo: "Expedición a comedores",
+      texto: "Los carros se agrupan por comedor y turno antes de pasar a los montacargas. Esta última comprobación confirma cantidades, menú y destino, y coordina la salida hacia las cubiertas 6, 7 y 8 sin interferir con el retorno de envases ni los suministros entrantes.",
+      medio: {
+        tipo: "video",
+        src: "assets/img/cocina/cocinac5p04.mp4"
+      }
+    }
+  ];
+
   const puntosCubierta6 = [
     {
       x: 58,
@@ -285,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
     [2, puntosCubierta2],
     [3, puntosCubierta3],
     [4, puntosCubierta4],
+    [5, puntosCubierta5],
     [6, puntosCubierta6],
     [9, puntosCubierta9]
   ]);
