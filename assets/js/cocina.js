@@ -120,6 +120,28 @@ document.addEventListener("DOMContentLoaded", () => {
       medio: {
         tipo: "video",
         src: "assets/img/cocina/cocinac3p01.mp4"
+      },
+      receta: {
+        imagen: "assets/img/cocina/cocinac3p01-receta.jpg",
+        alt: "Costillas de cerdo caramelizadas con salsa de cola",
+        ingredientes: [
+          "1,5 kg de costillas de cerdo",
+          "330 ml de refresco de cola",
+          "120 g de kétchup",
+          "1 cucharada de mostaza",
+          "1 cucharada de salsa Worcestershire",
+          "2 dientes de ajo rallados",
+          "1 cucharadita de pimentón ahumado",
+          "1 cucharada de vinagre de manzana",
+          "Sal y pimienta negra"
+        ],
+        pasos: [
+          "Sazonar las costillas con sal, pimienta y pimentón.",
+          "Mezclar la cola, el kétchup, la mostaza, la salsa Worcestershire, el ajo y el vinagre.",
+          "Cubrir las costillas con dos tercios de la salsa y hornear, tapadas, a 160 °C durante 1 hora y 45 minutos.",
+          "Retirar el aluminio, pintar con la salsa restante y subir el horno a 220 °C.",
+          "Hornear entre 12 y 18 minutos más, pintando una o dos veces, hasta que el glaseado caramelice."
+        ]
       }
     },
     {
@@ -347,19 +369,95 @@ document.addEventListener("DOMContentLoaded", () => {
   detalleTitulo.className = "cocina-info-nombre";
   const detalleTexto = document.createElement("p");
   detalleTexto.className = "cocina-info-descripcion";
+    const detalleAccion = document.createElement("button");
+  detalleAccion.type = "button";
+  detalleAccion.className = "cocina-detalle-accion";
+  detalleAccion.textContent = "VER RECETA DE SERVICIO";
+  detalleAccion.hidden = true;
+
+  const detalleReceta = document.createElement("div");
+  detalleReceta.className = "cocina-receta";
+  detalleReceta.hidden = true;
+
+  const detalleVolver = document.createElement("button");
+  detalleVolver.type = "button";
+  detalleVolver.className = "cocina-detalle-volver";
+  detalleVolver.textContent = "VOLVER A HORNOS";
+  detalleVolver.hidden = true;
+
   const detalleCerrar = document.createElement("button");
   detalleCerrar.type = "button";
   detalleCerrar.className = "cocina-detalle-cerrar";
   detalleCerrar.textContent = "CERRAR";
+
   detalle.append(
     detalleMedio,
     detalleReferencia,
     detalleTitulo,
     detalleTexto,
+    detalleAccion,
+    detalleReceta,
+    detalleVolver,
     detalleCerrar
   );
   intro.parentElement.appendChild(detalle);
+  const mostrarReceta = (receta, nivel, numeroPunto, punto) => {
+    detalleReferencia.textContent =
+      `CUBIERTA ${nivel} · PUNTO ${String(numeroPunto).padStart(2, "0")} · RECETA DE SERVICIO`;
 
+    detalleTitulo.textContent = "COSTILLAS LACADAS CON COLA";
+    detalleTexto.hidden = true;
+    detalleAccion.hidden = true;
+    detalleVolver.hidden = false;
+
+    detalleMedio.replaceChildren();
+    const imagen = document.createElement("img");
+    imagen.src = receta.imagen;
+    imagen.alt = receta.alt;
+    detalleMedio.appendChild(imagen);
+    detalleMedio.classList.add("con-medio");
+
+    const introduccion = document.createElement("p");
+    introduccion.textContent =
+      "Una preparación informal de rosticería: cocción lenta y un glaseado final oscuro, dulce y ligeramente ácido.";
+
+    const tituloIngredientes = document.createElement("h3");
+    tituloIngredientes.textContent = "INGREDIENTES · 4 RACIONES";
+
+    const ingredientes = document.createElement("ul");
+    receta.ingredientes.forEach((ingrediente) => {
+      const item = document.createElement("li");
+      item.textContent = ingrediente;
+      ingredientes.appendChild(item);
+    });
+
+    const tituloPreparacion = document.createElement("h3");
+    tituloPreparacion.textContent = "PREPARACIÓN";
+
+    const pasos = document.createElement("ol");
+    receta.pasos.forEach((paso) => {
+      const item = document.createElement("li");
+      item.textContent = paso;
+      pasos.appendChild(item);
+    });
+
+    const nota = document.createElement("p");
+    nota.className = "cocina-receta__nota";
+    nota.textContent =
+      "La cola no deja un sabor reconocible a refresco: aporta color, dulzor y una capa caramelizada. La mostaza y el vinagre evitan que el resultado sea empalagoso.";
+
+    detalleReceta.replaceChildren(
+      introduccion,
+      tituloIngredientes,
+      ingredientes,
+      tituloPreparacion,
+      pasos,
+      nota
+    );
+    detalleReceta.hidden = false;
+
+    detalleVolver.onclick = () => punto.click();
+  };
   const cerrarDetalle = () => {
     detalle.classList.remove("cocina-detalle-activo");
     detalleMedio.replaceChildren();
@@ -388,6 +486,11 @@ document.addEventListener("DOMContentLoaded", () => {
         detalleReferencia.textContent = `CUBIERTA ${nivel} · PUNTO ${String(indice + 1).padStart(2, "0")}`;
         detalleTitulo.textContent = contenido.titulo;
         detalleTexto.textContent = contenido.texto;
+        detalleTexto.hidden = false;
+        detalleReceta.hidden = true;
+        detalleReceta.replaceChildren();
+        detalleAccion.hidden = true;
+        detalleVolver.hidden = true;
         detalleMedio.replaceChildren();
         detalleMedio.classList.remove("con-medio");
 
@@ -410,7 +513,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
           detalleMedio.classList.add("con-medio");
         }
-
+        if (contenido.receta) {
+          detalleAccion.hidden = false;
+          detalleAccion.onclick = () => {
+            mostrarReceta(contenido.receta, nivel, indice + 1, punto);
+          };
+        }
         detalle.classList.add("cocina-detalle-activo");
       });
       intro.appendChild(punto);

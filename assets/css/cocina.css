@@ -527,3 +527,55 @@
   }
 }
 
+.cocina-detalle-accion, .cocina-detalle-volver {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 1rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(245, 181, 75, 0.72);
+  background: rgba(116, 67, 17, 0.22);
+  color: #ffd58a;
+  font-family: "Tektur", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.11em;
+}
+
+.cocina-detalle-accion:hover, .cocina-detalle-accion:focus-visible, .cocina-detalle-volver:hover, .cocina-detalle-volver:focus-visible {
+  border-color: #ffe3a9;
+  background: rgba(160, 96, 23, 0.36);
+  color: #fff2d5;
+  outline: none;
+}
+
+.cocina-receta {
+  margin-top: 1rem;
+  color: rgba(215, 235, 255, 0.9);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cocina-receta h3 {
+  margin: 1.1rem 0 0.45rem;
+  color: #ffd58a;
+  font-family: "Tektur", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+}
+
+.cocina-receta ul, .cocina-receta ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.cocina-receta li {
+  margin-bottom: 0.35rem;
+}
+
+.cocina-receta__nota {
+  margin: 1rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(245, 181, 75, 0.25);
+  color: #ffd58a;
+  font-size: 0.84rem;
+}
+

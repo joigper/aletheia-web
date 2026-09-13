@@ -80,8 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const map = document.querySelector(".home-map-image");
   const summaryCard = document.getElementById("home-info-card");
   const liftCard = document.getElementById("home-lift-card");
+  const cabinCard = document.getElementById("home-cabin-card");
 
-  if (!planStage || !map || !summaryCard || !liftCard) return;
+  if (!planStage || !map || !summaryCard || !liftCard || !cabinCard) return;
 
   const poiLayer = document.createElement("div");
   poiLayer.className = "home-poi-layer";
@@ -101,12 +102,20 @@ document.addEventListener("DOMContentLoaded", () => {
       y: 53.4,
       label: "Ascensor multipropósito A-3000",
       title: "Ascensor A-3000"
-    }
+    },
+     {
+      type: "cabin",
+      x: 75.2,
+      y: 40.3,
+      label: "Camarote Tipo A · unidad residencial base",
+      title: "Camarote Tipo A"
+    } 
   ];
 
-  function showCard(card) {
+    function showCard(card) {
     summaryCard.hidden = card !== "summary";
     liftCard.hidden = card !== "lift";
+    cabinCard.hidden = card !== "cabin";
   }
 
   function syncPoints() {

@@ -605,3 +605,27 @@
   object-position: center;
 }
 
+.home-cabin-card__plan {
+  height: clamp(150px, 22vh, 230px);
+  margin: 12px 0 16px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 35, 49, 0.72);
+  border: 1px solid rgba(98, 207, 229, 0.38);
+  border-radius: 10px;
+}
+
+.home-cabin-card__plan img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-poi--cabin {
+  background: #36c997;
+  box-shadow: 0 0 0 4px rgba(54, 201, 151, 0.20), 0 0 16px rgba(54, 201, 151, 0.92);
+}
+

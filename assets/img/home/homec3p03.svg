@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 783.74341 900"
+   role="img"
+   aria-labelledby="title description"
+   version="1.1"
+   id="svg23"
+   sodipodi:docname="download (3).svg"
+   width="783.74341"
+   height="900"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview23"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.8933333"
+     inkscape:cx="392.95775"
+     inkscape:cy="328.52113"
+     inkscape:window-width="1920"
+     inkscape:window-height="1010"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g20" />
+  <title
+     id="title">Plano de distribución de camarote Tipo A de ALÉTHEIA</title>
+  <desc
+     id="description">Vivienda de cinco por seis metros con acceso por el lado corto, baño, cocina auxiliar, salón, cama doble y armarios.</desc>
+  <defs
+     id="defs1">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#grid"
+       id="pattern26"
+       patternTransform="matrix(0.78374343,0,0,1,6.472168e-6,0)" />
+    <pattern
+       id="grid"
+       width="20"
+       height="20"
+       patternUnits="userSpaceOnUse">
+      <path
+         d="M20 0H0V20"
+         fill="none"
+         stroke="#163f56"
+         stroke-width="1"
+         opacity=".6"
+         id="path1" />
+    </pattern>
+    <style
+       id="style1">
+      .wall{fill:none;stroke:#d1f4ff;stroke-width:12;stroke-linejoin:round;stroke-linecap:square}
+      .part{fill:none;stroke:#8cddf7;stroke-width:5;stroke-linejoin:round}
+      .furn{fill:#12384c;stroke:#b8f0ff;stroke-width:3}
+      .soft{fill:#1b5369;stroke:#b8f0ff;stroke-width:3}
+      .label{fill:#d9f7ff;font-family:Bahnschrift,Arial,sans-serif;font-size:17px;font-weight:700;letter-spacing:2px}
+      .minor{fill:#90d4ea;font-family:Bahnschrift,Arial,sans-serif;font-size:13px;letter-spacing:1px}
+      .measure{fill:none;stroke:#77cbe8;stroke-width:2}
+    </style>
+  </defs>
+  <rect
+     width="783.74341"
+     height="900"
+     fill="#04111a"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.885293" />
+  <rect
+     width="783.74341"
+     height="900"
+     fill="url(#grid)"
+     id="rect2"
+     x="0"
+     y="0"
+     style="fill:url(#pattern26);stroke-width:0.885293" />
+  <text
+     x="26.895561"
+     y="53.624512"
+     class="label"
+     font-size="27"
+     id="text2">CAMAROTE TIPO A · PLANO DE DISTRIBUCIÓN</text>
+  <text
+     x="45.033257"
+     y="78.073349"
+     class="minor"
+     font-size="16"
+     id="text3">VIVIENDA BASE · 5 × 6 m · ≈ 30 m² · HASTA 2 RESIDENTES</text>
+  <!-- 100 px por metro. 5m de frente, 6m de fondo. -->
+  <g
+     transform="translate(141.8717,155)"
+     id="g20">
+    <rect
+       x="0"
+       y="0"
+       width="500"
+       height="600"
+       fill="#082332"
+       id="rect3" />
+    <path
+       id="rect4"
+       class="wall"
+       style="fill:none;stroke:#d1f4ff;stroke-width:12;stroke-linecap:square;stroke-linejoin:round"
+       d="M 0,0 H 250 500 V 600 H 0 Z"
+       sodipodi:nodetypes="cccccc" />
+    <!-- Acceso superior, en el lado corto -->
+    <path
+       d="m 395.00357,-6 -3.21011,-88.375488 m 0,0 c -49.70563,0 -90,40.294372 -90,89.9999997"
+       class="part"
+       id="path4"
+       sodipodi:nodetypes="cccc" />
+    <text
+       x="346"
+       y="23"
+       text-anchor="middle"
+       class="label"
+       id="text4">ACCESO</text>
+    <!-- Banda de servicios derecha -->
+    <path
+       d="M 275,377.5 V 600"
+       class="part"
+       id="path5" />
+    <path
+       d="M 275,380 H 500"
+       class="part"
+       id="path7" />
+    <!-- Cocina auxiliar lineal -->
+    <rect
+       x="294.8645"
+       y="319.33258"
+       width="196.94707"
+       height="56.947075"
+       rx="4.1462541"
+       class="furn"
+       id="rect7" />
+    <rect
+       x="305.33804"
+       y="331.30615"
+       width="42"
+       height="32"
+       class="part"
+       id="rect8" />
+    <rect
+       x="25.42358"
+       y="566.53198"
+       width="35.848347"
+       height="25.848341"
+       class="part"
+       id="rect8-4"
+       style="fill:none;stroke:#8cddf7;stroke-width:4.15166;stroke-linejoin:round" />
+    <rect
+       x="211.20413"
+       y="567.07581"
+       width="35.848347"
+       height="25.848341"
+       class="part"
+       id="rect8-4-2"
+       style="fill:none;stroke:#8cddf7;stroke-width:4.15166;stroke-linejoin:round" />
+    <rect
+       x="366.33804"
+       y="331.30615"
+       width="42"
+       height="32"
+       class="part"
+       id="rect9" />
+    <rect
+       x="421.33804"
+       y="331.30615"
+       width="27"
+       height="32"
+       class="part"
+       id="rect10" />
+    <rect
+       x="461.33804"
+       y="331.30615"
+       width="19"
+       height="32"
+       class="part"
+       id="rect11" />
+    <text
+       x="392.93326"
+       y="294.9624"
+       text-anchor="middle"
+       class="minor"
+       id="text11">COCINA DE APOYO</text>
+    <text
+       x="392.83804"
+       y="309.80615"
+       text-anchor="middle"
+       class="minor"
+       id="text12">MICRO · CAFÉ · FRÍO</text>
+    <!-- Mesa junto a cocina -->
+    <rect
+       x="330.38403"
+       y="143.38405"
+       width="96.231895"
+       height="76.231895"
+       rx="5.173758"
+       class="soft"
+       id="rect12" />
+    <path
+       d="m 317,163 h -18 v 36 h 18 m 123,-36 h 18 v 36 h -18"
+       class="part"
+       id="path12" />
+    <text
+       x="378.5"
+       y="178.5"
+       text-anchor="middle"
+       class="minor"
+       id="text13"><tspan
+         sodipodi:role="line"
+         id="tspan25"
+         x="378.5"
+         y="178.5">MESA</tspan><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         x="379"
+         y="194.75">2 PLAZAS</tspan></text>
+    <!-- Baño: bañera compacta, inodoro y lavabo -->
+    <path
+       d="m 275,424 h 70 a 70,70 0 0 1 -70,70"
+       class="part"
+       id="path13" />
+    <text
+       x="387.37549"
+       y="482.5542"
+       text-anchor="middle"
+       class="label"
+       id="text14">BAÑO</text>
+    <text
+       x="395.33804"
+       y="511.90479"
+       text-anchor="middle"
+       class="minor"
+       id="text15"><tspan
+         style="fill:#ffffff"
+         id="tspan24">BAÑERA · WC · LAVABO</tspan></text>
+    <!-- Salón abierto, lado izquierdo superior -->
+    <path
+       id="rect15"
+       class="furn"
+       style="fill:#12384c;stroke:#b8f0ff;stroke-width:5.3039"
+       d="M 6.4715328,223.21663 V 35.351971 c 0,-1.892309 1.6325283,-3.415721 3.6603772,-3.415721 h 21.962262 c 2.027848,0 3.660377,1.523412 3.660377,3.415721 V 223.21663 c 0,1.8923 -1.632529,3.41572 -3.660377,3.41572 H 10.13191 c -2.0278489,0 -3.6603772,-1.52342 -3.6603772,-3.41572 z" />
+    <text
+       x="20.771732"
+       y="130.41235"
+       text-anchor="middle"
+       class="minor"
+       id="text16">TV</text>
+    <path
+       id="rect16"
+       style="fill:#1b5369;stroke:#b8f0ff;stroke-width:2.49182"
+       class="soft"
+       d="m 166.97531,30.53021 c -3.02012,0 -5.45188,2.022659 -5.45188,4.536852 V 168.40333 c 0,-2.56064 -2.47606,-4.62193 -5.55198,-4.62193 H 103.2267 c -3.07589,0 -5.551959,2.06129 -5.551959,4.62193 v 55.01311 c 0,2.56067 2.476069,4.62195 5.551959,4.62195 h 52.74475 c 3.07592,0 5.55198,-2.06128 5.55198,-4.62195 0,2.51419 2.43176,4.53863 5.45188,4.53863 h 51.78855 c 3.02007,0 5.45187,-2.02444 5.45187,-4.53863 V 35.067062 c 0,-2.514193 -2.4318,-4.536852 -5.45187,-4.536852 z" />
+    <path
+       id="rect16-2-5"
+       style="fill:#1b5369;stroke:#b8f0ff;stroke-width:1.63931"
+       class="soft"
+       d="m 161.8093,30.001416 h 56.47186 c 3.29321,0 5.94442,2.51392 5.94442,5.636586 V 102.7255 c 0,3.12269 -2.65121,5.63661 -5.94442,5.63661 H 161.8093 c -3.2932,0 -5.94441,-2.51392 -5.94441,-5.63661 V 35.638002 c 0,-3.122666 2.65121,-5.636586 5.94441,-5.636586 z" />
+    <path
+       id="rect16-2"
+       style="fill:#1b5369;stroke:#b8f0ff;stroke-width:1.55776"
+       class="soft"
+       d="m 161.73037,100.00678 h 56.53924 c 3.29714,0 5.95151,2.26732 5.95151,5.08367 v 60.50659 c 0,2.81636 -2.65437,5.08368 -5.95151,5.08368 h -56.53924 c -3.29713,0 -5.9515,-2.26732 -5.9515,-5.08368 v -60.50659 c 0,-2.81635 2.65437,-5.08367 5.9515,-5.08367 z" />
+    <circle
+       cx="95.40979"
+       cy="91.936623"
+       class="soft"
+       id="circle16"
+       r="28.656717" />
+    <!-- Armario: divisor bajo entre salón y cama -->
+    <rect
+       x="7.7973232"
+       y="287.87952"
+       width="197.12709"
+       height="57.12709"
+       class="furn"
+       id="rect17" />
+    <path
+       d="m 69.157891,288 v 56.88612 M 140.23647,288 v 56.88612"
+       class="part"
+       id="path17" />
+    <text
+       x="108.26593"
+       y="280.79199"
+       text-anchor="middle"
+       class="minor"
+       id="text18"><tspan
+         style="fill:#ffffff"
+         id="tspan23">ARMARIOS / ALMACENAJE</tspan></text>
+    <!-- Cama al fondo, zona privada -->
+    <rect
+       x="68.151237"
+       y="396.94855"
+       width="137.0919"
+       height="196.05356"
+       rx="4.6811867"
+       class="soft"
+       id="rect18" />
+    <rect
+       x="70"
+       y="552"
+       width="64.087524"
+       height="29"
+       rx="3.4180012"
+       fill="#d0eff8"
+       id="rect19"
+       style="stroke-width:0.924388" />
+    <rect
+       x="138"
+       y="552"
+       width="64.087524"
+       height="29"
+       rx="3.4180012"
+       fill="#d0eff8"
+       id="rect19-4"
+       style="stroke-width:0.924388" />
+    <text
+       x="136"
+       y="415.32394"
+       text-anchor="middle"
+       class="label"
+       id="text20">CAMA 135</text>
+  </g>
+  <!-- Cotas -->
+  <g
+     class="measure"
+     id="g21"
+     transform="translate(-108.1283)">
+    <path
+       d="m 250,790 h 500 m -500,-8 v 16 m 500,-16 v 16"
+       id="path20" />
+    <path
+       d="m 810,155 v 600 m -8,-600 h 16 m -16,600 h 16"
+       id="path21" />
+  </g>
+  <text
+     x="391.8717"
+     y="830"
+     text-anchor="middle"
+     class="label"
+     id="text21">5 m</text>
+  <text
+     x="-455"
+     y="746.8717"
+     text-anchor="middle"
+     class="label"
+     transform="rotate(-90)"
+     id="text22">6 m</text>
+  <metadata
+     id="metadata26">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Plano de distribución de camarote Tipo A de ALÉTHEIA</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
