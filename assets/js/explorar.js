@@ -1188,13 +1188,19 @@ L1_033: {
         botonVerVideo.hidden = !videoActual;
         botonVerVideo.textContent = "VER VÍDEO";
     }
-    botonSaberMas.hidden = !datos.enlace;
+   const enlaceSaberMas =
+    datos.enlace ||
+    (datos.nombre?.startsWith("HOME-")
+        ? "home.html"
+        : null);
 
-    if (datos.enlace) {
-        botonSaberMas.href = datos.enlace;
-    } else {
-        botonSaberMas.removeAttribute("href");
-    }
+botonSaberMas.hidden = !enlaceSaberMas;
+
+if (enlaceSaberMas) {
+    botonSaberMas.href = enlaceSaberMas;
+} else {
+    botonSaberMas.removeAttribute("href");
+}
 
     fichaModulo.classList.remove(
         "ficha-modulo--oculta"

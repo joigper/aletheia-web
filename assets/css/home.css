@@ -1,0 +1,607 @@
+.home-map {
+  height: clamp(420px, calc(100svh - 240px), 1000px);
+}
+
+.home-map > [class*="col-"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.home-map-image {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.home-map > .col, .home-map > .col-auto {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.home-map > .col-auto {
+  justify-content: flex-start;
+}
+
+.home-map > .col {
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.home-floor-selector {
+  width: clamp(180px, 12vw, 250px);
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Añadir estas reglas al final de assets/css/home.css. */
+
+.home-selector {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.home-selector .home-floor-selector {
+  display: block;
+}
+
+.home-floor-zone {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.home-floor-zone:hover, .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 24%);
+  outline: none;
+}
+
+.home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 36%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone {
+  background: rgb(84 207 255 / 8%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone:hover, .home-selector.is-residential-selected .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 28%);
+}
+
+/* Añadir estas reglas al final de assets/css/home.css. */
+
+.home-selector {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.home-selector .home-floor-selector {
+  display: block;
+}
+
+.home-floor-zone {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.home-floor-zone:hover, .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 24%);
+  outline: none;
+}
+
+.home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 36%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone {
+  background: rgb(84 207 255 / 8%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone:hover, .home-selector.is-residential-selected .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 28%);
+}
+
+.home-selector.is-collective-selected .home-floor-zone--collective {
+  background: rgb(56 183 138 / 18%);
+}
+
+.home-selector.is-collective-selected .home-floor-zone--collective:hover, .home-selector.is-collective-selected .home-floor-zone--collective:focus-visible {
+  background: rgb(56 183 138 / 32%);
+}
+
+/* Añadir estas reglas al final de assets/css/home.css. */
+
+.home-selector {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.home-selector .home-floor-selector {
+  display: block;
+}
+
+.home-floor-zone {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.home-floor-zone:hover, .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 24%);
+  outline: none;
+}
+
+.home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 36%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone {
+  background: rgb(84 207 255 / 8%);
+}
+
+.home-selector.is-residential-selected .home-floor-zone:hover, .home-selector.is-residential-selected .home-floor-zone:focus-visible {
+  background: rgb(84 207 255 / 28%);
+}
+
+.home-selector.is-collective-selected .home-floor-zone--collective {
+  background: rgb(56 183 138 / 18%);
+}
+
+.home-selector.is-collective-selected .home-floor-zone--collective:hover, .home-selector.is-collective-selected .home-floor-zone--collective:focus-visible {
+  background: rgb(56 183 138 / 32%);
+}
+
+/* Identifica la cubierta activa sin ocultar el plano. */
+
+.home-plan-stage {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 24px);
+  height: 100%;
+  min-width: 0;
+}
+
+.home-plan-stage .home-map-image {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: calc(100% - clamp(58px, 6vw, 94px));
+}
+
+.home-deck-number {
+  flex: 0 0 clamp(48px, 5vw, 78px);
+  color: #bdeeff;
+  font-family: Bahnschrift, Arial, sans-serif;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 0 12px rgb(98 207 239 / 38%);
+}
+
+.home-deck-number span {
+  display: block;
+  font-size: clamp(0.45rem, 0.7vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.2rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.home-deck-number strong {
+  display: block;
+  font-size: clamp(3.4rem, 6vw, 6.5rem);
+  font-weight: 500;
+}
+
+.home-data-section {
+  margin-top: 22px;
+}
+
+.home-data-section h3 {
+  margin: 0 0 10px;
+  color: #54cfff;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.home-accommodation {
+  border: 1px solid #1c638b;
+}
+
+.home-accommodation__row {
+  display: grid;
+  grid-template-columns: 62px 38px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 9px 11px;
+  border-bottom: 1px solid #1c638b;
+  background: #061e2b;
+}
+
+.home-accommodation__row:last-child {
+  border-bottom: 0;
+}
+
+.home-accommodation__row span {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.home-accommodation__row strong {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.home-accommodation__row small {
+  color: #b9d3df;
+  font-size: .75rem;
+  line-height: 1.3;
+}
+
+.home-accommodation__row--a span {
+  color: #55bfe9;
+}
+
+.home-accommodation__row--b span {
+  color: #42bd91;
+}
+
+.home-accommodation__row--c span {
+  color: #b781dc;
+}
+
+.home-info-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #1c638b;
+  color: #76ccef;
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.home-info-card__footer strong {
+  color: #fff;
+  font-size: .78rem;
+}
+
+/* Ficha técnica HOME: mismo lenguaje visual que Explorar */
+
+.home-info-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+  max-height: calc(100vh - 220px);
+  margin: 0;
+  padding: 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(17, 24, 34, .96);
+  border: 1px solid rgba(111, 214, 255, .24);
+  border-radius: 16px;
+  color: #d5dbe2;
+}
+
+.home-info-card__eyebrow {
+  margin: 0 0 10px;
+  color: #8ea1b5;
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .10em;
+}
+
+.home-info-card h2 {
+  margin: 0 0 8px;
+  color: #f2f4f6;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+}
+
+.home-info-card__area {
+  margin: 0 0 18px;
+  color: #6fd6ff;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+
+.home-info-card__intro {
+  margin: 0;
+  color: #d5dbe2;
+  line-height: 1.65;
+}
+
+@media (min-width: 1200px) {
+  .home-info-card {
+    max-width: none;
+    align-self: stretch;
+  }
+}
+
+.home-data-section {
+  margin-top: 22px;
+}
+
+.home-data-section__title {
+  margin: 0 0 10px;
+  color: #6fd6ff;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.home-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid rgba(111, 214, 255, .24);
+  background: rgba(111, 214, 255, .24);
+}
+
+.home-stat {
+  padding: 12px;
+  background: rgba(12, 17, 24, .88);
+}
+
+.home-stat__label {
+  margin: 0 0 5px;
+  color: #8ea1b5;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.home-stat__value {
+  margin: 0;
+  color: #f2f4f6;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+@media (min-width: 1400px) {
+  .home-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.home-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid rgba(111, 214, 255, .24);
+  background: rgba(111, 214, 255, .24);
+}
+
+.home-unit {
+  min-width: 0;
+  padding: 13px;
+  background: rgba(12, 17, 24, .88);
+}
+
+.home-unit__name, .home-unit__size, .home-unit__detail {
+  margin: 0;
+}
+
+.home-unit__name {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+
+.home-unit__size {
+  margin-top: 7px;
+  color: #f2f4f6;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.home-unit__detail {
+  margin-top: 7px;
+  color: #b9c8d3;
+  font-size: .73rem;
+  line-height: 1.4;
+}
+
+.home-unit--a .home-unit__name {
+  color: #57a6d9;
+}
+
+.home-unit--b .home-unit__name {
+  color: #38b78a;
+}
+
+.home-unit--c .home-unit__name {
+  color: #9d7bd8;
+}
+
+.home-info-card__note {
+  margin-top: 22px;
+  padding: 14px;
+  border-left: 3px solid #6fd6ff;
+  background: rgba(111, 214, 255, .07);
+}
+
+.home-info-card__note strong {
+  color: #6fd6ff;
+  font-size: .68rem;
+  letter-spacing: .09em;
+}
+
+.home-info-card__note p {
+  margin: 7px 0 0;
+  color: #b9c8d3;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.home-lift-card__image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 20px;
+  overflow: hidden;
+  border: 1px solid rgba(111, 214, 255, .24);
+  border-radius: 10px;
+  background: #0c1118;
+}
+
+.home-lift-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-plan-stage {
+  position: relative;
+}
+
+.home-poi-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.home-poi {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid #d9f7ff;
+  border-radius: 50%;
+  background: #27c8ff;
+  box-shadow: 0 0 0 4px rgba(39, 200, 255, .18), 0 0 16px rgba(39, 200, 255, .95);
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  transition: transform .18s ease, background-color .18s ease;
+}
+
+.home-poi::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.home-poi:hover, .home-poi:focus-visible {
+  background: #ffffff;
+  outline: none;
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.home-poi--lift {
+  background: #c77be8;
+  box-shadow: 0 0 0 4px rgba(199, 123, 232, .18), 0 0 16px rgba(199, 123, 232, .95);
+}
+
+/* Ficha A-3000: composición compacta para priorizar la imagen */
+
+#home-lift-card {
+  padding: 18px;
+}
+
+#home-lift-card .home-info-card__eyebrow {
+  margin-bottom: 6px;
+  font-size: .70rem;
+}
+
+#home-lift-card h2 {
+  margin-bottom: 6px;
+  font-size: clamp(1.2rem, 1.55vw, 1.55rem);
+}
+
+#home-lift-card .home-info-card__intro {
+  font-size: .84rem;
+  line-height: 1.42;
+}
+
+#home-lift-card .home-lift-card__image-wrap {
+  height: clamp(180px, 25vh, 250px);
+  aspect-ratio: auto;
+  margin: 0 0 14px;
+  flex: 0 0 auto;
+}
+
+#home-lift-card .home-data-section {
+  margin-top: 14px;
+}
+
+#home-lift-card .home-data-section__title {
+  margin-bottom: 7px;
+  font-size: .66rem;
+}
+
+#home-lift-card .home-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+#home-lift-card .home-stat {
+  padding: 8px;
+}
+
+#home-lift-card .home-stat__label {
+  margin-bottom: 4px;
+  font-size: .55rem;
+}
+
+#home-lift-card .home-stat__value {
+  font-size: .86rem;
+}
+
+#home-lift-card .home-info-card__note {
+  margin-top: 14px;
+  padding: 10px;
+}
+
+#home-lift-card .home-info-card__note p {
+  font-size: .74rem;
+  line-height: 1.38;
+}
+
+@media (max-width: 1199.98px) {
+  #home-lift-card .home-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+#home-lift-card .home-lift-card__image {
+  object-fit: contain;
+  object-position: center;
+}
+
