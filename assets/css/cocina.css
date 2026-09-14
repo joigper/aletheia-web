@@ -634,3 +634,126 @@
   }
 }
 
+/* MÓVIL: selector compacto a la izquierda y plano funcional a la derecha. */
+
+@media (max-width: 991.98px) {
+  .cocina-layout {
+    display: grid;
+    grid-template-columns: minmax(78px, 22vw) minmax(0, 1fr);
+    gap: 12px !important;
+    align-items: center;
+    margin-inline: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-layout > .col-12, .cocina-layout > .col-lg-5, .cocina-layout > .col-lg-7 {
+    width: auto;
+    max-width: none;
+    padding: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-layout > .col-lg-5 {
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-selector {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-intro {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-info {
+    min-height: 0;
+    max-width: none;
+    margin: 0.5rem 0 0;
+    padding: 0.65rem 0.75rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-info-numero {
+    margin-bottom: 0.18rem;
+    font-size: 0.64rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-info-nombre {
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-info-descripcion {
+    margin-top: 0.35rem;
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+}
+
+/* MÓVIL: la ficha de un punto de interés sustituye temporalmente al plano. */
+
+@media (max-width: 991.98px) {
+  body.cocina-detalle-abierto {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-detalle.cocina-detalle-activo {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    width: 100vw;
+    max-width: none;
+    min-height: 100svh;
+    max-height: 100svh;
+    margin: 0;
+    padding: 1.25rem 1rem 5rem;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    background: #031622;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-detalle.cocina-detalle-activo .cocina-detalle-cerrar {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 1051;
+    margin: 0;
+    padding: 0.6rem 0.85rem;
+    border-color: rgba(189, 232, 255, 0.8);
+    background: rgba(3, 22, 38, 0.96);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-detalle.cocina-detalle-activo .cocina-info-numero, .cocina-detalle.cocina-detalle-activo .cocina-info-nombre {
+    padding-right: 6rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-detalle.cocina-detalle-activo .cocina-detalle-medio {
+    margin-top: 0.75rem;
+  }
+}
+

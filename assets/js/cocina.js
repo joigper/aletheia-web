@@ -460,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const cerrarDetalle = () => {
     detalle.classList.remove("cocina-detalle-activo");
+    document.body.classList.remove("cocina-detalle-abierto");
     detalleMedio.replaceChildren();
     detalleMedio.classList.remove("con-medio");
     intro.querySelectorAll(".cocina-punto").forEach((punto) => {
@@ -520,6 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
           };
         }
         detalle.classList.add("cocina-detalle-activo");
+        document.body.classList.add("cocina-detalle-abierto");
       });
       intro.appendChild(punto);
     });
