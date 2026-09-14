@@ -757,3 +757,152 @@
   }
 }
 
+/* Cabecera compacta exclusiva para móviles. */
+
+@media (max-width: 991.98px) {
+  .cocina-header {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 0.65rem;
+    align-items: center;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col {
+    width: auto;
+    max-width: none;
+    flex: none;
+    padding: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:first-child img {
+    display: block;
+    width: 58px !important;
+    height: 58px !important;
+    object-fit: contain;
+  }
+}
+
+/* El emblema ya identifica la marca; ahorramos una segunda línea. */
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:first-child h1 {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) p:first-child {
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) p:last-child {
+    margin: 0.22rem 0 0 !important;
+    font-size: 0.64rem !important;
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:last-child {
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header .galaxy-button--small .galaxy-trigger {
+    padding: 0.48em 0.72em;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-lead {
+    margin: 0.65rem 0 0.8rem !important;
+    font-size: 0.84rem !important;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header + .mt-4 {
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* MÓVIL: el plano es protagonista.   El selector de cubiertas flota sobre él y deja de robar ancho. */
+
+@media (max-width: 991.98px) {
+  .cocina-layout {
+    position: relative;
+    display: block;
+    min-height: calc(100svh - 165px);
+    margin: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-layout > .col-lg-5 {
+    position: absolute;
+    z-index: 10;
+    top: 0.75rem;
+    left: 0.75rem;
+    width: 76px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-layout > .col-lg-7 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    min-height: inherit;
+    padding: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-selector {
+    width: 76px;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid rgba(126, 188, 255, 0.42);
+    background: rgba(3, 22, 38, 0.88);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.42);
+    opacity: 0.94;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-intro {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-info {
+    width: 100%;
+    max-width: none;
+    margin-top: 0.75rem;
+  }
+}
+
