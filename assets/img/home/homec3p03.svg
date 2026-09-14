@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   viewBox="0 0 783.74341 900"
+   viewBox="0 0 673.96576 586.55023"
    role="img"
    aria-labelledby="title description"
    version="1.1"
    id="svg23"
-   sodipodi:docname="download (3).svg"
-   width="783.74341"
-   height="900"
+   sodipodi:docname="homec3p03.svg"
+   width="673.96576"
+   height="586.55023"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -27,8 +27,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.8933333"
-     inkscape:cx="392.95775"
-     inkscape:cy="328.52113"
+     inkscape:cx="338.02817"
+     inkscape:cy="385.56339"
      inkscape:window-width="1920"
      inkscape:window-height="1010"
      inkscape:window-x="-6"
@@ -45,7 +45,7 @@
        inkscape:collect="always"
        xlink:href="#grid"
        id="pattern26"
-       patternTransform="matrix(0.78374343,0,0,1,6.472168e-6,0)" />
+       patternTransform="matrix(0.67095824,0,0,0.86186763,-84.407959,-775.6809)" />
     <pattern
        id="grid"
        width="20"
@@ -71,36 +71,26 @@
     </style>
   </defs>
   <rect
-     width="783.74341"
-     height="900"
-     fill="#04111a"
-     id="rect1"
-     x="0"
-     y="0"
-     style="stroke-width:0.885293" />
-  <rect
-     width="783.74341"
-     height="900"
+     width="586.55023"
+     height="673.96576"
      fill="url(#grid)"
      id="rect2"
      x="0"
-     y="0"
-     style="fill:url(#pattern26);stroke-width:0.885293" />
-  <text
-     x="26.895561"
-     y="53.624512"
-     class="label"
-     font-size="27"
-     id="text2">CAMAROTE TIPO A · PLANO DE DISTRIBUCIÓN</text>
-  <text
-     x="45.033257"
-     y="78.073349"
-     class="minor"
-     font-size="16"
-     id="text3">VIVIENDA BASE · 5 × 6 m · ≈ 30 m² · HASTA 2 RESIDENTES</text>
+     y="-673.96576"
+     style="fill:url(#pattern26);stroke-width:0.760446"
+     transform="rotate(90)" />
+  <rect
+     width="586.55023"
+     height="673.96576"
+     fill="#04111a"
+     id="rect1"
+     x="0"
+     y="-673.96576"
+     style="stroke-width:0.788026"
+     transform="rotate(90)" />
   <!-- 100 px por metro. 5m de frente, 6m de fondo. -->
   <g
-     transform="translate(141.8717,155)"
+     transform="rotate(90,296.85388,340.129)"
      id="g20">
     <rect
        x="0"
@@ -117,16 +107,17 @@
        sodipodi:nodetypes="cccccc" />
     <!-- Acceso superior, en el lado corto -->
     <path
-       d="m 395.00357,-6 -3.21011,-88.375488 m 0,0 c -49.70563,0 -90,40.294372 -90,89.9999997"
+       d="M 393.72697,6.3524123 390.51686,94.7279 m 0,0 c -49.70563,0 -90,-40.294372 -90,-89.9999997"
        class="part"
        id="path4"
        sodipodi:nodetypes="cccc" />
     <text
-       x="346"
-       y="23"
+       x="-46.614422"
+       y="381.37549"
        text-anchor="middle"
        class="label"
-       id="text4">ACCESO</text>
+       id="text4"
+       transform="rotate(-90)">ACCESO</text>
     <!-- Banda de servicios derecha -->
     <path
        d="M 275,377.5 V 600"
@@ -190,17 +181,19 @@
        class="part"
        id="rect11" />
     <text
-       x="392.93326"
-       y="294.9624"
+       x="-257.29028"
+       y="474.26544"
        text-anchor="middle"
        class="minor"
-       id="text11">COCINA DE APOYO</text>
+       id="text11"
+       transform="rotate(-90)">COCINA DE APOYO</text>
     <text
-       x="392.83804"
-       y="309.80615"
+       x="-247.86475"
+       y="490.96988"
        text-anchor="middle"
        class="minor"
-       id="text12">MICRO · CAFÉ · FRÍO</text>
+       id="text12"
+       transform="rotate(-90)">MICRO · CAFÉ · FRÍO</text>
     <!-- Mesa junto a cocina -->
     <rect
        x="330.38403"
@@ -215,36 +208,39 @@
        class="part"
        id="path12" />
     <text
-       x="378.5"
-       y="178.5"
+       x="-182.01025"
+       y="374.98975"
        text-anchor="middle"
        class="minor"
-       id="text13"><tspan
+       id="text13"
+       transform="rotate(-90)"><tspan
          sodipodi:role="line"
          id="tspan25"
-         x="378.5"
-         y="178.5">MESA</tspan><tspan
+         x="-182.01025"
+         y="374.98975">MESA</tspan><tspan
          sodipodi:role="line"
          id="tspan26"
-         x="379"
-         y="194.75">2 PLAZAS</tspan></text>
+         x="-181.51025"
+         y="391.23975">2 PLAZAS</tspan></text>
     <!-- Baño: bañera compacta, inodoro y lavabo -->
     <path
        d="m 275,424 h 70 a 70,70 0 0 1 -70,70"
        class="part"
        id="path13" />
     <text
-       x="387.37549"
-       y="482.5542"
+       x="-486.82202"
+       y="389.35669"
        text-anchor="middle"
        class="label"
-       id="text14">BAÑO</text>
+       id="text14"
+       transform="rotate(-90)">BAÑO</text>
     <text
-       x="395.33804"
-       y="511.90479"
+       x="-490.18237"
+       y="409.25089"
        text-anchor="middle"
        class="minor"
-       id="text15"><tspan
+       id="text15"
+       transform="rotate(-90)"><tspan
          style="fill:#ffffff"
          id="tspan24">BAÑERA · WC · LAVABO</tspan></text>
     <!-- Salón abierto, lado izquierdo superior -->
@@ -254,11 +250,12 @@
        style="fill:#12384c;stroke:#b8f0ff;stroke-width:5.3039"
        d="M 6.4715328,223.21663 V 35.351971 c 0,-1.892309 1.6325283,-3.415721 3.6603772,-3.415721 h 21.962262 c 2.027848,0 3.660377,1.523412 3.660377,3.415721 V 223.21663 c 0,1.8923 -1.632529,3.41572 -3.660377,3.41572 H 10.13191 c -2.0278489,0 -3.6603772,-1.52342 -3.6603772,-3.41572 z" />
     <text
-       x="20.771732"
-       y="130.41235"
+       x="-125.63892"
+       y="25.227787"
        text-anchor="middle"
        class="minor"
-       id="text16">TV</text>
+       id="text16"
+       transform="rotate(-90)">TV</text>
     <path
        id="rect16"
        style="fill:#1b5369;stroke:#b8f0ff;stroke-width:2.49182"
@@ -293,13 +290,24 @@
        class="part"
        id="path17" />
     <text
-       x="108.26593"
-       y="280.79199"
+       x="-316.66522"
+       y="215.74911"
        text-anchor="middle"
        class="minor"
-       id="text18"><tspan
-         style="fill:#ffffff"
-         id="tspan23">ARMARIOS / ALMACENAJE</tspan></text>
+       id="text18"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         x="-316.66522"
+         y="215.74911"><tspan
+           style="fill:#ffffff"
+           id="tspan23">ARMARIOS</tspan></tspan><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         x="-316.16522"
+         y="231.99911"><tspan
+           style="fill:#ffffff"
+           id="tspan3">LAMACENAJE</tspan></tspan></text>
     <!-- Cama al fondo, zona privada -->
     <rect
        x="68.151237"
@@ -328,37 +336,18 @@
        id="rect19-4"
        style="stroke-width:0.924388" />
     <text
-       x="136"
-       y="415.32394"
+       x="-488.81616"
+       y="142.73186"
        text-anchor="middle"
        class="label"
-       id="text20">CAMA 135</text>
+       id="text20"
+       transform="rotate(-90)">CAMA 135</text>
   </g>
   <!-- Cotas -->
   <g
      class="measure"
      id="g21"
-     transform="translate(-108.1283)">
-    <path
-       d="m 250,790 h 500 m -500,-8 v 16 m 500,-16 v 16"
-       id="path20" />
-    <path
-       d="m 810,155 v 600 m -8,-600 h 16 m -16,600 h 16"
-       id="path21" />
-  </g>
-  <text
-     x="391.8717"
-     y="830"
-     text-anchor="middle"
-     class="label"
-     id="text21">5 m</text>
-  <text
-     x="-455"
-     y="746.8717"
-     text-anchor="middle"
-     class="label"
-     transform="rotate(-90)"
-     id="text22">6 m</text>
+     transform="translate(-163.01713,-161.72488)" />
   <metadata
      id="metadata26">
     <rdf:RDF>

@@ -579,3 +579,58 @@
   font-size: 0.84rem;
 }
 
+/* Selector de cubiertas COCINA:   misma escala visual que el alzado del módulo HOME. */
+
+.cocina-selector {
+  width: clamp(180px, 12vw, 250px);
+}
+
+/* En móvil el selector sigue siendo legible, pero no domina la pantalla. */
+
+@media (max-width: 991.98px) {
+  .cocina-selector {
+    width: clamp(150px, 40vw, 180px);
+    margin: 0 auto 1rem;
+  }
+}
+
+/* En escritorio, el selector toma solo el ancho que necesita.   El resto se entrega al mapa y a su ficha. */
+
+@media (min-width: 992px) {
+  .cocina-layout {
+    display: grid;
+    grid-template-columns: clamp(180px, 12vw, 250px) minmax(0, 1fr);
+    gap: clamp(1rem, 2vw, 2.5rem) !important;
+    max-width: none;
+    margin-inline: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-layout > .col-lg-5, .cocina-layout > .col-lg-7 {
+    width: auto;
+    max-width: none;
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-layout > .col-lg-5 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-selector {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .cocina-layout > .col-lg-7 {
+    column-gap: clamp(2.5rem, 4vw, 5rem);
+  }
+}
+
