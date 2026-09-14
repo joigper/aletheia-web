@@ -629,3 +629,59 @@
   box-shadow: 0 0 0 4px rgba(54, 201, 151, 0.20), 0 0 16px rgba(54, 201, 151, 0.92);
 }
 
+/* En pantallas compactas, la ficha deja de estrecharse a la derecha.   El alzado y el plano siguen juntos; la información continúa debajo. */
+
+@media (max-width: 991.98px) {
+  .home-map {
+    height: auto;
+    row-gap: 1rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-map > [class*="col-"] {
+    height: auto;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-map > .col-auto {
+    flex: 0 0 34%;
+    max-width: 34%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-map > .col:nth-child(2) {
+    flex: 0 0 66%;
+    max-width: 66%;
+    padding-left: .75rem !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-map > .col:nth-child(3) {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-floor-selector, .home-map-image, .home-plan-stage {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .home-info-card {
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
