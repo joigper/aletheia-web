@@ -1,3 +1,7 @@
+/* * MÓDULO COCINA * Hoja única y depurada. La composición tiene tres estados: * - escritorio amplio: selector, plano y ficha lateral; * - escritorio medio: selector y plano, con la ficha bajo el plano; * - móvil: plano protagonista y ficha de punto de interés a pantalla completa. */
+
+/* --- Plano, vídeo y transición --- */
+
 .cocina-intro {
   position: relative;
   width: 100%;
@@ -6,147 +10,71 @@
   background: #030609;
 }
 
-.cocina-intro-media {
+.cocina-intro-media, .cocina-plano {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
 #cocina-video {
-  z-index: 2;
+  z-index: 1;
   opacity: 1;
   transition: opacity 500ms ease;
 }
 
 .cocina-final {
-  z-index: 1;
+  z-index: 2;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 500ms ease;
 }
 
-.cocina-intro.intro-finalizada #cocina-video {
-  opacity: 0;
+.cocina-intro.intro-finalizada .cocina-final, .cocina-intro.modelo-resaltado .cocina-final {
+  opacity: 1;
+}
+
+.cocina-intro.transicion-cubierta #cocina-video {
+  z-index: 4;
+  opacity: 1;
   pointer-events: none;
 }
 
-.cocina-intro.intro-finalizada .cocina-final {
-  opacity: 1;
-}
-
-.cocina-layout {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.cocina-croquis {
-  display: block;
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  margin: 0 auto;
-}
-
-.cocina-intro-media {
-  display: block;
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  margin: 0 auto;
-  background: #02070d;
-}
-
-.cocina-info {
-  width: 100%;
-  max-width: 600px;
-  min-height: 150px;
-  margin: 1.25rem auto 0;
-  padding: 1.25rem;
-  border: 1px solid rgba(126, 188, 255, 0.35);
-  background: rgba(3, 22, 38, 0.85);
-  color: #d7ebff;
+.cocina-intro.transicion-cubierta .cocina-final {
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: opacity 0.45s ease, transform 0.45s ease, visibility 0.45s;
 }
 
-.cocina-info.cocina-info-activa {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-@media (max-width: 991.98px) {
-  .cocina-croquis {
-    max-width: 430px;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-intro-media, .cocina-info {
-    max-width: 560px;
-  }
-}
-
-/* Ajuste de la composición para escritorio */
-
-@media (min-width: 992px) {
-  .cocina-croquis {
-    width: auto;
-    max-width: 100%;
-    max-height: 55vh;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 992px) {
-  .cocina-layout {
-    align-items: flex-start;
-  }
-}
-
-@media (min-width: 992px) {
-  .cocina-intro {
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 992px) {
-  .cocina-info {
-    max-width: 560px;
-  }
-}
-
-/* La imagen final aparece sobre el vídeo sin descubrir el fondo */
-
-#cocina-video {
-  z-index: 1;
-}
-
-.cocina-final {
-  z-index: 2;
+.cocina-intro.vista-planta::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0;
   pointer-events: none;
 }
 
-.cocina-intro.intro-finalizada #cocina-video {
-  opacity: 1;
+.cocina-plano {
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5%) scale(.72) rotate(1.5deg);
+  transform-origin: center;
+  transition: opacity 800ms ease, transform 800ms cubic-bezier(.22,.75,.25,1);
 }
 
-.cocina-intro.intro-finalizada .cocina-final {
+.cocina-intro.plano-visible .cocina-plano {
   opacity: 1;
+  transform: translateY(0) scale(1) rotate(0);
 }
 
-/* Selector superpuesto al croquis */
+/* --- Selector de cubiertas --- */
 
 .cocina-selector {
   position: relative;
-  width: min(100%, 430px);
+  width: clamp(180px, 12vw, 250px);
   aspect-ratio: 2 / 3;
-  margin: 0 auto;
+  margin: 0;
   line-height: 0;
 }
 
@@ -154,25 +82,12 @@
   display: block;
   width: 100%;
   height: 100%;
-  max-width: none;
-  max-height: none;
-  margin: 0;
   object-fit: contain;
-}
-
-@media (min-width: 992px) {
-  .cocina-selector {
-    width: min(100%, calc(55vh * 2 / 3));
-  }
 }
 
 .cocina-zona {
   position: absolute;
   z-index: 3;
-  /*left: 23%;*/
-  /*top: calc(12.5% + var(--nivel-desde-arriba) * 7.5%);*/
-  /*width: 54%;*/
-  /*height: 7.5%;*/
   inset: 0;
   width: 100%;
   height: 100%;
@@ -194,9 +109,31 @@
 
 .cocina-zona:hover, .cocina-zona:focus-visible, .cocina-zona.activa, .cocina-zona.fijada {
   outline: none;
-  border-color: rgba(174, 224, 255, 0.95);
-  background: rgba(48, 159, 226, 0.32);
-  box-shadow: 0 0 12px rgba(76, 181, 244, 0.8), inset 0 0 20px rgba(95, 196, 255, 0.3);
+  border-color: rgba(174,224,255,.95);
+  background: rgba(48,159,226,.32);
+  box-shadow: 0 0 12px rgba(76,181,244,.8), inset 0 0 20px rgba(95,196,255,.3);
+}
+
+/* --- Ficha de cubierta --- */
+
+.cocina-info {
+  width: 100%;
+  min-height: 150px;
+  margin: 1.25rem 0 0;
+  padding: 1.25rem;
+  border: 1px solid rgba(126,188,255,.35);
+  background: rgba(3,22,38,.85);
+  color: #d7ebff;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity .45s ease, transform .45s ease, visibility .45s;
+}
+
+.cocina-info.cocina-info-activa {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .cocina-info-numero, .cocina-info-nombre {
@@ -205,223 +142,28 @@
 }
 
 .cocina-info-numero {
-  margin-bottom: 0.35rem;
+  margin-bottom: .35rem;
   color: #85cfff;
-  font-family: "Tektur", sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.16em;
+  font-family: "Tektur",sans-serif;
+  font-size: .85rem;
+  letter-spacing: .16em;
 }
 
 .cocina-info-nombre {
   color: #e3f3ff;
-  font-family: "Tektur", sans-serif;
-  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  font-family: "Tektur",sans-serif;
+  font-size: clamp(1.05rem,1.8vw,1.45rem);
   font-weight: 500;
 }
 
-@media (min-width: 992px) {
-  .cocina-selector {
-    width: min(100%, calc(55vh * 2 / 3));
-  }
-}
-
-/* Imagen 3D correspondiente a la cubierta señalada */
-
-.cocina-final {
-  transition: opacity 140ms ease;
-}
-
-.cocina-intro.modelo-resaltado .cocina-final {
-  opacity: 1;
-}
-
-/* Transición desde el módulo completo hasta la planta de una cubierta */
-
-.cocina-intro.transicion-cubierta #cocina-video {
-  z-index: 4;
-  opacity: 1;
-  pointer-events: none;
-}
-
-.cocina-intro.transicion-cubierta .cocina-final {
-  opacity: 0;
-}
-
-/* Punto de anclaje para el futuro plano 2D superpuesto. */
-
-.cocina-intro.vista-planta::after {
-  content: "";
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  pointer-events: none;
-}
-
-/* Transición desde el módulo completo hasta la planta de una cubierta */
-
-.cocina-intro.transicion-cubierta #cocina-video {
-  z-index: 4;
-  opacity: 1;
-  pointer-events: none;
-}
-
-.cocina-intro.transicion-cubierta .cocina-final {
-  opacity: 0;
-}
-
-/* Punto de anclaje para el futuro plano 2D superpuesto. */
-
-.cocina-intro.vista-planta::after {
-  content: "";
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  pointer-events: none;
-}
-
 .cocina-info-descripcion {
-  margin: 0.8rem 0 0;
-  color: rgba(215, 235, 255, 0.88);
-  font-size: 0.95rem;
+  margin: .8rem 0 0;
+  color: rgba(215,235,255,.88);
+  font-size: .95rem;
   line-height: 1.55;
 }
 
-/* Transición desde el módulo completo hasta la planta de una cubierta */
-
-.cocina-intro.transicion-cubierta #cocina-video {
-  z-index: 4;
-  opacity: 1;
-  pointer-events: none;
-}
-
-.cocina-intro.transicion-cubierta .cocina-final {
-  opacity: 0;
-}
-
-/* Punto de anclaje para el futuro plano 2D superpuesto. */
-
-.cocina-intro.vista-planta::after {
-  content: "";
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  pointer-events: none;
-}
-
-.cocina-plano {
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transform: translateY(5%) scale(0.72) rotate(1.5deg);
-  transform-origin: center center;
-  pointer-events: none;
-  transition: opacity 650ms ease;
-  transition: opacity 800ms ease, transform 800ms cubic-bezier(0.22, 0.75, 0.25, 1);
-}
-
-.cocina-intro.plano-visible .cocina-plano {
-  opacity: 1;
-  transform: translateY(0) scale(1) rotate(0deg);
-}
-
-.cocina-info-descripcion {
-  margin: 0.8rem 0 0;
-  color: rgba(215, 235, 255, 0.88);
-  font-size: 0.95rem;
-  line-height: 1.55;
-}
-
-/* Aprovechamiento de monitores anchos. Mantiene intacto el diseño normal. */
-
-@media (min-width: 1600px) {
-  body > .container {
-    width: calc(100% - 4rem);
-    max-width: none;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout {
-    display: grid;
-    grid-template-columns: minmax(360px, 430px) minmax(0, 1fr);
-    gap: clamp(1.5rem, 2vw, 2.5rem) !important;
-    width: 100%;
-    max-width: none;
-    margin-inline: 0;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout > [class*="col-"] {
-    width: auto;
-    max-width: none;
-    padding-inline: 0;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout > .col-lg-5 {
-    display: flex;
-    justify-content: flex-start;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout > .col-lg-7 {
-    display: grid;
-    grid-template-columns: minmax(560px, 700px) minmax(300px, 1fr);
-    grid-template-rows: auto auto;
-    column-gap: clamp(1.5rem, 2vw, 2.5rem);
-    align-items: start;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout .cocina-intro {
-    grid-column: 1;
-    grid-row: 1;
-    width: 100%;
-    max-width: none;
-    margin: 0;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout .cocina-info {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
-    max-width: none;
-    margin: 0.7rem 0 0;
-  }
-}
-
-/* La futura ficha de un punto de interés ocupará esta tercera zona. */
-
-@media (min-width: 1600px) {
-  .cocina-detalle {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    min-width: 0;
-  }
-}
-
-@media (min-width: 1600px) {
-  .cocina-layout .cocina-intro-media, .cocina-layout .cocina-plano {
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    margin: 0;
-    object-fit: contain;
-  }
-}
-
-/* Puntos de interés superpuestos al plano */
+/* --- Puntos de interés --- */
 
 .cocina-punto {
   position: absolute;
@@ -434,50 +176,53 @@
   border: 3px solid #d7f3ff;
   border-radius: 50%;
   background: #27c9ff;
-  box-shadow: 0 0 0 5px rgba(39, 201, 255, 0.18), 0 0 18px #27c9ff;
+  box-shadow: 0 0 0 5px rgba(39,201,255,.18), 0 0 18px #27c9ff;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.6);
-  transition: opacity 250ms ease, transform 250ms ease, box-shadow 180ms ease;
+  transform: translate(-50%,-50%) scale(.6);
+  transition: opacity .25s ease, transform .25s ease, box-shadow .18s ease;
 }
 
 .cocina-intro.vista-planta[data-cubierta="1"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="2"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="3"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="4"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="5"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="6"] .cocina-punto, .cocina-intro.vista-planta[data-cubierta="9"] .cocina-punto {
   opacity: 1;
   pointer-events: auto;
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%,-50%) scale(1);
   animation: cocina-punto-pulso 2.2s ease-in-out infinite;
 }
 
 .cocina-punto:hover, .cocina-punto:focus-visible, .cocina-punto.activo {
   outline: none;
-  box-shadow: 0 0 0 7px rgba(39, 201, 255, 0.3), 0 0 26px #9be9ff;
+  box-shadow: 0 0 0 7px rgba(39,201,255,.3), 0 0 26px #9be9ff;
 }
 
 @keyframes cocina-punto-pulso {
   0%, 100% {
-    box-shadow: 0 0 0 4px rgba(39, 201, 255, 0.15), 0 0 13px #27c9ff;
+    box-shadow: 0 0 0 4px rgba(39,201,255,.15), 0 0 13px #27c9ff;
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(39, 201, 255, 0.05), 0 0 23px #7fe4ff;
+    box-shadow: 0 0 0 8px rgba(39,201,255,.05), 0 0 23px #7fe4ff;
   }
 }
 
-/* Ficha derecha de un punto de interés */
+/* --- Ficha de un punto de interés --- */
 
 .cocina-detalle {
+  display: none;
   width: 100%;
+  display: none;
   min-height: 260px;
   padding: 1.25rem;
-  border: 1px solid rgba(126, 188, 255, 0.35);
-  background: rgba(3, 22, 38, 0.85);
+  border: 1px solid rgba(126,188,255,.35);
+  background: rgba(3,22,38,.85);
   color: #d7ebff;
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
-  transition: opacity 350ms ease, transform 350ms ease, visibility 350ms;
+  transition: opacity .35s ease, transform .35s ease, visibility .35s;
 }
 
 .cocina-detalle.cocina-detalle-activo {
+  display: block;
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -503,15 +248,20 @@
   object-fit: contain;
 }
 
-.cocina-detalle-cerrar {
+.cocina-detalle-cerrar, .cocina-detalle-accion, .cocina-detalle-volver {
+  display: inline-block;
+  width: fit-content;
   margin-top: 1rem;
-  padding: 0.45rem 0.8rem;
-  border: 1px solid rgba(133, 207, 255, 0.5);
+  padding: .5rem .8rem;
   background: transparent;
+  font-family: "Tektur",sans-serif;
+  font-size: .75rem;
+  letter-spacing: .12em;
+}
+
+.cocina-detalle-cerrar {
+  border: 1px solid rgba(133,207,255,.5);
   color: #85cfff;
-  font-family: "Tektur", sans-serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
 }
 
 .cocina-detalle-cerrar:hover, .cocina-detalle-cerrar:focus-visible {
@@ -520,46 +270,34 @@
   outline: none;
 }
 
-@media (max-width: 1599.98px) {
-  .cocina-detalle {
-    max-width: 600px;
-    margin: 1rem auto 0;
-  }
-}
-
 .cocina-detalle-accion, .cocina-detalle-volver {
-  display: inline-block;
-  width: fit-content;
-  margin-top: 1rem;
-  padding: 0.5rem 0.8rem;
-  border: 1px solid rgba(245, 181, 75, 0.72);
-  background: rgba(116, 67, 17, 0.22);
+  border: 1px solid rgba(245,181,75,.72);
+  background: rgba(116,67,17,.22);
   color: #ffd58a;
-  font-family: "Tektur", sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.11em;
+  font-size: .72rem;
+  letter-spacing: .11em;
 }
 
 .cocina-detalle-accion:hover, .cocina-detalle-accion:focus-visible, .cocina-detalle-volver:hover, .cocina-detalle-volver:focus-visible {
   border-color: #ffe3a9;
-  background: rgba(160, 96, 23, 0.36);
+  background: rgba(160,96,23,.36);
   color: #fff2d5;
   outline: none;
 }
 
 .cocina-receta {
   margin-top: 1rem;
-  color: rgba(215, 235, 255, 0.9);
-  font-size: 0.9rem;
+  color: rgba(215,235,255,.9);
+  font-size: .9rem;
   line-height: 1.5;
 }
 
 .cocina-receta h3 {
-  margin: 1.1rem 0 0.45rem;
+  margin: 1.1rem 0 .45rem;
   color: #ffd58a;
-  font-family: "Tektur", sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+  font-family: "Tektur",sans-serif;
+  font-size: .78rem;
+  letter-spacing: .1em;
 }
 
 .cocina-receta ul, .cocina-receta ol {
@@ -568,39 +306,26 @@
 }
 
 .cocina-receta li {
-  margin-bottom: 0.35rem;
+  margin-bottom: .35rem;
 }
 
 .cocina-receta__nota {
   margin: 1rem 0 0;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(245, 181, 75, 0.25);
+  padding-top: .8rem;
+  border-top: 1px solid rgba(245,181,75,.25);
   color: #ffd58a;
-  font-size: 0.84rem;
+  font-size: .84rem;
 }
 
-/* Selector de cubiertas COCINA:   misma escala visual que el alzado del módulo HOME. */
-
-.cocina-selector {
-  width: clamp(180px, 12vw, 250px);
-}
-
-/* En móvil el selector sigue siendo legible, pero no domina la pantalla. */
-
-@media (max-width: 991.98px) {
-  .cocina-selector {
-    width: clamp(150px, 40vw, 180px);
-    margin: 0 auto 1rem;
-  }
-}
-
-/* En escritorio, el selector toma solo el ancho que necesita.   El resto se entrega al mapa y a su ficha. */
+/* --- Escritorio: selector + plano/ficha. --- */
 
 @media (min-width: 992px) {
   .cocina-layout {
     display: grid;
-    grid-template-columns: clamp(180px, 12vw, 250px) minmax(0, 1fr);
-    gap: clamp(1rem, 2vw, 2.5rem) !important;
+    grid-template-columns: clamp(180px,12vw,250px) minmax(0,1fr);
+    align-items: start;
+    gap: clamp(1rem,2vw,2.5rem) !important;
+    width: 100%;
     max-width: none;
     margin-inline: 0;
   }
@@ -617,54 +342,210 @@
 @media (min-width: 992px) {
   .cocina-layout > .col-lg-5 {
     display: flex;
-    align-items: center;
     justify-content: flex-start;
+    align-items: center;
   }
 }
 
 @media (min-width: 992px) {
-  .cocina-selector {
+  .cocina-layout > .col-lg-7 {
+    display: block;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-intro {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-info {
+    max-width: 620px;
+    margin: .8rem auto 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .cocina-detalle {
+    max-width: 620px;
+    margin: 1rem auto 0;
+  }
+}
+
+/* El ancho que antes se desaprovechaba: ficha lateral desde 1200 px. */
+
+@media (min-width: 1200px) {
+  .cocina-layout > .col-lg-7 {
+    display: grid;
+    grid-template-columns: minmax(430px,650px) minmax(300px,1fr);
+    grid-template-rows: auto auto;
+    column-gap: clamp(1.5rem,3vw,4rem);
+    align-items: start;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cocina-layout .cocina-intro {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cocina-layout .cocina-info {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    margin: .8rem 0 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cocina-layout .cocina-detalle {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 100%;
+    max-width: none;
     margin: 0;
   }
 }
 
 @media (min-width: 1600px) {
-  .cocina-layout > .col-lg-7 {
-    column-gap: clamp(2.5rem, 4vw, 5rem);
+  body > .container {
+    width: calc(100% - 4rem);
+    max-width: none;
   }
 }
 
-/* MÓVIL: selector compacto a la izquierda y plano funcional a la derecha. */
+@media (min-width: 1600px) {
+  .cocina-layout > .col-lg-7 {
+    grid-template-columns: minmax(560px,700px) minmax(320px,1fr);
+  }
+}
+
+/* --- Móvil: el plano ocupa el ancho y el detalle sustituye la vista. --- */
+
+@media (max-width: 991.98px) {
+  .cocina-header {
+    display: grid;
+    grid-template-columns: 64px minmax(0,1fr) auto;
+    gap: .65rem;
+    align-items: center;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col {
+    width: auto;
+    max-width: none;
+    flex: none;
+    padding: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:first-child img {
+    display: block;
+    width: 58px !important;
+    height: 58px !important;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:first-child h1 {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) p:first-child {
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:nth-child(2) p:last-child {
+    margin: .22rem 0 0 !important;
+    font-size: .64rem !important;
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header > .col:last-child {
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header .galaxy-button--small .galaxy-trigger {
+    padding: .48em .72em;
+    font-size: .72rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-lead {
+    margin: .65rem 0 .8rem !important;
+    font-size: .84rem !important;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cocina-header + .mt-4 {
+    margin-top: .75rem !important;
+  }
+}
 
 @media (max-width: 991.98px) {
   .cocina-layout {
-    display: grid;
-    grid-template-columns: minmax(78px, 22vw) minmax(0, 1fr);
-    gap: 12px !important;
-    align-items: center;
-    margin-inline: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;
+    min-height: 0;
+    margin: 0;
   }
 }
 
 @media (max-width: 991.98px) {
   .cocina-layout > .col-12, .cocina-layout > .col-lg-5, .cocina-layout > .col-lg-7 {
-    width: auto;
+    width: 100%;
     max-width: none;
     padding: 0;
   }
 }
 
 @media (max-width: 991.98px) {
-  .cocina-layout > .col-lg-5 {
-    display: flex;
-    align-items: center;
+  .cocina-layout > .col-lg-7 {
+    order: 1;
   }
 }
 
 @media (max-width: 991.98px) {
-  .cocina-selector {
-    width: 100%;
-    margin: 0;
+  .cocina-layout > .col-lg-5 {
+    order: 2;
+    display: flex;
+    justify-content: center;
+    margin-top: .9rem;
+    padding-top: 0;
   }
 }
 
@@ -680,33 +561,41 @@
   .cocina-info {
     min-height: 0;
     max-width: none;
-    margin: 0.5rem 0 0;
-    padding: 0.65rem 0.75rem;
+    margin: .65rem 0 0;
+    padding: .7rem .8rem;
   }
 }
 
 @media (max-width: 991.98px) {
   .cocina-info-numero {
-    margin-bottom: 0.18rem;
-    font-size: 0.64rem;
+    margin-bottom: .18rem;
+    font-size: .67rem;
   }
 }
 
 @media (max-width: 991.98px) {
   .cocina-info-nombre {
-    font-size: 0.88rem;
+    font-size: .95rem;
   }
 }
 
 @media (max-width: 991.98px) {
   .cocina-info-descripcion {
-    margin-top: 0.35rem;
-    font-size: 0.76rem;
+    margin-top: .35rem;
+    font-size: .8rem;
     line-height: 1.35;
   }
 }
 
-/* MÓVIL: la ficha de un punto de interés sustituye temporalmente al plano. */
+@media (max-width: 991.98px) {
+  .cocina-selector {
+    width: min(34vw,150px);
+    margin: 0;
+    padding: 5px;
+    border: 1px solid rgba(126,188,255,.38);
+    background: rgba(3,22,38,.78);
+  }
+}
 
 @media (max-width: 991.98px) {
   body.cocina-detalle-abierto {
@@ -739,9 +628,9 @@
     right: 14px;
     z-index: 1051;
     margin: 0;
-    padding: 0.6rem 0.85rem;
-    border-color: rgba(189, 232, 255, 0.8);
-    background: rgba(3, 22, 38, 0.96);
+    padding: .6rem .85rem;
+    border-color: rgba(189,232,255,.8);
+    background: rgba(3,22,38,.96);
   }
 }
 
@@ -753,156 +642,187 @@
 
 @media (max-width: 991.98px) {
   .cocina-detalle.cocina-detalle-activo .cocina-detalle-medio {
-    margin-top: 0.75rem;
+    margin-top: .75rem;
   }
 }
 
-/* Cabecera compacta exclusiva para móviles. */
-
-@media (max-width: 991.98px) {
-  .cocina-header {
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr) auto;
-    gap: 0.65rem;
-    align-items: center;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col {
-    width: auto;
-    max-width: none;
-    flex: none;
-    padding: 0;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:first-child img {
-    display: block;
-    width: 58px !important;
-    height: 58px !important;
-    object-fit: contain;
-  }
-}
-
-/* El emblema ya identifica la marca; ahorramos una segunda línea. */
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:first-child h1 {
-    display: none;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:nth-child(2) {
-    align-items: flex-start !important;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:nth-child(2) p:first-child {
-    margin: 0 !important;
-    font-size: 1.3rem !important;
-    line-height: 1.1;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:nth-child(2) p:last-child {
-    margin: 0.22rem 0 0 !important;
-    font-size: 0.64rem !important;
-    line-height: 1.2;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header > .col:last-child {
-    justify-content: flex-end !important;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header .galaxy-button--small .galaxy-trigger {
-    padding: 0.48em 0.72em;
-    font-size: 0.72rem;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-lead {
-    margin: 0.65rem 0 0.8rem !important;
-    font-size: 0.84rem !important;
-    line-height: 1.35;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-header + .mt-4 {
-    margin-top: 0.75rem !important;
-  }
-}
-
-/* MÓVIL: el plano es protagonista.   El selector de cubiertas flota sobre él y deja de robar ancho. */
-
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .cocina-layout {
-    position: relative;
-    display: block;
-    min-height: calc(100svh - 165px);
-    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "mapa" "alzado";
+    align-content: start;
+    min-height: 0;
   }
 }
 
-@media (max-width: 991.98px) {
-  .cocina-layout > .col-lg-5 {
-    position: absolute;
-    z-index: 10;
-    top: 0.75rem;
-    left: 0.75rem;
-    width: 76px;
-    padding: 0;
-  }
-}
-
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .cocina-layout > .col-lg-7 {
+    grid-area: mapa;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .cocina-layout > .col-lg-5 {
+    grid-area: alzado;
+    min-height: 0;
+    height: auto;
+    margin: .9rem 0 0 !important;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .cocina-info {
+    height: 220px;
+    min-height: 220px;
+    overflow-y: auto;
+  }
+}
+
+/* Ajuste definitivo para tabletas y ventanas intermedias. */
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .cocina-layout {
+    display: grid;
+    grid-template-columns: clamp(150px, 18vw, 220px) minmax(0, 1fr);
+    grid-template-areas: "alzado mapa";
+    gap: clamp(1rem, 3vw, 2rem) !important;
+    align-items: start;
+    margin-top: 0 !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .cocina-layout > .col-lg-5 {
+    grid-area: alzado;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     width: 100%;
     max-width: none;
-    min-height: inherit;
+    margin: 0 !important;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .cocina-layout > .col-lg-7 {
+    grid-area: mapa;
+    width: 100%;
+    max-width: none;
+    margin-top: 0 !important;
     padding: 0;
   }
 }
 
-@media (max-width: 991.98px) {
+@media (min-width: 768px) and (max-width: 1199.98px) {
   .cocina-selector {
-    width: 76px;
-    margin: 0;
-    padding: 4px;
-    border: 1px solid rgba(126, 188, 255, 0.42);
-    background: rgba(3, 22, 38, 0.88);
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.42);
-    opacity: 0.94;
-  }
-}
-
-@media (max-width: 991.98px) {
-  .cocina-intro {
     width: 100%;
-    max-width: none;
     margin: 0;
   }
 }
 
-@media (max-width: 991.98px) {
-  .cocina-info {
+/* Teléfono: mapa, ficha y alzado en columna, todos centrados. */
+
+@media (max-width: 767.98px) {
+  .cocina-layout > .col-lg-5, .cocina-layout > .col-lg-7 {
     width: 100%;
     max-width: none;
-    margin-top: 0.75rem;
+    padding: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-layout > .col-lg-5 {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-selector {
+    margin-inline: auto;
+  }
+}
+
+/* En ventana compacta o baja, la ficha debe abrirse sobre el plano. */
+
+@media (max-width: 1199.98px), (max-height: 820px) {
+  body.cocina-detalle-abierto {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 1199.98px), (max-height: 820px) {
+  .cocina-detalle.cocina-detalle-activo {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: block;
+    width: 100vw;
+    max-width: none;
+    min-height: 100svh;
+    max-height: 100svh;
+    margin: 0;
+    padding: 1.25rem 1rem 5rem;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    background: #031622;
+  }
+}
+
+@media (max-width: 1199.98px), (max-height: 820px) {
+  .cocina-detalle.cocina-detalle-activo .cocina-detalle-cerrar {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 1051;
+    margin: 0;
+    padding: .6rem .85rem;
+    border-color: rgba(189, 232, 255, .8);
+    background: rgba(3, 22, 38, .96);
+  }
+}
+
+@media (max-width: 1199.98px), (max-height: 820px) {
+  .cocina-detalle.cocina-detalle-activo .cocina-info-numero, .cocina-detalle.cocina-detalle-activo .cocina-info-nombre {
+    padding-right: 6rem;
+  }
+}
+
+/* En móvil, la zona interactiva y el alzado comparten exactamente el mismo marco. */
+
+@media (max-width: 767.98px) {
+  .cocina-selector {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-selector {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-selector::after {
+    content: "SELECCIONA\A CUBIERTA";
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 12px);
+    z-index: 4;
+    width: 96px;
+    transform: translateY(-50%);
+    color: #85cfff;
+    font-family: "Tektur", sans-serif;
+    font-size: .7rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: .12em;
+    pointer-events: none;
   }
 }
 
