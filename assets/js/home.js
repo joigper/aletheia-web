@@ -81,8 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const summaryCard = document.getElementById("home-info-card");
   const liftCard = document.getElementById("home-lift-card");
   const cabinCard = document.getElementById("home-cabin-card");
+  const technicalCard = document.getElementById("home-technical-card");
 
-  if (!planStage || !map || !summaryCard || !liftCard || !cabinCard) return;
+  if (!planStage || !map || !summaryCard || !liftCard || !cabinCard || !technicalCard) return;
 
   const poiLayer = document.createElement("div");
   poiLayer.className = "home-poi-layer";
@@ -109,13 +110,21 @@ document.addEventListener("DOMContentLoaded", () => {
       y: 40.3,
       label: "Camarote Tipo A · unidad residencial base",
       title: "Camarote Tipo A"
-    } 
+    },
+    {
+      type: "technical",
+      x: 50,
+      y: 67,
+      label: "Pleno técnico intercubiertas",
+      title: "Pleno técnico · 2,3 m"
+    }
   ];
 
     function showCard(card) {
     summaryCard.hidden = card !== "summary";
     liftCard.hidden = card !== "lift";
     cabinCard.hidden = card !== "cabin";
+    technicalCard.hidden = card !== "technical";
   }
 
   function syncPoints() {
@@ -170,4 +179,119 @@ document.addEventListener("DOMContentLoaded", () => {
 
   showCard("summary");
   updatePointsVisibility();
+});
+
+/* Visor inmersivo de la estructura del módulo HOME. */
+document.addEventListener("DOMContentLoaded", () => {
+  const openButton = document.getElementById("home-open-structure");
+  const viewer = document.getElementById("home-structure-viewer");
+  const closeButton = document.getElementById("home-close-structure");
+
+  if (!openButton || !viewer || !closeButton) return;
+
+  const closeViewer = () => {
+    viewer.hidden = true;
+    document.body.classList.remove("home-structure-open");
+    openButton.focus();
+  };
+
+  openButton.addEventListener("click", () => {
+    viewer.hidden = false;
+    document.body.classList.add("home-structure-open");
+    closeButton.focus();
+  });
+
+  closeButton.addEventListener("click", closeViewer);
+
+  viewer.addEventListener("click", (event) => {
+    if (event.target === viewer) closeViewer();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !viewer.hidden) closeViewer();
+  });
+});
+/* Visor inmersivo de la estructura del módulo HOME. */
+document.addEventListener("DOMContentLoaded", () => {
+  const openButton = document.getElementById("home-open-structure");
+  if (!openButton) return;
+
+  let viewer = document.getElementById("home-structure-viewer");
+
+  if (!viewer) {
+    viewer = document.createElement("section");
+    viewer.id = "home-structure-viewer";
+    viewer.className = "home-structure-viewer";
+    viewer.hidden = true;
+    viewer.setAttribute("role", "dialog");
+    viewer.setAttribute("aria-modal", "true");
+    viewer.setAttribute("aria-label", "Estructura 3D del módulo HOME");
+
+    viewer.innerHTML = `
+      <div class="home-structure-viewer__panel">
+        <button id="home-close-structure"
+                class="home-structure-viewer__close"
+                type="button">CERRAR</button>
+
+        <div class="home-structure-viewer__title">
+          <p>INFRAESTRUCTURA · MODELO INTERACTIVO</p>
+          <h2>ESTRUCTURA DEL MÓDULO HOME</h2>
+        </div>
+
+        <model-viewer
+          src="assets/img/home/home-estructura.glb"
+          alt="Modelo estructural tridimensional del módulo HOME"
+          loading="lazy"
+          camera-controls
+          touch-action="pan-y"
+          auto-rotate
+          auto-rotate-delay="1400"
+          rotation-per-second="10deg"
+          shadow-intensity="1"
+          exposure="1.1">
+          <p>Tu navegador no puede mostrar el modelo 3D.</p>
+        </model-viewer>
+
+        <p class="home-structure-viewer__hint">
+          Arrastra para girar · Pellizca o usa la rueda para acercar
+        </p>
+      </div>`;
+
+    document.body.append(viewer);
+  }
+
+  if (!document.querySelector('script[src*="@google/model-viewer"]')) {
+    const script = document.createElement("script");
+    script.type = "module";
+    script.src =
+      "https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js";
+    document.head.append(script);
+  }
+
+  openButton.innerHTML = "<span>EXPLORAR</span><strong>ESTRUCTURA 3D</strong>";
+  openButton.type = "button";
+
+  const closeButton = viewer.querySelector("#home-close-structure");
+
+  const closeViewer = () => {
+    viewer.hidden = true;
+    document.body.classList.remove("home-structure-open");
+    openButton.focus();
+  };
+
+  openButton.addEventListener("click", () => {
+    viewer.hidden = false;
+    document.body.classList.add("home-structure-open");
+    closeButton.focus();
+  });
+
+  closeButton.addEventListener("click", closeViewer);
+
+  viewer.addEventListener("click", (event) => {
+    if (event.target === viewer) closeViewer();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !viewer.hidden) closeViewer();
+  });
 });
