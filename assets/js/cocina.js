@@ -564,6 +564,17 @@ document.addEventListener("DOMContentLoaded", () => {
   croquis.parentNode.insertBefore(selector, croquis);
   selector.appendChild(croquis);
 
+  // Indicador visual de la cubierta activa: se reubica por CSS según el formato.
+  const indicadorCubierta = document.createElement("div");
+  indicadorCubierta.className = "cocina-indicador-cubierta";
+  const indicadorEtiqueta = document.createElement("span");
+  indicadorEtiqueta.textContent = "CUBIERTA";
+  const indicadorNumero = document.createElement("strong");
+  indicadorNumero.textContent = "—";
+  indicadorNumero.setAttribute("aria-live", "polite");
+  indicadorCubierta.append(indicadorEtiqueta, indicadorNumero);
+  selector.insertAdjacentElement("afterend", indicadorCubierta);
+
   const numero = document.createElement("span");
   numero.className = "cocina-info-numero";
   const nombre = document.createElement("strong");
@@ -597,6 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
       zona.classList.toggle("activa", Number(zona.dataset.nivel) === nivel);
     });
     numero.textContent = `CUBIERTA ${nivel}`;
+    indicadorNumero.textContent = nivel;
     nombre.textContent = cubiertas[nivel];
     descripcion.textContent = descripciones[nivel];
     info.classList.add("cocina-info-activa");
@@ -612,6 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selector.querySelectorAll(".cocina-zona").forEach((zona) => {
       zona.classList.remove("activa");
     });
+    indicadorNumero.textContent = "—";
     info.classList.remove("cocina-info-activa");
     intro.classList.remove("modelo-resaltado");
     modelo.setAttribute("src", modeloBase);
@@ -665,6 +678,29 @@ document.addEventListener("DOMContentLoaded", () => {
     video.play();
   };
 
+  // Tras la primera entrada, el plano ya es el contexto de navegación.
+  // Cambiar de cubierta sustituye plano y puntos sin repetir dos animaciones.
+  const cambiarCubiertaEnPlano = (nivel) => {
+    cubiertaEnPlanta = nivel;
+    cubiertaFijada = nivel;
+    cubiertaPendiente = null;
+    faseTransicion = "planta";
+    actualizarFijada();
+    mostrarCubierta(nivel);
+    cerrarDetalle();
+    mostrarPuntos(nivel);
+    intro.dataset.cubierta = nivel;
+
+    plano.removeAttribute("src");
+    if (planosDisponibles.has(nivel)) {
+      plano.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
+      plano.alt = `Plano funcional de la cubierta ${nivel}`;
+    }
+
+    video.pause();
+    intro.classList.add("transicion-cubierta", "vista-planta", "plano-visible");
+  };
+
   const seleccionarCubierta = (nivel) => {
     // La cubierta 0 conserva el comportamiento informativo sencillo.
     if (nivel === 0) {
@@ -686,7 +722,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cubiertaEnPlanta === nivel) {
       salirDeCubierta();
     } else if (cubiertaEnPlanta !== null) {
-      salirDeCubierta(nivel);
+      cambiarCubiertaEnPlano(nivel);
     } else {
       entrarEnCubierta(nivel);
     }
@@ -733,6 +769,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modelosCubierta.forEach((ruta) => {
       const imagen = new Image();
       imagen.src = ruta;
+    });
+    planosDisponibles.forEach((nivel) => {
+      const imagen = new Image();
+      imagen.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
     });
   };
 

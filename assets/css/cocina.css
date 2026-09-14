@@ -826,3 +826,66 @@
   }
 }
 
+/* Indicador de cubierta junto al alzado: debajo en escritorio, a la izquierda en móvil. */
+
+.cocina-indicador-cubierta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  color: #85cfff;
+  font-family: "Tektur", sans-serif;
+  line-height: 1;
+  text-align: center;
+}
+
+.cocina-indicador-cubierta span {
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+}
+
+.cocina-indicador-cubierta strong {
+  color: #d7f4ff;
+  font-family: Bahnschrift, Arial, sans-serif;
+  font-size: clamp(3.4rem, 5vw, 6rem);
+  font-weight: 500;
+  text-shadow: 0 0 14px rgb(86 209 255 / 45%);
+}
+
+@media (min-width: 768px) {
+  .cocina-layout > .col-lg-5 {
+    flex-direction: column;
+    gap: .75rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-layout > .col-lg-5 {
+    flex-direction: row;
+    align-items: center;
+    gap: .8rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-indicador-cubierta {
+    order: -1;
+    flex-direction: column;
+    gap: .15rem;
+    min-width: 92px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-indicador-cubierta span {
+    font-size: .55rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-indicador-cubierta strong {
+    font-size: clamp(4.5rem, 21vw, 6.5rem);
+  }
+}
+
