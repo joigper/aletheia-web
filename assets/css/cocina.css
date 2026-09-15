@@ -889,3 +889,49 @@
   }
 }
 
+.cocina-controles-cubierta {
+  display: flex;
+  justify-content: center;
+  gap: .45rem;
+}
+
+.cocina-control-cubierta {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 1px solid #5fd7ff;
+  background: rgba(5, 29, 43, .9);
+  color: #c9f3ff;
+  font-family: "Tektur", sans-serif;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(63, 205, 255, .16);
+  transition: background .18s ease, transform .18s ease;
+}
+
+.cocina-control-cubierta:hover:not(:disabled), .cocina-control-cubierta:focus-visible:not(:disabled) {
+  background: rgba(20, 103, 135, .9);
+  outline: none;
+  transform: scale(1.06);
+}
+
+.cocina-control-cubierta:disabled {
+  opacity: .28;
+  cursor: default;
+}
+
+@media (min-width: 768px) {
+  .cocina-controles-cubierta {
+    margin-top: .15rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cocina-controles-cubierta {
+    order: -1;
+    flex-direction: column;
+    gap: .4rem;
+  }
+}
+

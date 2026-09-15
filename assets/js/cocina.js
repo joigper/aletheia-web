@@ -575,6 +575,23 @@ document.addEventListener("DOMContentLoaded", () => {
   indicadorCubierta.append(indicadorEtiqueta, indicadorNumero);
   selector.insertAdjacentElement("afterend", indicadorCubierta);
 
+  const controlesCubierta = document.createElement("div");
+  controlesCubierta.className = "cocina-controles-cubierta";
+  const subirCubierta = document.createElement("button");
+  subirCubierta.type = "button";
+  subirCubierta.className = "cocina-control-cubierta";
+  subirCubierta.textContent = "▲";
+  subirCubierta.setAttribute("aria-label", "Subir una cubierta");
+  subirCubierta.title = "Subir cubierta";
+  const bajarCubierta = document.createElement("button");
+  bajarCubierta.type = "button";
+  bajarCubierta.className = "cocina-control-cubierta";
+  bajarCubierta.textContent = "▼";
+  bajarCubierta.setAttribute("aria-label", "Bajar una cubierta");
+  bajarCubierta.title = "Bajar cubierta";
+  controlesCubierta.append(subirCubierta, bajarCubierta);
+  indicadorCubierta.insertAdjacentElement("afterend", controlesCubierta);
+
   const numero = document.createElement("span");
   numero.className = "cocina-info-numero";
   const nombre = document.createElement("strong");
@@ -589,6 +606,38 @@ document.addEventListener("DOMContentLoaded", () => {
   let faseTransicion = "reposo";
   let interaccionActivada = false;
 
+  const actualizarControlesAscensor = () => {
+    const nivel = cubiertaEnPlanta ?? cubiertaFijada;
+    const enTransicion = faseTransicion === "entrada" || faseTransicion === "salida";
+    const disponible = interaccionActivada && nivel !== null && !enTransicion;
+    subirCubierta.disabled = !disponible || nivel >= 9;
+    bajarCubierta.disabled = !disponible || nivel <= 0;
+  };
+
+  subirCubierta.addEventListener("click", () => {
+  const nivelActual = cubiertaEnPlanta ?? cubiertaFijada;
+
+  if (
+    subirCubierta.disabled ||
+    nivelActual === null ||
+    nivelActual >= 9
+  ) return;
+
+  seleccionarCubierta(nivelActual + 1);
+});
+
+bajarCubierta.addEventListener("click", () => {
+  const nivelActual = cubiertaEnPlanta ?? cubiertaFijada;
+
+  if (
+    bajarCubierta.disabled ||
+    nivelActual === null ||
+    nivelActual <= 0
+  ) return;
+
+  seleccionarCubierta(nivelActual - 1);
+});
+      actualizarControlesAscensor();
   // La animación dura 4 s. Entre estos dos tiempos permanece cenital.
   const comienzoPlano = 1.2;
   const pausaCenital = 2;
@@ -614,6 +663,7 @@ document.addEventListener("DOMContentLoaded", () => {
     info.classList.add("cocina-info-activa");
     modelo.setAttribute("src", modelosCubierta[nivel]);
     intro.classList.add("modelo-resaltado");
+    actualizarControlesAscensor();
   };
 
   const limpiarCubierta = () => {
@@ -656,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (planosDisponibles.has(nivel)) {
         intro.classList.add("plano-visible");
       }
+      actualizarControlesAscensor();
     });
   };
 
@@ -671,6 +722,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cerrarDetalle();
     intro.querySelectorAll(".cocina-punto").forEach((punto) => punto.remove());
     faseTransicion = "salida";
+    actualizarControlesAscensor();
     intro.classList.remove("vista-planta", "plano-visible");
     if (video.currentTime < comienzoRegreso) {
       video.currentTime = comienzoRegreso;
@@ -707,9 +759,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cubiertaEnPlanta !== null) {
         salirDeCubierta(nivel);
       } else {
-        cubiertaFijada = cubiertaFijada === nivel ? null : nivel;
+        cubiertaFijada = nivel;
         actualizarFijada();
-        cubiertaFijada === null ? limpiarCubierta() : mostrarCubierta(nivel);
+        mostrarCubierta(nivel);
       }
       return;
     }
@@ -774,6 +826,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const imagen = new Image();
       imagen.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
     });
+
+    if (cubiertaFijada === null && cubiertaEnPlanta === null) {
+      cubiertaFijada = 0;
+      actualizarFijada();
+      mostrarCubierta(0);
+    }
+    actualizarControlesAscensor();
   };
 
   video.addEventListener("timeupdate", () => {
@@ -789,6 +848,7 @@ document.addEventListener("DOMContentLoaded", () => {
       video.pause();
       faseTransicion = "planta";
       intro.classList.add("vista-planta");
+      actualizarControlesAscensor();
     }
   });
 
@@ -804,6 +864,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cubiertaEnPlanta = null;
     cubiertaPendiente = null;
     faseTransicion = "reposo";
+    actualizarControlesAscensor();
     intro.classList.remove(
       "transicion-cubierta",
       "vista-planta",
