@@ -945,3 +945,64 @@ body.home-structure-open {
   background: transparent;
 }
 
+.home-c8-cabin-card__image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(111, 214, 255, .28);
+  border-radius: 10px;
+  background: #0c1118;
+}
+
+.home-c8-cabin-card__image-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-poi--collective-cabin {
+  background: #ffad4d;
+  box-shadow: 0 0 0 4px rgba(255, 173, 77, .20), 0 0 16px rgba(255, 173, 77, .92);
+}
+
+.home-c8-card__image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(111, 214, 255, .28);
+  border-radius: 10px;
+  background: #050a0e;
+}
+
+.home-c8-card__image-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-poi--collective-overview {
+  background: #f3b84d;
+  box-shadow: 0 0 0 4px rgba(243, 184, 77, .20), 0 0 16px rgba(243, 184, 77, .92);
+}
+
+.home-poi--collective-cabin {
+  background: #ff8d63;
+  box-shadow: 0 0 0 4px rgba(255, 141, 99, .20), 0 0 16px rgba(255, 141, 99, .92);
+}
+
+.home-poi--collective-showers {
+  background: #56c8ff;
+  box-shadow: 0 0 0 4px rgba(86, 200, 255, .20), 0 0 16px rgba(86, 200, 255, .92);
+}
+
+.home-poi--collective-common {
+  background: #c77be8;
+  box-shadow: 0 0 0 4px rgba(199, 123, 232, .20), 0 0 16px rgba(199, 123, 232, .92);
+}
+

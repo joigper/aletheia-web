@@ -74,57 +74,106 @@ document.addEventListener("DOMContentLoaded", () => {
   // El plano residencial es la vista inicial de HOME.
   showPlan(plans.residential, "is-residential-selected", "3");
 });
-/* Puntos de interés del plano residencial HOME */
+/* Puntos de interés de los planos del módulo HOME. */
+/* Puntos de interés de los planos del módulo HOME. */
 document.addEventListener("DOMContentLoaded", () => {
   const planStage = document.querySelector(".home-plan-stage");
   const map = document.querySelector(".home-map-image");
-  const summaryCard = document.getElementById("home-info-card");
-  const liftCard = document.getElementById("home-lift-card");
-  const cabinCard = document.getElementById("home-cabin-card");
-  const technicalCard = document.getElementById("home-technical-card");
 
-  if (!planStage || !map || !summaryCard || !liftCard || !cabinCard || !technicalCard) return;
+  const cards = {
+    summary: document.getElementById("home-info-card"),
+    lift: document.getElementById("home-lift-card"),
+    cabin: document.getElementById("home-cabin-card"),
+    technical: document.getElementById("home-technical-card"),
+    collectiveOverview: document.getElementById("home-c8-overview-card"),
+    collectiveCabin: document.getElementById("home-c8-cabin-card"),
+    collectiveShowers: document.getElementById("home-c8-showers-card"),
+    collectiveCommon: document.getElementById("home-c8-common-card")
+  };
+
+  if (!planStage || !map || Object.values(cards).some((card) => !card)) return;
 
   const poiLayer = document.createElement("div");
   poiLayer.className = "home-poi-layer";
   planStage.append(poiLayer);
 
+  let activeCard = "summary";
+
   const points = [
     {
       type: "summary",
-      x: 50,
-      y: 50,
+      plan: "residential",
+      x: 50, y: 50,
       label: "Resumen de la cubierta residencial",
       title: "Datos de cubierta"
     },
     {
       type: "lift",
-      x: 72.4,
-      y: 53.4,
+      plan: "residential",
+      x: 72.4, y: 53.4,
       label: "Ascensor multipropósito A-3000",
       title: "Ascensor A-3000"
     },
-     {
+    {
       type: "cabin",
-      x: 75.2,
-      y: 40.3,
+      plan: "residential",
+      x: 75.2, y: 40.3,
       label: "Camarote Tipo A · unidad residencial base",
       title: "Camarote Tipo A"
     },
     {
       type: "technical",
-      x: 50,
-      y: 67,
+      plan: "residential",
+      x: 50, y: 67,
       label: "Pleno técnico intercubiertas",
       title: "Pleno técnico · 2,3 m"
+    },
+    {
+      type: "collective-overview",
+      card: "collectiveOverview",
+      plan: "collective",
+      x: 50, y: 50,
+      label: "Alojamiento colectivo de contingencia",
+      title: "711 cabinas · capacidad ampliada"
+    },
+    {
+      type: "collective-cabin",
+      card: "collectiveCabin",
+      plan: "collective",
+      x: 68, y: 35,
+      label: "Cabina individual de alta densidad",
+      title: "Cabina individual"
+    },
+    {
+      type: "collective-showers",
+      card: "collectiveShowers",
+      plan: "collective",
+      x: 27.5, y: 25.5,
+      label: "Duchas y vestuarios",
+      title: "Duchas y vestuarios"
+    },
+    {
+      type: "collective-common",
+      card: "collectiveCommon",
+      plan: "collective",
+      x: 79, y: 60,
+      label: "Sala común",
+      title: "Sala común"
     }
   ];
 
-    function showCard(card) {
-    summaryCard.hidden = card !== "summary";
-    liftCard.hidden = card !== "lift";
-    cabinCard.hidden = card !== "cabin";
-    technicalCard.hidden = card !== "technical";
+  const currentPlan = () =>
+    map.src.includes("homec8-plano.svg") ? "collective" : "residential";
+
+  const activeCardPlan = () =>
+    activeCard.startsWith("collective") ? "collective" : "residential";
+
+  function showCard(cardName) {
+    Object.entries(cards).forEach(([name, card]) => {
+      card.hidden = name !== cardName;
+    });
+
+    activeCard = cardName;
   }
 
   function syncPoints() {
@@ -150,23 +199,29 @@ document.addEventListener("DOMContentLoaded", () => {
     point.className = `home-poi home-poi--${data.type}`;
     point.dataset.x = data.x;
     point.dataset.y = data.y;
+    point.dataset.plan = data.plan;
     point.setAttribute("aria-label", data.label);
     point.title = data.title;
 
     point.addEventListener("click", () => {
-      showCard(data.type);
+      showCard(data.card || data.type);
     });
 
     poiLayer.append(point);
   });
 
   function updatePointsVisibility() {
-    const residentialPlan = map.src.includes("homec3a7-plano.svg");
-    poiLayer.hidden = !residentialPlan;
+    const plan = currentPlan();
 
-    if (residentialPlan) {
-      syncPoints();
+    poiLayer.querySelectorAll(".home-poi").forEach((point) => {
+      point.hidden = point.dataset.plan !== plan;
+    });
+
+    if (activeCardPlan() !== plan) {
+      showCard(plan === "collective" ? "collectiveOverview" : "summary");
     }
+
+    syncPoints();
   }
 
   map.addEventListener("load", syncPoints);
@@ -180,7 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showCard("summary");
   updatePointsVisibility();
 });
-
 /* Visor inmersivo de la estructura del módulo HOME. */
 document.addEventListener("DOMContentLoaded", () => {
   const openButton = document.getElementById("home-open-structure");
