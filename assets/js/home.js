@@ -88,8 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
     collectiveOverview: document.getElementById("home-c8-overview-card"),
     collectiveCabin: document.getElementById("home-c8-cabin-card"),
     collectiveShowers: document.getElementById("home-c8-showers-card"),
-    collectiveCommon: document.getElementById("home-c8-common-card")
-  };
+    collectiveCommon: document.getElementById("home-c8-common-card"),
+    expanded: document.getElementById("home-c8-expanded-card"),
+    lockers: document.getElementById("home-c8-lockers-card")
+    };
 
   if (!planStage || !map || Object.values(cards).some((card) => !card)) return;
 
@@ -101,54 +103,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const points = [
     {
-      type: "summary",
-      plan: "residential",
-      x: 50, y: 50,
-      label: "Resumen de la cubierta residencial",
-      title: "Datos de cubierta"
-    },
-    {
-      type: "lift",
-      plan: "residential",
-      x: 72.4, y: 53.4,
-      label: "Ascensor multipropósito A-3000",
-      title: "Ascensor A-3000"
-    },
-    {
-      type: "cabin",
-      plan: "residential",
-      x: 75.2, y: 40.3,
-      label: "Camarote Tipo A · unidad residencial base",
-      title: "Camarote Tipo A"
-    },
-    {
-      type: "technical",
-      plan: "residential",
-      x: 50, y: 67,
-      label: "Pleno técnico intercubiertas",
-      title: "Pleno técnico · 2,3 m"
-    },
+  type: "summary",
+  plan: "residential",
+  x: 50, y: 50,
+  label: "Resumen de la cubierta residencial",
+  title: "Datos de cubierta"
+},
+{
+  type: "lift",
+  plan: "residential",
+  x: 50, y: 8,
+  label: "Núcleo de circulación vertical",
+  title: "Núcleo vertical"
+},
+{
+  type: "cabin",
+  plan: "residential",
+  x: 43, y: 27,
+  label: "Unidad residencial base · sistema panelizable",
+  title: "Unidad residencial base"
+},
+{
+  type: "technical",
+  plan: "residential",
+  x: 10, y: 50,
+  label: "Pleno técnico intercubiertas",
+  title: "Pleno técnico · 2,3 m"
+},
     {
       type: "collective-overview",
       card: "collectiveOverview",
       plan: "collective",
       x: 50, y: 50,
       label: "Alojamiento colectivo de contingencia",
-      title: "711 cabinas · capacidad ampliada"
+      title: "700 cabinas · 1.400 plazas"
     },
     {
       type: "collective-cabin",
       card: "collectiveCabin",
       plan: "collective",
-      x: 68, y: 35,
-      label: "Cabina individual de alta densidad",
-      title: "Cabina individual"
+      x: 68, y: 34,
+      label: "Cabina estándar de alta densidad",
+      title: "Cabina estándar"
     },
     {
       type: "collective-showers",
       card: "collectiveShowers",
       plan: "collective",
-      x: 27.5, y: 25.5,
+      x: 40, y: 17,
       label: "Duchas y vestuarios",
       title: "Duchas y vestuarios"
     },
@@ -156,17 +158,36 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "collective-common",
       card: "collectiveCommon",
       plan: "collective",
-      x: 79, y: 60,
+      x: 60, y: 83,
       label: "Sala común",
       title: "Sala común"
-    }
+    },      
+{
+  type: "collective-expanded",
+  card: "expanded",
+  plan: "collective",
+  x: 45, y: 34,
+  label: "Cabina ampliada y adaptable",
+  title: "Cabina ampliada"
+},
+{
+  type: "collective-lockers",
+  card: "lockers",
+  plan: "collective",
+  x: 72, y: 20,
+  label: "Taquillas y lavandería",
+  title: "Taquillas y lavandería"
+}
   ];
 
   const currentPlan = () =>
     map.src.includes("homec8-plano.svg") ? "collective" : "residential";
 
   const activeCardPlan = () =>
-    activeCard.startsWith("collective") ? "collective" : "residential";
+  ["collectiveOverview", "collectiveCabin", "collectiveShowers",
+   "collectiveCommon", "expanded", "lockers"].includes(activeCard)
+    ? "collective"
+    : "residential";
 
   function showCard(cardName) {
     Object.entries(cards).forEach(([name, card]) => {

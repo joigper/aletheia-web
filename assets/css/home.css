@@ -1006,3 +1006,18 @@ body.home-structure-open {
   box-shadow: 0 0 0 4px rgba(199, 123, 232, .20), 0 0 16px rgba(199, 123, 232, .92);
 }
 
+/* Las imágenes de la cubierta 8 no se encogen dentro de la ficha. */
+
+.home-c8-card__image-wrap {
+  flex: 0 0 clamp(180px, 24vh, 280px) !important;
+  height: clamp(180px, 24vh, 280px) !important;
+  aspect-ratio: auto !important;
+}
+
+.home-c8-card__image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
