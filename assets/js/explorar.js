@@ -1188,12 +1188,27 @@ L1_033: {
         botonVerVideo.hidden = !videoActual;
         botonVerVideo.textContent = "VER VÍDEO";
     }
-   const enlaceSaberMas =
+  const esZeus = datos.nombre?.startsWith("ZEUS-");
+
+const enlaceSaberMas =
     datos.enlace ||
     (datos.nombre?.startsWith("HOME-")
         ? "home.html"
-        : null);
+        : esZeus
+            ? "zeus.html"
+            : null);
 
+botonSaberMas.hidden = !enlaceSaberMas;
+
+if (enlaceSaberMas) {
+    botonSaberMas.href = enlaceSaberMas;
+
+    botonSaberMas.textContent = esZeus
+        ? "SABINE EXPLICA"
+        : "SABER MÁS";
+} else {
+    botonSaberMas.removeAttribute("href");
+}
 botonSaberMas.hidden = !enlaceSaberMas;
 
 if (enlaceSaberMas) {
