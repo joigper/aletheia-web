@@ -632,6 +632,7 @@ L1_061: {
         L1_055: {
     nombre: "HOSPITAL",
     area: "Medicina, investigación y formación",
+    enlace: "hospital.html",
     imagenes: [ 
     {
         src: "assets/img/HOSPITAL.jpg",
