@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 720" role="img" aria-labelledby="title desc">
+  <title id="title">Alzado esquemático del módulo Hospital</title>
+  <desc id="desc">Cuatro volúmenes hospitalarios conectados alrededor de un núcleo central.</desc>
+
+  <defs>
+    <linearGradient id="volumen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#13384c" stop-opacity=".92"/>
+      <stop offset="1" stop-color="#061824" stop-opacity=".94"/>
+    </linearGradient>
+    <filter id="resplandor" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .reticula{fill:none;stroke:rgba(105,202,236,.08);stroke-width:1}
+      .conexion{fill:none;stroke:rgba(119,223,255,.55);stroke-width:5;stroke-linecap:round;stroke-dasharray:5 10}
+      .modulo path{fill:url(#volumen);stroke:rgba(136,226,255,.75);stroke-width:2;vector-effect:non-scaling-stroke}
+      .modulo text{fill:#bceeff;font-family:Tektur,Arial,sans-serif;font-size:22px;letter-spacing:.12em}
+      .nucleo path{fill:rgba(9,54,75,.9);stroke:#8fe6ff;stroke-width:2}
+      .nucleo circle{fill:#8fe6ff;animation:pulso 2.5s ease-in-out infinite}
+      @keyframes pulso{0%,100%{opacity:.65}50%{opacity:1}}
+      @media (prefers-reduced-motion:reduce){.nucleo circle{animation:none}}
+    </style>
+  </defs>
+
+  <g class="reticula" aria-hidden="true">
+    <path d="M40 650H520M40 570H520M40 490H520M40 410H520M40 330H520M40 250H520M40 170H520M40 90H520"/>
+    <path d="M80 60V670M160 60V670M240 60V670M320 60V670M400 60V670M480 60V670"/>
+  </g>
+
+  <path class="conexion" d="M118 475L212 416M442 475L348 416M118 285L212 344M442 285L348 344" aria-hidden="true"/>
+
+  <g class="modulo">
+    <path d="M52 430L122 392L196 435L124 477Z"/>
+    <path d="M52 430V548L124 592V477Z"/>
+    <path d="M124 477L196 435V550L124 592Z"/>
+    <text x="87" y="511">H1</text>
+  </g>
+  <g class="modulo">
+    <path d="M364 435L438 392L508 430L436 477Z"/>
+    <path d="M364 435V550L436 592V477Z"/>
+    <path d="M436 477L508 430V548L436 592Z"/>
+    <text x="416" y="511">H2</text>
+  </g>
+  <g class="modulo">
+    <path d="M52 210L122 172L196 215L124 257Z"/>
+    <path d="M52 210V328L124 372V257Z"/>
+    <path d="M124 257L196 215V330L124 372Z"/>
+    <text x="87" y="291">H3</text>
+  </g>
+  <g class="modulo">
+    <path d="M364 215L438 172L508 210L436 257Z"/>
+    <path d="M364 215V330L436 372V257Z"/>
+    <path d="M436 257L508 210V328L436 372Z"/>
+    <text x="416" y="291">H4</text>
+  </g>
+
+  <g class="nucleo" aria-hidden="true" filter="url(#resplandor)">
+    <path d="M212 300L280 261L348 300V416L280 455L212 416Z"/>
+    <path d="M212 300L280 339L348 300M280 339V455"/>
+    <circle cx="280" cy="358" r="12"/>
+  </g>
+</svg>

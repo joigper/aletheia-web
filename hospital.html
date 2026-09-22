@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>ALÉTHEIA | Módulo HOSPITAL</title>
+    <meta name="description" content="Explora el Hospital de ALÉTHEIA: atención médica, cirugía, diagnóstico, investigación biomédica y formación sanitaria a bordo de la nave.">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/bss-overrides.css">
+    <link rel="stylesheet" href="assets/css/adelanto.css">
+    <link rel="stylesheet" href="assets/css/aletheia-books.css">
+    <link rel="stylesheet" href="assets/css/aletheia-earth.css">
+    <link rel="stylesheet" href="assets/css/cocina.css">
+    <link rel="stylesheet" href="assets/css/explorar.css">
+    <link rel="stylesheet" href="assets/css/flota.css">
+    <link rel="stylesheet" href="assets/css/galaxy-button.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tripulacion.css">
+    <link rel="stylesheet" href="assets/css/zeus.css">
+    <link rel="stylesheet" href="assets/css/hospital.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col"><img src="assets/img/Emblemahospital.png" style="color:var(--bs-border-color-translucent);text-align:center;" width="131" height="131">
+                <h1 style="font-family:Tektur, serif;font-weight:bold;font-size:28px;color:rgb(255,255,255);">ALÉTHEIA</h1>
+            </div>
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+                <p style="font-family:Tektur, serif;color:var(--bs-light);font-size:30px;margin-bottom:0;">MÓDULO HOSPITAL</p>
+                <p style="color:var(--bs-light);font-size:16px;">SERVICIOS MÉDICOS</p>
+            </div>
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="aletheia-galaxy-button galaxy-button--small" style="--button-hue:265;"><a href="explorar.html" class="galaxy-trigger"><span class="spark"></span><span class="backdrop"></span><span class="galaxy__container"><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span></span><span class="galaxy"><span class="galaxy__ring"><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span></span></span><span class="text">VOLVER</span></a></div>
+            </div>
+        </div>
+        <div class="mt-4" style="width:100%;height:1px;background:#3a3a3a;"></div>
+        <div class="row">
+            <div class="col-12">
+                <p style="color:rgb(255,255,255);">HOSPITAL reúne los servicios sanitarios de ALÉTHEIA. Sus instalaciones combinan <strong>atención médica y quirúrgica, diagnóstico, hospitalización y cuidados críticos</strong> con áreas dedicadas a la <strong>investigación biomédica, la formación sanitaria y la producción farmacéutica</strong>, garantizando una asistencia integral durante toda la misión.</p>
+            </div>
+        </div>
+        <main class="hospital-terminal" aria-labelledby="hospital-directorio-titulo">
+            <section class="hospital-alzado" aria-label="Esquema del complejo hospitalario">
+                <div class="hospital-alzado__cabecera" aria-hidden="true"><span>COMPLEJO HOSPITALARIO</span><span>ESTADO · OPERATIVO</span></div><img class="img-fluid hospital-alzado__grafico" width="1400" height="1400" src="assets/img/hospital/hospital-alzado.png" alt="Alzado esquemático del módulo Hospital."><video class="aspect-ratio-16x9 w-100 hospital-alzado__video" controls="" preload="metadata">
+                    <source src="assets/img/hospital/hospital.mp4" type="video/mp4">
+                </video>
+                <div class="hospital-alzado__pie" aria-hidden="true"><span>HOSPITAL · RED ASISTENCIAL</span><span>04 MÓDULOS</span></div>
+            </section>
+            <section class="hospital-directorio" aria-live="polite">
+                <header class="hospital-directorio__cabecera">
+                    <p class="hospital-directorio__codigo">HOSPITAL · DIRECTORIO</p>
+                    <h2 id="hospital-directorio-titulo">¿A dónde desea dirigirse?</h2>
+                    <p>Seleccione un área para continuar.</p>
+                </header>
+                <nav class="hospital-directorio__lista" aria-label="Áreas del Hospital"><button class="hospital-categoria" type="button" data-categoria="urgencias-cuidados-criticos" aria-pressed="false"><span>Urgencias y cuidados críticos</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="especialidades-medicas" aria-pressed="false"><span>Especialidades médicas</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="cirugia" aria-pressed="false"><span>Cirugía</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="mujer-infancia-familia" aria-pressed="false"><span>Mujer, infancia y familia</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="diagnostico-laboratorios" aria-pressed="false"><span>Diagnóstico y laboratorios</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="oncologia" aria-pressed="false"><span>Oncología</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="rehabilitacion" aria-pressed="false"><span>Rehabilitación</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="salud-mental" aria-pressed="false"><span>Salud mental</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="investigacion-biomedica" aria-pressed="false"><span>Investigación biomédica</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="docencia-formacion" aria-pressed="false"><span>Docencia y formación</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="farmacia" aria-pressed="false"><span>Farmacia</span><span aria-hidden="true">›</span></button><button class="hospital-categoria" type="button" data-categoria="servicios-hospitalarios" aria-pressed="false"><span>Servicios hospitalarios</span><span aria-hidden="true">›</span></button></nav>
+                <p id="hospital-directorio-estado" class="hospital-directorio__estado">DIRECTORIO GENERAL · NIVEL 01</p>
+            </section>
+        </main>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/01naves.js"></script>
+    <script src="assets/js/02flota.js"></script>
+    <script src="assets/js/cocina.js"></script>
+    <script src="assets/js/contacto.js"></script>
+    <script src="assets/js/explorar.js"></script>
+    <script src="assets/js/galaxy-button.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/hospital.js"></script>
+    <script src="assets/js/personajes.js"></script>
+    <script src="assets/js/tripulacion.js"></script>
+    <script src="assets/js/zeus.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,863 @@
+/* * HOSPITAL · Terminal de orientación, tres niveles y ficha común. * Los selectores quedan aislados bajo .hospital-terminal para no alterar la cabecera * ni los estilos compartidos de ALÉTHEIA. */
+
+.hospital-terminal {
+  --hospital-cian: #77dfff;
+  --hospital-cian-suave: rgba(119, 223, 255, .38);
+  --hospital-panel: rgba(3, 22, 38, .91);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(330px, .88fr) minmax(440px, 1.12fr);
+  gap: clamp(1.25rem, 3.5vw, 4.5rem);
+  align-items: center;
+  width: 100%;
+  margin: 1.5rem 0 3rem;
+  color: #d9f2ff;
+  font-family: "Exo 2", sans-serif;
+  isolation: isolate;
+}
+
+.hospital-terminal::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -1rem;
+  background: radial-gradient(circle at 22% 50%, rgba(25, 148, 195, .12), transparent 37%), linear-gradient(rgba(85, 185, 224, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(85, 185, 224, .025) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
+  pointer-events: none;
+}
+
+.hospital-alzado, .hospital-directorio {
+  border: 1px solid rgba(119, 223, 255, .28);
+  background: linear-gradient(145deg, rgba(5, 29, 45, .94), rgba(2, 13, 23, .96));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .32), inset 0 0 35px rgba(78, 192, 236, .035);
+}
+
+.hospital-alzado {
+  position: relative;
+  overflow: hidden;
+  transform-origin: right center;
+  animation: hospital-alzado-entrada 620ms cubic-bezier(.2, .78, .24, 1) both;
+}
+
+.hospital-alzado::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -2.2rem;
+  width: 2.2rem;
+  height: 1px;
+  background: var(--hospital-cian-suave);
+  box-shadow: 0 0 8px rgba(119, 223, 255, .35);
+}
+
+.hospital-alzado__cabecera, .hospital-alzado__pie {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .75rem 1rem;
+  color: #8bcde4;
+  font-family: "Tektur", sans-serif;
+  font-size: .66rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.hospital-alzado__cabecera {
+  border-bottom: 1px solid rgba(119, 223, 255, .16);
+}
+
+/* Monitor discreto: traza reversible y rótulo en el espacio superior del alzado. */
+
+.hospital-alzado__monitor {
+  --monitor-color: #77dfff;
+  position: absolute;
+  z-index: 3;
+  top: 3rem;
+  right: 1rem;
+  left: 1rem;
+  height: 76px;
+  pointer-events: none;
+}
+
+.hospital-alzado__monitor[data-modulo="norte"] {
+  --monitor-color: #5bb5e8;
+}
+
+.hospital-alzado__monitor[data-modulo="sur"] {
+  --monitor-color: #ed7378;
+}
+
+.hospital-alzado__monitor[data-modulo="este"] {
+  --monitor-color: #6bd1a0;
+}
+
+.hospital-alzado__monitor[data-modulo="oeste"] {
+  --monitor-color: #d2a17a;
+}
+
+.hospital-alzado__onda {
+  display: block;
+  width: 100%;
+  height: 42px;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 800ms cubic-bezier(.35, 0, .2, 1);
+}
+
+.hospital-alzado__onda path {
+  fill: none;
+  stroke: var(--monitor-color);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.hospital-alzado__rotulo {
+  display: flex;
+  justify-content: space-between;
+  gap: .8rem;
+  min-width: 0;
+  padding: .1rem .15rem 0;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  white-space: nowrap;
+  transition: clip-path 620ms ease;
+}
+
+.hospital-alzado__rotulo strong, .hospital-alzado__rotulo span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: "Tektur", sans-serif;
+  letter-spacing: .1em;
+}
+
+.hospital-alzado__rotulo strong {
+  flex: none;
+  color: var(--monitor-color);
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.hospital-alzado__rotulo span {
+  color: rgba(217, 242, 255, .7);
+  font-size: .55rem;
+}
+
+.hospital-alzado__monitor.is-visible .hospital-alzado__onda {
+  clip-path: inset(0);
+}
+
+.hospital-alzado__monitor.is-visible .hospital-alzado__rotulo {
+  clip-path: inset(0);
+  transition-delay: 140ms;
+}
+
+.hospital-alzado__pie {
+  border-top: 1px solid rgba(119, 223, 255, .16);
+}
+
+.hospital-alzado__grafico {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  max-height: 590px;
+  padding: clamp(.5rem, 2vw, 1.3rem);
+}
+
+.hospital-alzado__escena {
+  position: relative;
+  overflow: hidden;
+  width: calc(100% - 2 * clamp(.5rem, 2vw, 1.3rem));
+  max-width: 590px;
+  aspect-ratio: 1;
+  margin: clamp(.5rem, 2vw, 1.3rem) auto;
+  line-height: 0;
+}
+
+/* La ficha final sustituye el alzado por el vídeo, sin alterar el directorio. */
+
+.hospital-alzado__video {
+  display: none;
+  width: calc(100% - 2 * clamp(.5rem, 2vw, 1.3rem));
+  aspect-ratio: 16 / 9;
+  margin: clamp(.5rem, 2vw, 1.3rem) auto;
+  background: #020d17;
+}
+
+.hospital-terminal.is-ficha .hospital-alzado__escena, .hospital-terminal.is-ficha .hospital-alzado__monitor {
+  display: none;
+}
+
+.hospital-terminal.is-ficha .hospital-alzado__video {
+  display: block;
+}
+
+.hospital-alzado__escena > .hospital-alzado__grafico {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  padding: 0;
+  object-fit: contain;
+}
+
+.hospital-alzado__escena.is-ready > .hospital-alzado__grafico:first-child {
+  visibility: hidden;
+}
+
+.hospital-alzado__capa {
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 360ms ease, transform 540ms cubic-bezier(.22, .75, .25, 1), filter 360ms ease;
+}
+
+.hospital-alzado__escena.is-ready .hospital-alzado__capa {
+  opacity: 1;
+}
+
+.hospital-terminal[data-vista="previa"] .hospital-alzado__escena.is-ready .hospital-alzado__capa {
+  filter: brightness(.8);
+}
+
+.hospital-terminal[data-vista="previa"][data-modulo-activo="norte"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="norte"] {
+  filter: none;
+  transform: translateY(2%) scale(1.08);
+}
+
+.hospital-terminal[data-vista="previa"][data-modulo-activo="sur"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="sur"] {
+  filter: none;
+  transform: translateY(-2%) scale(1.08);
+}
+
+.hospital-terminal[data-vista="previa"][data-modulo-activo="este"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="este"] {
+  filter: none;
+  transform: translateX(-3%) scale(1.08);
+}
+
+.hospital-terminal[data-vista="previa"][data-modulo-activo="oeste"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="oeste"] {
+  filter: none;
+  transform: translateX(3%) scale(1.08);
+}
+
+.hospital-terminal[data-vista="ampliada"] .hospital-alzado__escena.is-ready .hospital-alzado__capa {
+  opacity: 0;
+}
+
+.hospital-terminal[data-vista="ampliada"][data-modulo-activo="norte"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="norte"] {
+  opacity: 1;
+  transform: translateY(23%) scale(1.55);
+}
+
+.hospital-terminal[data-vista="ampliada"][data-modulo-activo="sur"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="sur"] {
+  opacity: 1;
+  transform: translateY(-22%) scale(1.55);
+}
+
+.hospital-terminal[data-vista="ampliada"][data-modulo-activo="este"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="este"] {
+  opacity: 1;
+  transform: translateX(-48%) scale(1.55);
+}
+
+.hospital-terminal[data-vista="ampliada"][data-modulo-activo="oeste"] .hospital-alzado__escena.is-ready .hospital-alzado__capa[data-modulo="oeste"] {
+  opacity: 1;
+  transform: translateX(48%) scale(1.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hospital-alzado__capa {
+    transition: none;
+  }
+}
+
+.hospital-alzado__reticula path {
+  fill: none;
+  stroke: rgba(105, 202, 236, .08);
+  stroke-width: 1;
+}
+
+.hospital-alzado__conexiones path {
+  fill: none;
+  stroke: rgba(119, 223, 255, .55);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 5 10;
+}
+
+.hospital-alzado__modulo path {
+  fill: url(#hospital-volumen);
+  stroke: rgba(136, 226, 255, .75);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.hospital-alzado__modulo text {
+  fill: #bceeff;
+  font-family: "Tektur", sans-serif;
+  font-size: 22px;
+  letter-spacing: .12em;
+}
+
+.hospital-alzado__nucleo path {
+  fill: rgba(9, 54, 75, .9);
+  stroke: #8fe6ff;
+  stroke-width: 2;
+}
+
+.hospital-alzado__nucleo circle {
+  fill: #8fe6ff;
+  animation: hospital-nucleo-pulso 2.5s ease-in-out infinite;
+}
+
+.hospital-directorio {
+  position: relative;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  overflow: hidden;
+  transform-origin: left center;
+  animation: hospital-directorio-entrada 520ms 260ms cubic-bezier(.2, .78, .24, 1) both;
+}
+
+.hospital-directorio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(transparent, var(--hospital-cian), transparent);
+  opacity: .7;
+}
+
+/* Cambio de nivel dentro del mismo panel, con una transición corta. */
+
+.hospital-directorio__vistas {
+  display: grid;
+  min-width: 0;
+}
+
+.hospital-directorio__vista {
+  grid-area: 1 / 1;
+  min-width: 0;
+  transition: opacity 260ms ease, transform 300ms cubic-bezier(.22, .75, .25, 1), visibility 0s linear 300ms;
+}
+
+.hospital-directorio__vista--general {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition-delay: 0s;
+}
+
+.hospital-directorio__vista--servicios, .hospital-directorio__vista--unidades, .hospital-directorio__vista--ficha {
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(1.5rem);
+  pointer-events: none;
+}
+
+.hospital-directorio.is-segundo-nivel .hospital-directorio__vista--general, .hospital-directorio.is-tercer-nivel .hospital-directorio__vista--general, .hospital-directorio.is-ficha .hospital-directorio__vista--general {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-1.5rem);
+  pointer-events: none;
+  transition-delay: 0s, 0s, 300ms;
+}
+
+.hospital-directorio.is-segundo-nivel .hospital-directorio__vista--servicios, .hospital-directorio.is-tercer-nivel .hospital-directorio__vista--unidades, .hospital-directorio.is-ficha .hospital-directorio__vista--ficha {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.hospital-directorio__volver {
+  align-self: flex-start;
+  margin: 0 0 1rem;
+  padding: .45rem 0;
+  border: 0;
+  background: transparent;
+  color: #a9ddf0;
+  font-family: "Tektur", sans-serif;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+
+.hospital-directorio__volver:hover, .hospital-directorio__volver:focus-visible {
+  color: #fff;
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: .3rem;
+}
+
+.hospital-directorio__vista--servicios[data-modulo="sur"] {
+  --servicio-color: #df5960;
+  --servicio-fondo: rgba(155, 40, 47, .2);
+}
+
+.hospital-directorio__vista--servicios[data-modulo="norte"] {
+  --servicio-color: #3c9bd1;
+  --servicio-fondo: rgba(35, 111, 157, .2);
+}
+
+.hospital-directorio__vista--servicios[data-modulo="este"] {
+  --servicio-color: #54bd8b;
+  --servicio-fondo: rgba(37, 122, 83, .2);
+}
+
+.hospital-directorio__vista--servicios[data-modulo="oeste"] {
+  --servicio-color: #bd895f;
+  --servicio-fondo: rgba(119, 76, 45, .22);
+}
+
+.hospital-directorio__vista--unidades[data-modulo="sur"] {
+  --servicio-color: #df5960;
+  --servicio-fondo: rgba(155, 40, 47, .2);
+}
+
+.hospital-directorio__vista--unidades[data-modulo="norte"] {
+  --servicio-color: #3c9bd1;
+  --servicio-fondo: rgba(35, 111, 157, .2);
+}
+
+.hospital-directorio__vista--unidades[data-modulo="este"] {
+  --servicio-color: #54bd8b;
+  --servicio-fondo: rgba(37, 122, 83, .2);
+}
+
+.hospital-directorio__vista--unidades[data-modulo="oeste"] {
+  --servicio-color: #bd895f;
+  --servicio-fondo: rgba(119, 76, 45, .22);
+}
+
+.hospital-directorio__vista--ficha[data-modulo="sur"] {
+  --servicio-color: #df5960;
+}
+
+.hospital-directorio__vista--ficha[data-modulo="norte"] {
+  --servicio-color: #3c9bd1;
+}
+
+.hospital-directorio__vista--ficha[data-modulo="este"] {
+  --servicio-color: #54bd8b;
+}
+
+.hospital-directorio__vista--ficha[data-modulo="oeste"] {
+  --servicio-color: #bd895f;
+}
+
+.hospital-directorio__vista--servicios .hospital-directorio__modulo, .hospital-directorio__vista--unidades .hospital-directorio__modulo {
+  color: var(--servicio-color, #80d9f6);
+}
+
+.hospital-servicios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .45rem .8rem;
+  min-width: 0;
+  max-height: 370px;
+  overflow-y: auto;
+  scrollbar-color: rgba(119, 223, 255, .42) transparent;
+}
+
+.hospital-servicio {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .7rem;
+  min-height: 51px;
+  padding: .65rem .8rem;
+  border: 1px solid rgba(119, 223, 255, .15);
+  background: rgba(2, 15, 25, .36);
+  color: #d9f2ff;
+  font-family: "Exo 2", sans-serif;
+  font-size: .9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.hospital-servicio > span:last-child {
+  color: var(--servicio-color, #80d9f6);
+  font-family: "Tektur", sans-serif;
+  font-size: 1.2rem;
+}
+
+.hospital-servicio:hover, .hospital-servicio:focus-visible, .hospital-servicio.is-activa {
+  outline: none;
+  border-color: var(--servicio-color, #80d9f6);
+  background: var(--servicio-fondo, rgba(50, 164, 204, .16));
+}
+
+.hospital-directorio__vista--servicios .hospital-directorio__estado, .hospital-directorio__vista--unidades .hospital-directorio__estado {
+  margin-top: auto;
+  padding-top: 1.25rem;
+}
+
+/* Ficha única: las cifras describen capacidad, no puestos abiertos a toda hora. */
+
+.hospital-ficha {
+  display: grid;
+  gap: .85rem;
+  max-height: 370px;
+  overflow-y: auto;
+  padding-right: .4rem;
+  scrollbar-color: rgba(119, 223, 255, .42) transparent;
+}
+
+.hospital-ficha p {
+  margin: 0;
+  color: #c9e4ef;
+  font-size: .86rem;
+  line-height: 1.5;
+}
+
+.hospital-ficha p > strong {
+  color: #eefaff;
+}
+
+.hospital-ficha__cifras {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .6rem;
+}
+
+.hospital-ficha__cifras p {
+  display: grid;
+  gap: .15rem;
+  padding: .8rem;
+  border: 1px solid color-mix(in srgb, var(--servicio-color, #80d9f6) 45%, transparent);
+  background: rgba(2, 15, 25, .36);
+}
+
+.hospital-ficha__cifras strong {
+  color: var(--servicio-color, #80d9f6);
+  font-family: "Tektur", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.hospital-ficha__cifras span, .hospital-ficha__nota {
+  color: rgba(217, 242, 255, .68);
+  font-size: .76rem;
+}
+
+.hospital-directorio__cabecera {
+  margin-bottom: 1.15rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(119, 223, 255, .2);
+}
+
+.hospital-directorio__codigo, .hospital-directorio__estado {
+  color: #80d9f6;
+  font-family: "Tektur", sans-serif;
+  font-size: .7rem;
+  letter-spacing: .16em;
+}
+
+.hospital-directorio__codigo {
+  margin: 0 0 .55rem;
+}
+
+.hospital-directorio h2 {
+  margin: 0;
+  color: #eefaff;
+  font-family: "Tektur", sans-serif;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 500;
+}
+
+.hospital-directorio__cabecera > p:last-child {
+  margin: .4rem 0 0;
+  color: rgba(217, 242, 255, .62);
+  font-size: .9rem;
+}
+
+.hospital-directorio__lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px 1rem;
+}
+
+.hospital-grupo {
+  --grupo-color: #7bdcfb;
+  min-width: 0;
+}
+
+.hospital-grupo--sur {
+  --grupo-color: #df5960;
+}
+
+.hospital-grupo--norte {
+  --grupo-color: #3c9bd1;
+}
+
+.hospital-grupo--este {
+  --grupo-color: #54bd8b;
+}
+
+.hospital-grupo--oeste {
+  --grupo-color: #bd895f;
+}
+
+.hospital-grupo__titulo {
+  margin: .7rem 0 .15rem;
+  padding: 0 1rem .45rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--grupo-color) 45%, transparent);
+  color: var(--grupo-color);
+  font-family: "Tektur", sans-serif;
+  font-size: .66rem;
+  letter-spacing: .15em;
+}
+
+.hospital-grupo .hospital-categoria {
+  width: 100%;
+}
+
+.hospital-categoria {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 48px;
+  padding: .65rem .65rem .65rem 1rem;
+  border: 0;
+  border-bottom: 1px solid rgba(119, 223, 255, .13);
+  background: transparent;
+  color: rgba(224, 245, 255, .84);
+  font-family: "Exo 2", sans-serif;
+  font-size: .9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease, padding-left 150ms ease;
+}
+
+.hospital-categoria::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--hospital-cian);
+  opacity: 0;
+  transform: scaleY(.25);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.hospital-categoria > span:last-child {
+  color: #7bdcfb;
+  font-family: "Tektur", sans-serif;
+  font-size: 1.2rem;
+  transition: transform 150ms ease;
+}
+
+.hospital-categoria:hover, .hospital-categoria:focus-visible, .hospital-categoria.is-activa {
+  outline: none;
+  background: linear-gradient(90deg, rgba(50, 164, 204, .16), rgba(50, 164, 204, .035));
+  color: #fff;
+  padding-left: 1.2rem;
+}
+
+.hospital-categoria:hover::before, .hospital-categoria:focus-visible::before, .hospital-categoria.is-activa::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.hospital-categoria:hover > span:last-child, .hospital-categoria:focus-visible > span:last-child, .hospital-categoria.is-activa > span:last-child {
+  transform: translateX(3px);
+}
+
+.hospital-categoria.is-activa {
+  box-shadow: inset 0 0 18px rgba(62, 193, 237, .05);
+}
+
+/* Color del módulo asignado; se mantiene un fondo oscuro para conservar contraste. */
+
+.hospital-categoria[data-modulo="norte"] {
+  --modulo-color: #3c9bd1;
+  --modulo-fondo: rgba(35, 111, 157, .22);
+}
+
+.hospital-categoria[data-modulo="sur"] {
+  --modulo-color: #df5960;
+  --modulo-fondo: rgba(155, 40, 47, .22);
+}
+
+.hospital-categoria[data-modulo="este"] {
+  --modulo-color: #54bd8b;
+  --modulo-fondo: rgba(37, 122, 83, .22);
+}
+
+.hospital-categoria[data-modulo="oeste"] {
+  --modulo-color: #bd895f;
+  --modulo-fondo: rgba(119, 76, 45, .24);
+}
+
+.hospital-categoria[data-modulo]:hover, .hospital-categoria[data-modulo]:focus-visible, .hospital-categoria[data-modulo].is-activa {
+  background: linear-gradient(90deg, var(--modulo-fondo), rgba(3, 22, 38, .04));
+}
+
+.hospital-categoria[data-modulo]::before {
+  background: var(--modulo-color);
+  box-shadow: 0 0 10px var(--modulo-color);
+}
+
+.hospital-categoria[data-modulo] > span:last-child, .hospital-categoria[data-modulo].is-activa > span:last-child {
+  color: var(--modulo-color);
+}
+
+.hospital-terminal[data-modulo-activo="norte"] .hospital-directorio {
+  border-color: rgba(60, 155, 209, .58);
+}
+
+.hospital-terminal[data-modulo-activo="sur"] .hospital-directorio {
+  border-color: rgba(223, 89, 96, .58);
+}
+
+.hospital-terminal[data-modulo-activo="este"] .hospital-directorio {
+  border-color: rgba(84, 189, 139, .58);
+}
+
+.hospital-terminal[data-modulo-activo="oeste"] .hospital-directorio {
+  border-color: rgba(189, 137, 95, .58);
+}
+
+.hospital-directorio__estado {
+  min-height: 1.1rem;
+  margin: 1.1rem 0 0;
+  color: rgba(128, 217, 246, .68);
+}
+
+@keyframes hospital-alzado-entrada {
+  from {
+    opacity: 0;
+    transform: translateX(18%) scale(.92) rotateY(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotateY(0);
+  }
+}
+
+@keyframes hospital-directorio-entrada {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-1.5rem);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes hospital-nucleo-pulso {
+  0%, 100% {
+    opacity: .65;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1600px) {
+  body > .container {
+    width: calc(100% - 4rem);
+    max-width: 1680px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hospital-terminal {
+    grid-template-columns: minmax(240px, .8fr) minmax(400px, 1.2fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hospital-alzado::after {
+    right: -1rem;
+    width: 1rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hospital-directorio__lista {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hospital-servicios {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hospital-ficha__cifras {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-terminal {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-alzado__grafico {
+    max-height: 460px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-alzado__escena {
+    max-width: 460px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-alzado__rotulo span {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-alzado::after {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hospital-directorio {
+    animation-delay: 180ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hospital-alzado, .hospital-directorio, .hospital-alzado__nucleo circle {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hospital-categoria, .hospital-categoria::before, .hospital-categoria > span:last-child {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hospital-directorio__vista, .hospital-servicio, .hospital-alzado__onda, .hospital-alzado__rotulo {
+    transition: none;
+  }
+}
+
