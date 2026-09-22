@@ -110,55 +110,46 @@
   z-index: 2;
 }
 
-/* La fila principal pasa a una sola columna */
-
 @media (max-width: 767.98px) {
-  .zeus-panel .row {
-    display: grid;
-    grid-template-columns: 1fr;
+  .zeus-panel {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas: "header" "video" "questions";
   }
 }
 
-/* Las columnas dejan de comportarse como columnas Bootstrap */
-
 @media (max-width: 767.98px) {
-  .zeus-panel .row > .col {
-    display: contents;
+  .zeus-questions-col, .zeus-video-col {
+    display: contents !important;
   }
 }
-
-/* 1. Título */
 
 @media (max-width: 767.98px) {
   .zeus-question-header {
-    order: 1;
+    grid-area: header;
   }
 }
 
-/* 2. Sabine */
-
 @media (max-width: 767.98px) {
   .zeus-sabine-stage {
-    order: 2;
-    width: 100%;
+    grid-area: video;
+    width: 100% !important;
     margin: 18px 0 22px;
   }
 }
 
-/* 3. Preguntas */
-
 @media (max-width: 767.98px) {
   .zeus-question-list {
-    order: 3;
-    width: 100%;
+    grid-area: questions;
+    width: 100% !important;
+    margin: 0;
   }
 }
 
-/* Las preguntas aprovechan todo el ancho */
-
 @media (max-width: 767.98px) {
   .zeus-question {
-    width: 100%;
+    width: 100% !important;
+    max-width: none !important;
   }
 }
 
