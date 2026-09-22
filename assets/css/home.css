@@ -129,6 +129,14 @@
   background: rgb(56 183 138 / 32%);
 }
 
+.home-selector.is-logistics-selected .home-floor-zone--logistics {
+  background: rgb(243 184 77 / 18%);
+}
+
+.home-selector.is-logistics-selected .home-floor-zone--logistics:hover, .home-selector.is-logistics-selected .home-floor-zone--logistics:focus-visible {
+  background: rgb(243 184 77 / 32%);
+}
+
 /* Añadir estas reglas al final de assets/css/home.css. */
 
 .home-selector {

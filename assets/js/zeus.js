@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const explicaciones = [
         "zeusexpl01.mp4",
         "zeusexpl02.mp4",
-        null,
+        "zeusexpl03.mp4",
         null,
         null
     ];

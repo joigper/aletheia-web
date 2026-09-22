@@ -1,5 +1,6 @@
 /* Selector de cubiertas del módulo HOME.
-   C3–C7 comparten el plano residencial estándar; C8 muestra el colectivo. */
+   C1 muestra la planta logística, C3–C7 comparten el plano residencial
+   estándar y C8 muestra el alojamiento colectivo. */
 document.addEventListener("DOMContentLoaded", () => {
   const poster = document.querySelector(".home-floor-selector");
   const map = document.querySelector(".home-map-image");
@@ -30,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
     collective: {
       src: "assets/img/home/homec8-plano.svg",
       alt: "Plano de alojamiento colectivo de la cubierta 8 del módulo HOME"
+    },
+    logistics: {
+      src: "assets/img/home/homec1-plano.svg",
+      alt: "Plano logístico y técnico de la cubierta 1 del módulo HOME"
     }
   };
 
@@ -47,7 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
     deckNumber.innerHTML = `<span>CUBIERTA</span><strong>${floor}</strong>`;
     map.hidden = false;
     map.classList.add("is-visible");
-    selector.classList.remove("is-residential-selected", "is-collective-selected");
+    selector.classList.remove(
+      "is-residential-selected",
+      "is-collective-selected",
+      "is-logistics-selected"
+    );
     selector.classList.add(selectedClass);
   };
 
@@ -71,6 +80,15 @@ document.addEventListener("DOMContentLoaded", () => {
   collectiveZone.addEventListener("click", () => showPlan(plans.collective, "is-collective-selected", "8"));
   selector.append(collectiveZone);
 
+  const logisticsZone = document.createElement("button");
+  logisticsZone.type = "button";
+  logisticsZone.className = "home-floor-zone home-floor-zone--logistics";
+  logisticsZone.style.clipPath = "polygon(23.05% 70.39%, 34.77% 72.5%, 65.23% 72.5%, 76.95% 70.39%, 76.95% 78.55%, 65.23% 81.5%, 34.77% 81.5%, 23.05% 78.55%)";
+  logisticsZone.setAttribute("aria-label", "Cubierta C1: logística y servicios técnicos");
+  logisticsZone.title = "Cubierta C1 · Logística y servicios técnicos";
+  logisticsZone.addEventListener("click", () => showPlan(plans.logistics, "is-logistics-selected", "1"));
+  selector.append(logisticsZone);
+
   // El plano residencial es la vista inicial de HOME.
   showPlan(plans.residential, "is-residential-selected", "3");
 });
@@ -85,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lift: document.getElementById("home-lift-card"),
     cabin: document.getElementById("home-cabin-card"),
     technical: document.getElementById("home-technical-card"),
+    logisticsOverview: document.getElementById("home-c1-overview-card"),
     collectiveOverview: document.getElementById("home-c8-overview-card"),
     collectiveCabin: document.getElementById("home-c8-cabin-card"),
     collectiveShowers: document.getElementById("home-c8-showers-card"),
@@ -180,14 +199,20 @@ document.addEventListener("DOMContentLoaded", () => {
 }
   ];
 
-  const currentPlan = () =>
-    map.src.includes("homec8-plano.svg") ? "collective" : "residential";
+  const currentPlan = () => {
+    if (map.src.includes("homec1-plano.svg")) return "logistics";
+    if (map.src.includes("homec8-plano.svg")) return "collective";
+    return "residential";
+  };
 
-  const activeCardPlan = () =>
-  ["collectiveOverview", "collectiveCabin", "collectiveShowers",
-   "collectiveCommon", "expanded", "lockers"].includes(activeCard)
-    ? "collective"
-    : "residential";
+  const activeCardPlan = () => {
+    if (activeCard === "logisticsOverview") return "logistics";
+
+    return ["collectiveOverview", "collectiveCabin", "collectiveShowers",
+      "collectiveCommon", "expanded", "lockers"].includes(activeCard)
+      ? "collective"
+      : "residential";
+  };
 
   function showCard(cardName) {
     Object.entries(cards).forEach(([name, card]) => {
@@ -239,7 +264,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (activeCardPlan() !== plan) {
-      showCard(plan === "collective" ? "collectiveOverview" : "summary");
+      showCard(
+        plan === "collective"
+          ? "collectiveOverview"
+          : plan === "logistics"
+            ? "logisticsOverview"
+            : "summary"
+      );
     }
 
     syncPoints();
