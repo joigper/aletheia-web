@@ -740,6 +740,7 @@ L1_061: {
         L1_080: {
     nombre: "OBSERVATORIO",
     area: "Astronomía y observación espacial",
+    enlace: "observatorio.html",
     imagenes: [
     {
         src: "assets/img/OBSERVATORIO.jpg",

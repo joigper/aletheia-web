@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>ALÉTHEIA | Archivo planetario</title>
+    <meta name="description" content="Explora los planetas descubiertos.">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/bss-overrides.css">
+    <link rel="stylesheet" href="assets/css/adelanto.css">
+    <link rel="stylesheet" href="assets/css/aletheia-books.css">
+    <link rel="stylesheet" href="assets/css/aletheia-earth.css">
+    <link rel="stylesheet" href="assets/css/cocina.css">
+    <link rel="stylesheet" href="assets/css/explorar.css">
+    <link rel="stylesheet" href="assets/css/flota.css">
+    <link rel="stylesheet" href="assets/css/galaxy-button.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tripulacion.css">
+    <link rel="stylesheet" href="assets/css/zeus.css">
+    <link rel="stylesheet" href="assets/css/hospital.css">
+    <link rel="stylesheet" href="assets/css/observatorio.css">
+    <link rel="stylesheet" href="assets/css/planetas.css">
+</head>
+
+<body class="pagina-planetas">
+    <div class="container">
+        <div class="row">
+            <div class="col"><img src="assets/img/observatorio/emblemaobseervatorio.png" style="color:var(--bs-border-color-translucent);text-align:center;" width="131" height="131">
+                <h1 style="font-family:Tektur, serif;font-weight:bold;font-size:28px;color:rgb(255,255,255);">ALÉTHEIA</h1>
+            </div>
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+                <p style="font-family:Tektur, serif;color:var(--bs-light);font-size:30px;margin-bottom:0;">MÓDULO OBSERVATORIO</p>
+                <p style="color:var(--bs-light);font-size:16px;">ARCHIVO PLANETARIO</p>
+            </div>
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="aletheia-galaxy-button galaxy-button--small" style="--button-hue:265;"><a href="observatorio.html" class="galaxy-trigger"><span class="spark"></span><span class="backdrop"></span><span class="galaxy__container"><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span></span><span class="galaxy"><span class="galaxy__ring"><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span></span></span><span class="text">VOLVER</span></a></div>
+            </div>
+        </div>
+        <div class="mt-4" style="width:100%;height:1px;background:#3a3a3a;"></div>
+        <div class="row">
+            <div class="col-12">
+                <p style="color:rgb(255,255,255);"><strong>MUNDOS EXPLORADOS</strong><br><em>Más allá del Sistema Solar, las misiones de ALÉTHEIA han cartografiado mundos muy distintos. Algunos estériles. Otros hostiles. Y alguno cambió para siempre nuestra idea sobre la vida en el universo.</em></p>
+            </div>
+        </div>
+        <main id="archivo-planetas" class="archivo-planetas" aria-label="Archivo planetario">
+            <aside class="archivo-planetas__selector" aria-label="Mundos documentados">
+                <p class="archivo-planetas__selector-titulo">MUNDOS DOCUMENTADOS</p>
+                <div id="lista-planetas"></div>
+            </aside>
+            <article class="ficha-planeta" aria-live="polite">
+                <header class="ficha-planeta__cabecera">
+                    <div>
+                        <p class="ficha-planeta__registro">ALÉTHEIA · ARCHIVO PLANETARIO</p>
+                        <h2 id="planeta-nombre">THALARA</h2>
+                        <p id="planeta-clasificacion" class="ficha-planeta__clasificacion">Mundo documentado</p>
+                    </div><span id="planeta-novela" class="ficha-planeta__novela">SOMBRAS SOBRE THALARA</span>
+                </header>
+                <section class="visor-planeta" aria-label="Representación planetaria">
+                    <div class="visor-planeta__reticula" aria-hidden="true"></div>
+                    <div class="visor-planeta__orbita" aria-hidden="true"></div>
+                    <div id="planeta-esfera" class="planeta-esfera" aria-hidden="true"></div>
+                    <div class="visor-planeta__escaneo" aria-hidden="true"></div>
+                    <p id="planeta-codigo" class="visor-planeta__codigo">OBS-THA-01</p>
+                    <p class="visor-planeta__estado"><span></span> ENLACE DE OBSERVACIÓN ACTIVO</p>
+                </section>
+                <section id="planeta-telemetria" class="telemetria-planeta" aria-label="Telemetría planetaria"></section>
+                <section class="informe-planeta">
+                    <p class="informe-planeta__titulo">REGISTRO DE EXPLORACIÓN</p>
+                    <p id="planeta-descripcion"></p>
+                    <div class="informe-planeta__pie"><span id="planeta-estado"></span><span id="planeta-apariciones"></span></div>
+                </section>
+            </article>
+        </main>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/01naves.js"></script>
+    <script src="assets/js/02flota.js"></script>
+    <script src="assets/js/cocina.js"></script>
+    <script src="assets/js/contacto.js"></script>
+    <script src="assets/js/explorar.js"></script>
+    <script src="assets/js/galaxy-button.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/hospital.js"></script>
+    <script src="assets/js/personajes.js"></script>
+    <script src="assets/js/tripulacion.js"></script>
+    <script src="assets/js/zeus.js"></script>
+    <script src="assets/js/observatorio.js"></script>
+    <script src="assets/js/planetas.js"></script>
+</body>
+
+</html>
