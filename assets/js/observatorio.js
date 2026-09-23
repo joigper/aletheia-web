@@ -13,12 +13,12 @@ function blackhole(selector) {
   const stars = [];
   let collapse = false;
   let expanse = false;
-
-  let activacionPendiente = false;
+  let toquePreparado = false;
+  let temporizadorToque = null;
 
   const esDispositivoTactil = window.matchMedia(
-  '(hover: none), (pointer: coarse)'
-  ).matches;  
+    '(hover: none), (pointer: coarse)'
+  ).matches;
   const canvas = document.createElement('canvas');
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(width * pixelRatio);
@@ -93,65 +93,77 @@ function blackhole(selector) {
   }
 
   trigger.addEventListener('mouseenter', () => {
-    if (!expanse) collapse = true;
+    if (!esDispositivoTactil && !expanse) {
+      collapse = true;
+    }
   });
 
   trigger.addEventListener('mouseleave', () => {
-    collapse = false;
+    if (!esDispositivoTactil && !toquePreparado) {
+      collapse = false;
+    }
   });
-trigger.addEventListener('pointerdown', (event) => {
-  if (
-    event.pointerType !== 'mouse' &&
-    !expanse &&
-    !activacionPendiente
-  ) {
-    collapse = true;
 
-    if ('vibrate' in navigator) {
-      navigator.vibrate(18);
+  trigger.addEventListener('contextmenu', (event) => {
+    if (esDispositivoTactil) {
+      event.preventDefault();
     }
-  }
-});
+  });
 
-trigger.addEventListener('pointercancel', () => {
-  if (!activacionPendiente && !expanse) {
-    collapse = false;
-  }
-});
   trigger.addEventListener('click', (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (expanse || activacionPendiente) return;
+    if (expanse) return;
 
-  activacionPendiente = true;
+    function abrirArchivo() {
+      toquePreparado = false;
+      collapse = false;
+      expanse = true;
 
-  const abrirArchivo = () => {
-    collapse = false;
-    expanse = true;
-    trigger.classList.add('open');
+      window.clearTimeout(temporizadorToque);
+      trigger.classList.remove('touch-ready');
+      trigger.classList.add('open');
 
-    if ('vibrate' in navigator) {
-      navigator.vibrate([25, 20, 55]);
+      if ('vibrate' in navigator) {
+        navigator.vibrate([30, 20, 60]);
+      }
+
+      window.setTimeout(() => {
+        window.location.assign(trigger.href);
+      }, 900);
     }
 
-    window.setTimeout(() => {
-      window.location.assign(trigger.href);
-    }, 900);
-  };
+    if (!esDispositivoTactil) {
+      abrirArchivo();
+      return;
+    }
 
-  if (esDispositivoTactil) {
-    collapse = true;
-    window.setTimeout(abrirArchivo, 280);
-  } else {
+    if (!toquePreparado) {
+      toquePreparado = true;
+      collapse = true;
+      trigger.classList.add('touch-ready');
+
+      if ('vibrate' in navigator) {
+        navigator.vibrate(25);
+      }
+
+      temporizadorToque = window.setTimeout(() => {
+        toquePreparado = false;
+        collapse = false;
+        trigger.classList.remove('touch-ready');
+      }, 2500);
+
+      return;
+    }
+
     abrirArchivo();
-  }
-});
+  });
 
   function loop() {
     const currentTime = (Date.now() - startTime) / 50;
     context.clearRect(0, 0, width, height);
-context.fillStyle = '#000';
-context.fillRect(0, 0, width, height);
+    context.fillStyle = '#000';
+    context.fillRect(0, 0, width, height);
     stars.forEach((star) => star.draw(currentTime));
     window.requestAnimationFrame(loop);
   }
