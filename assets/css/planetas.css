@@ -58,7 +58,7 @@
 
 .pagina-planetas .selector-planeta {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 62px minmax(0, 1fr);
   gap: .8rem;
   align-items: center;
   width: 100%;
@@ -82,11 +82,28 @@
 }
 
 .pagina-planetas .selector-planeta__miniatura {
-  width: 36px;
+  position: relative;
+  width: 56px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--miniatura);
-  box-shadow: inset -8px -6px 10px rgba(0, 0, 0, .75), 0 0 12px color-mix(in srgb, var(--color-novela) 40%, transparent);
+  background-color: #26343d;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: 48% 50%;
+  background-size: 200% 100%;
+  box-shadow: inset -8px -3px 10px rgba(0, 0, 0, .62), inset 5px 3px 8px rgba(255, 255, 255, .2), 0 0 15px color-mix(in srgb, var(--color-novela) 42%, transparent);
+  filter: brightness(1.15) saturate(1.08);
+  animation: none;
+  overflow: hidden;
+}
+
+.pagina-planetas .selector-planeta__miniatura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .pagina-planetas .selector-planeta strong, .pagina-planetas .selector-planeta small {
@@ -154,6 +171,182 @@
   text-align: center;
 }
 
+.pagina-planetas .ficha-planeta__referencia {
+  display: grid;
+  justify-items: end;
+  gap: .65rem;
+  flex: 0 0 auto;
+}
+
+.pagina-planetas .ficha-planeta__primera-aparicion {
+  margin: 0;
+  color: #f0f3f5;
+  font-family: Tektur, sans-serif;
+  font-size: .72rem;
+  letter-spacing: .06em;
+  text-align: right;
+}
+
+.pagina-planetas .ficha-planeta__primera-aparicion span, .pagina-planetas .ficha-planeta__primera-aparicion strong {
+  display: block;
+}
+
+.pagina-planetas .ficha-planeta__primera-aparicion span {
+  margin-bottom: .2rem;
+  color: #778594;
+  font-size: .58rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+}
+
+.pagina-planetas .ficha-planeta__primera-aparicion strong {
+  color: var(--color-novela-activa);
+  font-weight: 500;
+}
+
+.pagina-planetas .pestanas-planeta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: .3rem;
+  min-height: 62px;
+  margin-top: .9rem;
+  border-bottom: 1px solid rgba(83, 183, 228, .34);
+}
+
+.pagina-planetas .pestanas-planeta::before {
+  content: "EXPEDIENTE · CONTENIDO POR NOVELA";
+  align-self: center;
+  margin-right: auto;
+  color: #647380;
+  font-family: Tektur, sans-serif;
+  font-size: .58rem;
+  letter-spacing: .13em;
+}
+
+.pagina-planetas .pestana-planeta {
+  min-height: 45px;
+  margin-bottom: -1px;
+  padding: .65rem 1.25rem .6rem 1.45rem;
+  border: 1px solid rgba(83, 183, 228, .48);
+  border-bottom-color: rgba(83, 183, 228, .34);
+  background: rgba(7, 16, 25, .88);
+  color: #82909d;
+  clip-path: polygon(13px 0, 100% 0, calc(100% - 13px) 100%, 0 100%);
+  font-family: Tektur, sans-serif;
+  font-size: .67rem;
+  letter-spacing: .09em;
+  transition: color 180ms ease, background-color 180ms ease;
+}
+
+.pagina-planetas .pestana-planeta:hover, .pagina-planetas .pestana-planeta:focus-visible {
+  color: #dbe7ed;
+}
+
+.pagina-planetas .pestana-planeta:focus-visible {
+  outline: 2px solid #62c9f4;
+  outline-offset: -3px;
+}
+
+.pagina-planetas .pestana-planeta--activa {
+  border-color: #62c9f4;
+  border-bottom-color: #0b1824;
+  background: #0b1824;
+  color: #62c9f4;
+}
+
+.pagina-planetas .panel-expediente[hidden] {
+  display: none !important;
+}
+
+.pagina-planetas .panel-expediente--archivo {
+  min-height: 420px;
+  padding: clamp(1.25rem, 3vw, 2.2rem) 0;
+}
+
+.pagina-planetas .archivo-adicional {
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-left: 3px solid #62c9f4;
+  background: rgba(255, 255, 255, .03);
+  color: #c7cdd3;
+  line-height: 1.7;
+}
+
+.pagina-planetas .archivo-adicional__registro {
+  margin: 0 0 .65rem;
+  color: var(--color-novela-activa);
+  font-family: Tektur, sans-serif;
+  font-size: .63rem;
+  letter-spacing: .13em;
+}
+
+.pagina-planetas .archivo-adicional__tipo {
+  display: inline-block;
+  margin: 0 0 .85rem;
+  padding: .35rem .65rem;
+  border: 1px solid rgba(218, 174, 91, .48);
+  color: #daba75;
+  font-family: Tektur, sans-serif;
+  font-size: .58rem;
+  letter-spacing: .13em;
+}
+
+.pagina-planetas .archivo-adicional__nota-canon {
+  max-width: 82ch;
+  margin: 0 0 1.25rem;
+  padding: .85rem 1rem;
+  border-left: 3px solid #daba75;
+  background: rgba(218, 174, 91, .07);
+  color: #d4c8ad;
+  font-size: .82rem;
+}
+
+.pagina-planetas .archivo-adicional h3 {
+  margin: 0 0 1.2rem;
+  color: #fff;
+  font-family: Tektur, sans-serif;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 500;
+}
+
+.pagina-planetas .archivo-adicional__contenido > p {
+  max-width: 78ch;
+}
+
+.pagina-planetas .archivo-adicional__galeria {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagina-planetas .archivo-adicional__imagen {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(83, 183, 228, .25);
+  background: #071019;
+}
+
+.pagina-planetas .archivo-adicional__imagen:only-child {
+  grid-column: 1 / -1;
+}
+
+.pagina-planetas .archivo-adicional__imagen img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.pagina-planetas .archivo-adicional__imagen figcaption {
+  padding: .65rem .8rem;
+  border-top: 1px solid rgba(83, 183, 228, .18);
+  color: #778594;
+  font-family: Tektur, sans-serif;
+  font-size: .58rem;
+  letter-spacing: .12em;
+}
+
 .pagina-planetas .visor-planeta {
   position: relative;
   display: grid;
@@ -201,19 +394,23 @@
   animation-duration: 70s;
 }
 
-.pagina-planetas .planeta-esfera--atmosfera::before {
-  content: "";
+.pagina-planetas .planeta-atmosfera {
+  display: none;
   position: absolute;
   inset: 0;
   z-index: 1;
   border-radius: 50%;
-  background-image: url("../img/observatorio/thalara-atmosfera.png");
   background-repeat: repeat-x;
   background-size: 200% 100%;
-  opacity: 1;
-  filter: saturate(.35);
+  background-position: 0 0;
   pointer-events: none;
-  animation: atmosfera-thalara 96s linear infinite;
+  animation-name: atmosfera-thalara;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.pagina-planetas .planeta-atmosfera--activa {
+  display: block;
 }
 
 .pagina-planetas .planeta-esfera--sincronica {
@@ -394,6 +591,44 @@
 }
 
 @media (max-width: 767.98px) {
+  .pagina-planetas .ficha-planeta__referencia {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pagina-planetas .ficha-planeta__primera-aparicion {
+    text-align: left;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pagina-planetas .pestanas-planeta {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pagina-planetas .pestanas-planeta::before {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pagina-planetas .pestana-planeta {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pagina-planetas .archivo-adicional__galeria {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
   .pagina-planetas .telemetria-planeta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -545,7 +780,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pagina-planetas .planeta-esfera, .pagina-planetas .planeta-esfera--atmosfera::before, .pagina-planetas .visor-planeta__escaneo, .pagina-planetas .dato-planeta dd::after {
+  .pagina-planetas .planeta-esfera, .pagina-planetas .planeta-atmosfera, .pagina-planetas .visor-planeta__escaneo, .pagina-planetas .dato-planeta dd::after {
     animation: none;
   }
 }

@@ -57,22 +57,29 @@
                         <p class="ficha-planeta__registro">ALÉTHEIA · ARCHIVO PLANETARIO</p>
                         <h2 id="planeta-nombre">THALARA</h2>
                         <p id="planeta-clasificacion" class="ficha-planeta__clasificacion">Mundo documentado</p>
-                    </div><span id="planeta-novela" class="ficha-planeta__novela">SOMBRAS SOBRE THALARA</span>
+                    </div>
+                    <div class="ficha-planeta__referencia"><span id="planeta-novela" class="ficha-planeta__novela">ALÉTHEIA I</span>
+                        <p class="ficha-planeta__primera-aparicion"><span>PRIMERA APARICIÓN</span><strong id="planeta-primera-aparicion">ALÉTHEIA I</strong></p>
+                    </div>
                 </header>
-                <section class="visor-planeta" aria-label="Representación planetaria">
-                    <div class="visor-planeta__reticula" aria-hidden="true"></div>
-                    <div class="visor-planeta__orbita" aria-hidden="true"></div>
-                    <div id="planeta-esfera" class="planeta-esfera" aria-hidden="true"></div>
-                    <div class="visor-planeta__escaneo" aria-hidden="true"></div>
-                    <p id="planeta-codigo" class="visor-planeta__codigo">OBS-THA-01</p>
-                    <p class="visor-planeta__estado"><span></span> ENLACE DE OBSERVACIÓN ACTIVO</p>
+                <nav id="planeta-pestanas" class="pestanas-planeta" aria-label="Secciones del expediente"></nav>
+                <section id="panel-planeta" class="panel-expediente" role="tabpanel">
+                    <section class="visor-planeta" aria-label="Representación planetaria">
+                        <div class="visor-planeta__reticula" aria-hidden="true"></div>
+                        <div class="visor-planeta__orbita" aria-hidden="true"></div>
+                        <div id="planeta-esfera" class="planeta-esfera" aria-hidden="true"></div>
+                        <div class="visor-planeta__escaneo" aria-hidden="true"></div>
+                        <p id="planeta-codigo" class="visor-planeta__codigo">OBS-THA-01</p>
+                        <p class="visor-planeta__estado"><span></span> ENLACE DE OBSERVACIÓN ACTIVO</p>
+                    </section>
+                    <section id="planeta-telemetria" class="telemetria-planeta" aria-label="Telemetría planetaria"></section>
+                    <section class="informe-planeta">
+                        <p class="informe-planeta__titulo">REGISTRO DE EXPLORACIÓN</p>
+                        <p id="planeta-descripcion"></p>
+                        <div class="informe-planeta__pie"><span id="planeta-estado"></span><span id="planeta-apariciones"></span></div>
+                    </section>
                 </section>
-                <section id="planeta-telemetria" class="telemetria-planeta" aria-label="Telemetría planetaria"></section>
-                <section class="informe-planeta">
-                    <p class="informe-planeta__titulo">REGISTRO DE EXPLORACIÓN</p>
-                    <p id="planeta-descripcion"></p>
-                    <div class="informe-planeta__pie"><span id="planeta-estado"></span><span id="planeta-apariciones"></span></div>
-                </section>
+                <section id="panel-archivo-planeta" class="panel-expediente panel-expediente--archivo" role="tabpanel" hidden=""></section>
             </article>
         </main>
     </div>
