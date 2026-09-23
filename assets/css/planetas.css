@@ -378,6 +378,7 @@
 
 .pagina-planetas .planeta-esfera {
   position: relative;
+  z-index: 2;
   width: clamp(190px, 26vw, 290px);
   aspect-ratio: 1;
   border-radius: 50%;
@@ -387,6 +388,33 @@
   background-repeat: repeat-x;
   box-shadow: inset -48px -20px 65px rgba(0, 0, 0, .78), inset 16px 10px 25px rgba(255, 255, 255, .13), 0 0 45px color-mix(in srgb, var(--color-novela-activa) 24%, transparent);
   animation: rotacion-planeta 24s linear infinite;
+}
+
+.pagina-planetas .planeta-anillos {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(285px, 39vw, 435px);
+  height: clamp(70px, 10vw, 110px);
+  border: 2px solid rgba(196, 216, 225, .52);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(111, 143, 157, .16), 0 0 0 10px rgba(211, 224, 229, .08);
+  transform: translate(-50%, -50%) rotate(-11deg);
+  pointer-events: none;
+}
+
+.pagina-planetas .planeta-anillos--activos {
+  display: block;
+}
+
+.pagina-planetas .planeta-anillos--fondo {
+  z-index: 1;
+}
+
+.pagina-planetas .planeta-anillos--frente {
+  z-index: 3;
+  clip-path: inset(50% -12px -12px -12px);
 }
 
 .pagina-planetas .planeta-esfera--textura {
@@ -436,6 +464,7 @@
   height: 1px;
   background: #68d4ff;
   box-shadow: 0 0 12px #68d4ff;
+  z-index: 4;
   animation: escaneo-planeta 5s ease-in-out infinite;
 }
 

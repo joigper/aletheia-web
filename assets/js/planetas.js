@@ -42,6 +42,57 @@ document.addEventListener('DOMContentLoaded', () => {
             ]
         },
         {
+          id: 'tau-ceti-t-iii',
+          nombre: 'TAU CETI T-III',
+          subtitulo: 'Gigante de hielo',
+          clasificacion: 'Gigante de hielo anillado',
+          codigo: 'TAU CETI · OBS-TIII-01',
+          estado: 'OBSERVACIÓN REMOTA · NO EXPLORADO',
+          apariciones: 'Primera aparición: ALÉTHEIA I',
+          primeraAparicion: 'ALÉTHEIA I · CAPÍTULO 28 · «LOS CONSTRUCTORES»',
+          ordenAparicion: 28,
+          descripcion: 'Gigante de hielo situado en una órbita ligeramente interior a la de Thalara. Su gran diámetro, su sistema tenue de anillos y un periodo orbital muy próximo al thalarano permiten que, durante alineamientos excepcionales, permanezca interpuesto entre Tau Ceti y Thalara durante treinta y cinco días y cinco horas. El fenómeno reduce de forma sostenida la radiación recibida y provoca un descenso térmico estimado de dieciocho grados en el cráter de Base THALARA-1. T-III no ha recibido ninguna misión de superficie y permanece clasificado como objetivo de observación remota.',
+          superficie: 'url("assets/img/observatorio/tau-ceti-t-iii-mapa.webp")',
+          usaTextura: true,
+          anillado: true,
+          archivos: [
+            {
+              id: 'eclipse',
+              etiqueta: 'ECLIPSE',
+              titulo: 'Eclipse prolongado de Thalara',
+              referencia: 'ALÉTHEIA I · CAPÍTULO 28 · «LOS CONSTRUCTORES»',
+              tipoRegistro: 'REGISTRO NARRATIVO · MODELO ORBITAL',
+              notaCanon: 'La novela establece una duración total de treinta y cinco días y cinco horas, además de la posición interior y el mayor tamaño de T-III. La resonancia casi 1:1 y la contribución de los anillos forman parte del modelo orbital desarrollado para el archivo.',
+              parrafos: [
+                'Treinta y un días antes del fenómeno, Base THALARA-1 recibió el aviso de que T-III quedaría alineado entre Tau Ceti y Thalara. El evento tendría una duración total de treinta y cinco días y cinco horas, con oscuridad total durante su fase máxima.',
+                'La ocultación sería principalmente parcial y progresiva. El gran diámetro aparente de T-III y el material de sus anillos reducirían de forma sostenida la radiación estelar, con una bajada térmica estimada de dieciocho grados en el cráter ocupado por la base.',
+                'La escasa diferencia entre ambos periodos orbitales y la inclinación relativa de sus planos hacen que estos eclipses prolongados sean acontecimientos excepcionales, separados por largos intervalos.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/tau-ceti-t-iii-eclipse-01.webp',
+                  alt: 'T-III ocultando casi por completo la luz de Tau Ceti, visto desde la superficie de Thalara',
+                  pie: 'INTERPRETACIÓN VISUAL · ECLIPSE PROLONGADO DE THALARA'
+                }
+              ]
+            }
+          ],
+          datos: [
+            ['SISTEMA', 'TAU CETI'],
+            ['TIPO', 'GIGANTE DE HIELO'],
+            ['POSICIÓN ORBITAL', 'INTERIOR A THALARA'],
+            ['TAMAÑO', 'SUPERIOR A THALARA'],
+            ['COMPOSICIÓN', 'HIDRÓGENO · HELIO · HIELOS VOLÁTILES'],
+            ['SUPERFICIE SÓLIDA', 'NO DEFINIDA'],
+            ['SISTEMA DE ANILLOS', 'TENUE'],
+            ['RELACIÓN ORBITAL', 'RESONANCIA CASI 1:1'],
+            ['EXPLORACIÓN DIRECTA', 'NINGUNA'],
+            ['FENÓMENO', 'ECLIPSE DE THALARA'],
+            ['DURACIÓN DEL EVENTO', '35 DÍAS · 5 HORAS'],
+            ['DESCENSO TÉRMICO', '18 °C · CRÁTER THALARA-1']
+          ]
+        },
+        {
   id: 'sirius-ab-b',
   nombre: 'SIRIUS AB b',
   subtitulo: 'Mundo mineral',
@@ -145,20 +196,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       ]
     },
+      {
+      novela: 'SOMBRAS SOBRE THALARA',
+      color: '#c2c4b7',
+      planetas: [
+        {
+          id: 'registro-N02',
+          nombre: 'REGISTRO N-02',
+          subtitulo: 'Clasificación pendiente',
+          clasificacion: 'Expediente en preparación',
+          codigo: 'OBS-S01',
+          estado: 'DATOS PENDIENTES',
+          apariciones: 'Primera aparición: Sombras sobre Thalara',
+          primeraAparicion: 'SOMBRAS SOBRE THALARA',
+          descripcion: 'Registro reservado para un mundo relacionado con Sombras sobre Thalara.',
+          superficie: 'radial-gradient(circle at 30% 25%, #e5e7ea 0 7%, #9ba8b8 23%, #596878 49%, #252c37 74%)',
+          datos: [['TIPO', 'PENDIENTE'], ['ATMÓSFERA', 'PENDIENTE'], ['GRAVEDAD', 'PENDIENTE'], ['ESTADO', 'ARCHIVADO']]
+        }
+      ]
+    },
     {
       novela: 'LA CUARTA SONDA',
       color: '#d8d8d9',
       planetas: [
         {
-          id: 'registro-s01',
-          nombre: 'REGISTRO S-01',
+          id: 'registro-N03',
+          nombre: 'REGISTRO N-03',
           subtitulo: 'Clasificación pendiente',
           clasificacion: 'Expediente en preparación',
           codigo: 'OBS-S01',
           estado: 'DATOS PENDIENTES',
           apariciones: 'Primera aparición: La cuarta sonda',
           primeraAparicion: 'LA CUARTA SONDA',
-          descripcion: 'Registro reservado para un mundo relacionado con La cuarta sonda. El nombre y los datos definitivos podrán sustituir estos textos provisionales desde un único objeto de JavaScript.',
+          descripcion: 'Registro reservado para un mundo relacionado con La cuarta sonda.',
           superficie: 'radial-gradient(circle at 30% 25%, #e5e7ea 0 7%, #9ba8b8 23%, #596878 49%, #252c37 74%)',
           datos: [['TIPO', 'PENDIENTE'], ['ATMÓSFERA', 'PENDIENTE'], ['GRAVEDAD', 'PENDIENTE'], ['ESTADO', 'ARCHIVADO']]
         }
@@ -357,6 +427,26 @@ const esMovil = () =>
     archivo.style.setProperty('--color-novela-activa', planeta.color);
     const esfera = archivo.querySelector('#planeta-esfera');
     esfera.style.backgroundImage = planeta.superficie;
+    const visor = esfera.closest('.visor-planeta');
+    let anillosFondo = visor.querySelector('.planeta-anillos--fondo');
+    let anillosFrente = visor.querySelector('.planeta-anillos--frente');
+
+    if (!anillosFondo || !anillosFrente) {
+      anillosFondo = document.createElement('span');
+      anillosFondo.className = 'planeta-anillos planeta-anillos--fondo';
+      anillosFondo.setAttribute('aria-hidden', 'true');
+
+      anillosFrente = document.createElement('span');
+      anillosFrente.className = 'planeta-anillos planeta-anillos--frente';
+      anillosFrente.setAttribute('aria-hidden', 'true');
+
+      esfera.insertAdjacentElement('beforebegin', anillosFondo);
+      esfera.insertAdjacentElement('afterend', anillosFrente);
+    }
+
+    [anillosFondo, anillosFrente].forEach((anillo) => {
+      anillo.classList.toggle('planeta-anillos--activos', Boolean(planeta.anillado));
+    });
       let capaAtmosfera = esfera.querySelector('.planeta-atmosfera');
 
 if (!capaAtmosfera) {
@@ -386,6 +476,7 @@ capaAtmosfera.classList.toggle(
     'planeta-esfera--sincronica',
     Boolean(planeta.rotacionSincronica)
     );
+    esfera.classList.toggle('planeta-esfera--anillado', Boolean(planeta.anillado));
     archivo.querySelector('#planeta-nombre').textContent = planeta.nombre;
     archivo.querySelector('#planeta-clasificacion').textContent = planeta.clasificacion;
     archivo.querySelector('#planeta-novela').textContent = planeta.novela;
