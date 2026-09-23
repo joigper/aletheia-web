@@ -14,6 +14,11 @@ function blackhole(selector) {
   let collapse = false;
   let expanse = false;
 
+  let activacionPendiente = false;
+
+  const esDispositivoTactil = window.matchMedia(
+  '(hover: none), (pointer: coarse)'
+  ).matches;  
   const canvas = document.createElement('canvas');
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(width * pixelRatio);
@@ -94,15 +99,53 @@ function blackhole(selector) {
   trigger.addEventListener('mouseleave', () => {
     collapse = false;
   });
+trigger.addEventListener('pointerdown', (event) => {
+  if (
+    event.pointerType !== 'mouse' &&
+    !expanse &&
+    !activacionPendiente
+  ) {
+    collapse = true;
 
+    if ('vibrate' in navigator) {
+      navigator.vibrate(18);
+    }
+  }
+});
+
+trigger.addEventListener('pointercancel', () => {
+  if (!activacionPendiente && !expanse) {
+    collapse = false;
+  }
+});
   trigger.addEventListener('click', (event) => {
-    event.preventDefault();
-    if (expanse) return;
+  event.preventDefault();
+
+  if (expanse || activacionPendiente) return;
+
+  activacionPendiente = true;
+
+  const abrirArchivo = () => {
     collapse = false;
     expanse = true;
     trigger.classList.add('open');
-    window.setTimeout(() => window.location.assign(trigger.href), 850);
-  });
+
+    if ('vibrate' in navigator) {
+      navigator.vibrate([25, 20, 55]);
+    }
+
+    window.setTimeout(() => {
+      window.location.assign(trigger.href);
+    }, 900);
+  };
+
+  if (esDispositivoTactil) {
+    collapse = true;
+    window.setTimeout(abrirArchivo, 280);
+  } else {
+    abrirArchivo();
+  }
+});
 
   function loop() {
     const currentTime = (Date.now() - startTime) / 50;

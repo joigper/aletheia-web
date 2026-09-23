@@ -201,7 +201,7 @@
   animation-duration: 70s;
 }
 
-.pagina-planetas .planeta-esfera--textura::before {
+.pagina-planetas .planeta-esfera--atmosfera::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -214,6 +214,11 @@
   filter: saturate(.35);
   pointer-events: none;
   animation: atmosfera-thalara 96s linear infinite;
+}
+
+.pagina-planetas .planeta-esfera--sincronica {
+  background-position: 50% 0;
+  animation: giro-planeta-sincronico 140s linear infinite;
 }
 
 .pagina-planetas .planeta-esfera::after {
@@ -341,6 +346,15 @@
   }
   to {
     background-position: 100% 0;
+  }
+}
+
+@keyframes giro-planeta-sincronico {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -531,7 +545,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pagina-planetas .planeta-esfera, .pagina-planetas .planeta-esfera--textura::before, .pagina-planetas .visor-planeta__escaneo, .pagina-planetas .dato-planeta dd::after {
+  .pagina-planetas .planeta-esfera, .pagina-planetas .planeta-esfera--atmosfera::before, .pagina-planetas .visor-planeta__escaneo, .pagina-planetas .dato-planeta dd::after {
     animation: none;
   }
 }

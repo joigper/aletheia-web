@@ -67,6 +67,8 @@ body.pagina-observatorio {
   text-align: center;
   transition: all 500ms;
   text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .centerHover.open {

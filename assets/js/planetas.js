@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
           descripcion: 'Mundo menor que la Tierra, cálido y seco, cuyos dos océanos polares contrastan con una extensa franja continental de lagos, montañas y grandes cuencas de impacto. Los cráteres habitables alcanzan los 40 °C, mientras que en los desiertos centrales se han medido máximas de hasta 80 °C. Su rotación prolonga el día hasta las veintinueve horas. Una única luna, sensiblemente menor que la terrestre, orbita el planeta y ejerce una influencia muy reducida sobre las mareas. Una bruma ligera cubre sus continentes y las nubes avanzan lentamente sobre un ecosistema activo y complejo. En los océanos se desplazan enormes criaturas; en tierra, los sensores han registrado organismos de morfología inquietantemente próxima a ciertos mamíferos.',
           superficie: 'url("assets/img/observatorio/thalara-mapa-final.png")',
           usaTextura: true,
+          usaAtmosfera: true,
           datos: [
   ['SISTEMA', 'TAU CETI'],
   ['TIPO', 'TERRESTRE BIÓTICO'],
@@ -44,7 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
   apariciones: 'ALÉTHEIA I · Sombras sobre Thalara',
   descripcion: 'Mundo mineral situado en una órbita exterior del sistema de Sirius. Su rotación sincrónica mantiene un hemisferio sometido permanentemente a la radiación de las estrellas y otro sumido en una noche perpetua. Mientras el agua hierve o permanece en forma de vapor en la cara iluminada, enormes reservas de hielo cubren las regiones oscuras. La ausencia de oxígeno respirable y una atmósfera rica en hidrógeno impiden la presencia humana sin protección. Sus vastos yacimientos de rodio se explotan en el hemisferio nocturno, donde las instalaciones mineras permanecen protegidas de la radiación directa de Sirius.',
   superficie: 'url("assets/img/observatorio/sirius-ab-b-mapa.png")',
-usaTextura: true,
+  usaTextura: true,
+  rotacionSincronica: true,
   datos: [
     ['SISTEMA', 'SIRIUS AB'],
     ['TIPO', 'MUNDO MINERAL'],
@@ -157,6 +159,14 @@ const esMovil = () =>
     const esfera = archivo.querySelector('#planeta-esfera');
     esfera.style.backgroundImage = planeta.superficie;
     esfera.classList.toggle('planeta-esfera--textura', Boolean(planeta.usaTextura));
+    esfera.classList.toggle(
+    'planeta-esfera--atmosfera',
+    Boolean(planeta.usaAtmosfera)
+    );
+    esfera.classList.toggle(
+    'planeta-esfera--sincronica',
+    Boolean(planeta.rotacionSincronica)
+    );
     archivo.querySelector('#planeta-nombre').textContent = planeta.nombre;
     archivo.querySelector('#planeta-clasificacion').textContent = planeta.clasificacion;
     archivo.querySelector('#planeta-novela').textContent = planeta.novela;
