@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" class="pagina-observatorio" lang="es">
+<html data-bs-theme="light" lang="es">
 
 <head>
     <meta charset="utf-8">
@@ -48,10 +48,29 @@
         </div>
         <div class="row align-items-stretch g-4 observatorio-paneles">
             <div class="col-12 col-lg-5">
-                <section class="h-100 observatorio-ficha">
-                    <p class="observatorio-ficha__eyebrow">MÓDULO OBSERVATORIO</p>
-                    <h2>El ojo en el cielo</h2>
-                    <p>Este espacio queda preparado para incorporar la futura ficha y los contenidos del Observatorio.</p>
+                <section class="h-100 observatorio-ficha observatorio-navegador" aria-labelledby="navegador-estelar-titulo">
+                    <div class="navegador-estelar__cabecera">
+                        <div>
+                            <p class="observatorio-ficha__eyebrow">CARTOGRAFÍA TRIDIMENSIONAL</p>
+                            <h2 id="navegador-estelar-titulo">Navegador estelar</h2>
+                        </div><label class="navegador-estelar__radio"><span>RADIO</span><select aria-label="Radio visible del mapa estelar" id="navegador-radio">
+                                <option value="12">12 AL</option>
+                                <option value="30" selected="">30 AL</option>
+                                <option value="50">50 AL</option>
+                            </select></label>
+                    </div>
+                    <div id="navegador-estelar" class="navegador-estelar__visor"><canvas id="navegador-estelar-canvas" aria-label="Mapa tridimensional de estrellas próximas"></canvas>
+                        <div class="navegador-estelar__orientacion" aria-hidden="true"><span>+Z</span><i></i><span>PLANO GALÁCTICO</span></div>
+                        <p class="navegador-estelar__ayuda">ARRASTRAR: ORBITAR · RUEDA/PELLIZCO: ZOOM · PULSAR: SELECCIONAR</p>
+                    </div>
+                    <div class="navegador-estelar__lectura" aria-live="polite">
+                        <p><span>SELECCIÓN</span><strong id="navegador-seleccion">SOL</strong></p>
+                        <p><span>CLASE</span><strong id="navegador-clase">G2V</strong></p>
+                        <p><span>DISTANCIA</span><strong id="navegador-distancia">0,00 AL</strong></p>
+                    </div>
+                    <div class="navegador-estelar__acciones"><button id="navegador-origen" type="button">FIJAR ORIGEN</button><button id="navegador-destino" type="button">FIJAR DESTINO</button><button id="navegador-centrar" type="button">CENTRAR AQUÍ</button><button id="navegador-reiniciar" type="button">SOL</button></div>
+                    <div class="navegador-estelar__ruta"><span id="navegador-ruta-nombres">SOL → SIN DESTINO</span><strong id="navegador-ruta-distancia">RUTA NO TRAZADA</strong></div>
+                    <p class="navegador-estelar__credito">DATOS ESTELARES: HYG v4.1 · CC BY-SA 4.0</p>
                 </section>
             </div>
             <div class="col-12 col-lg-7">
@@ -72,6 +91,8 @@
     <script src="assets/js/personajes.js"></script>
     <script src="assets/js/tripulacion.js"></script>
     <script src="assets/js/zeus.js"></script>
+    <script src="assets/js/navegador-estelar-datos.js"></script>
+    <script src="assets/js/navegador-estelar.js"></script>
     <script src="assets/js/observatorio.js"></script>
     <script src="assets/js/planetas.js"></script>
 </body>
