@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
           apariciones: 'Primera aparición: ALÉTHEIA I',
           primeraAparicion: 'ALÉTHEIA I · CAPÍTULO 11 · «EL SEGUNDO DESPERTAR»',
           ordenAparicion: 11,
-          descripcion: 'Mundo menor que la Tierra, cálido y seco, cuyos dos océanos polares contrastan con una extensa franja continental de lagos, montañas y grandes cuencas de impacto. Los cráteres habitables alcanzan los 40 °C, mientras que en los desiertos centrales se han medido máximas de hasta 80 °C. Su rotación prolonga el día hasta las veintinueve horas. Una única luna, sensiblemente menor que la terrestre, orbita el planeta y ejerce una influencia muy reducida sobre las mareas. Una bruma ligera cubre sus continentes y las nubes avanzan lentamente sobre un ecosistema activo y complejo. En los océanos se desplazan enormes criaturas; en tierra, los sensores han registrado organismos de morfología inquietantemente próxima a ciertos mamíferos.',
+          descripcion: 'Mundo menor que la Tierra, cálido y seco, cuyos dos océanos polares contrastan con una extensa franja continental de lagos, montañas y grandes cuencas de impacto. Los cráteres habitables alcanzan los 40 °C, mientras que en los desiertos centrales se han medido máximas de hasta 80 °C. Su rotación prolonga el día hasta las veintinueve horas. Una única luna, sensiblemente menor y más distante que la terrestre, ejerce una influencia muy reducida sobre las mareas. El gran océano austral presenta vientos suaves y corrientes lentas. Una bruma ligera cubre los continentes y las nubes avanzan lentamente sobre un ecosistema activo y complejo. En los océanos se desplazan enormes criaturas; en tierra, los sensores han registrado organismos de morfología inquietantemente próxima a ciertos mamíferos.',
           superficie: 'url("assets/img/observatorio/thalara-mapa-final.webp")',
           usaTextura: true,
           usaAtmosfera: true,
@@ -26,6 +26,53 @@ document.addEventListener('DOMContentLoaded', () => {
           mezclaAtmosfera: 'normal',
           opacidadAtmosfera: '1',
           velocidadAtmosfera: '96s',
+          archivos: [
+            {
+              id: 'archivo-n03',
+              etiqueta: 'RECUPERACIÓN',
+              titulo: 'Un planeta que vuelve a respirar',
+              referencia: 'LA CUARTA SONDA · CAPÍTULOS 10–13 Y 35',
+              tipoRegistro: 'EVOLUCIÓN PLANETARIA · TERCERA NOVELA',
+              notaCanon: 'Esta sección contiene información revelada en La cuarta sonda y puede anticipar la evolución de Thalara posterior a la primera novela.',
+              parrafos: [
+                'El agua del hemisferio sur avanza sobre territorios que permanecieron secos durante milenios. El nuevo mar, somero y cálido, disuelve fosfatos, nitratos y hierro, favoreciendo una rápida proliferación de algas microscópicas y fitoplancton. Su producción de oxígeno tardará décadas en alterar una atmósfera tan extensa, pero confirma que la recuperación ecológica del planeta se está acelerando.',
+                'La costa meridional presenta aguas tranquilas, playas claras, peces de escamas iridiscentes, crustáceos azulados y bosques de madera oscura. La región, más fresca y estable que los cráteres interiores, ha sido elegida para levantar un asentamiento thalariano y las primeras instalaciones humanas permanentes junto al océano.',
+                'Generadores instalados en los acantilados crearán una zona local enriquecida con oxígeno. Mientras tanto, Base THALARA-1 experimenta con cultivos terrestres y estudia cómo introducirlos sin transformar de manera agresiva el ecosistema autóctono.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/thalara-recuperacion-02.webp',
+                  alt: 'La nueva costa austral de Thalara, con aguas someras, peces iridiscentes y crustáceos azulados.',
+                  pie: 'INTERPRETACIÓN VISUAL · LA COSTA AUSTRAL VUELVE A RESPIRAR'
+                },
+                {
+                  src: 'assets/img/observatorio/thalara-resort-construccion-01.webp',
+                  alt: 'Muelle pesquero y primeras construcciones del asentamiento costero de Thalara, con los conversores de oxígeno sobre el acantilado.',
+                  pie: 'RECONSTRUCCIÓN VISUAL · EL ASENTAMIENTO COSTERO EMPIEZA A CRECER'
+                }
+              ]
+            },
+            {
+              id: 'archivo-n02',
+              etiqueta: 'ARCHIVO II',
+              titulo: 'Historia planetaria y protección',
+              referencia: 'SOMBRAS SOBRE THALARA · CAPÍTULO 25 · «AZUL OSCURO»',
+              tipoRegistro: 'CONTENIDO DE LA SEGUNDA NOVELA',
+              notaCanon: 'Esta sección amplía la historia de Thalara con información revelada en Sombras sobre Thalara y puede anticipar elementos de la segunda novela.',
+              parrafos: [
+                'Los registros confirman que Thalara albergó antes del cataclismo una civilización industrializada. Los Ancestros explotaron sus recursos durante generaciones y dejaron tras de sí infraestructuras, depósitos y señales de una historia tecnológica interrumpida por un desastre cósmico.',
+                'La extracción contemporánea no resulta sencilla ni barata: gran parte de los recursos accesibles ya fue utilizada. Algunos impactos posteriores removieron vetas profundas y expusieron minerales como el paladio, pero intervenir en ellas supondría amenazar ecosistemas que sobrevivieron al cataclismo.',
+                'Ante la ONU se propuso reconocer el planeta como hogar de los thalarianos y protegerlo como reserva de vida. La presencia humana queda así subordinada a la conservación del mundo y de sus habitantes.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/thalara-historia-proteccion-01.webp',
+                  alt: 'Ruinas industriales de los Ancestros alrededor de un lago habitado en uno de los antiguos cráteres de Thalara.',
+                  pie: 'RECONSTRUCCIÓN VISUAL · PATRIMONIO INDUSTRIAL Y RESERVA DE VIDA'
+                }
+              ]
+            }
+          ],
           datos: [
   ['SISTEMA', 'TAU CETI'],
   ['TIPO', 'TERRESTRE BIÓTICO'],
@@ -36,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ['MÁXIMA EN CRÁTERES', '40 °C'],
   ['MÍNIMA NOCTURNA', '20 °C · CRÁTERES'],
   ['MÁXIMA REGISTRADA', '80 °C · DESIERTO CENTRAL'],
-  ['SATÉLITES', '1 · LUNA MENOR'],
+  ['SATÉLITES', '1 · LUNA MENOR Y DISTANTE'],
   ['INFLUENCIA MAREAL', 'MUY REDUCIDA'],
   ['BIOSFERA', 'COMPLEJA']
             ]
@@ -111,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 'prospeccion',
       etiqueta: 'PROSPECCIÓN',
       titulo: 'Prospección del hemisferio nocturno',
-      referencia: 'ALÉTHEIA I · CAPÍTULO 8 · «LO QUE CAMBIA EL RUMBO»',
+      referencia: 'ALÉTHEIA I · CAP. 8 · ALÉTHEIA II · CAP. 2',
       tipoRegistro: 'INFERENCIA DEL ARCHIVO',
-      notaCanon: 'La novela confirma el descubrimiento de los yacimientos de rodio, pero no describe el descenso ni identifica a los integrantes del equipo. La operación mostrada a continuación es una reconstrucción compatible con esos datos.',
+      notaCanon: 'ALÉTHEIA I confirma el descubrimiento de los yacimientos de rodio y Sombras sobre Thalara confirma su explotación posterior por EXOWORLDS. Ninguna de las dos novelas describe el descenso ni identifica a los integrantes del equipo; la operación mostrada es una reconstrucción compatible con esos datos.',
       parrafos: [
         'Los registros de la misión sitúan en Sirius AB b el descubrimiento de vastos yacimientos de rodio. Para documentar el hallazgo, el archivo reconstruye una operación de prospección en el hemisferio nocturno, donde un equipo anónimo habría tomado muestras y realizado mediciones mineralógicas protegido de la radiación directa de Sirius.',
         'Años después, EXOWORLDS Co. obtuvo importantes beneficios mediante la explotación de aquel recurso. Parte de ese capital terminó vinculada a la financiación de PRAETORIAE.'
@@ -201,17 +248,61 @@ document.addEventListener('DOMContentLoaded', () => {
       color: '#c2c4b7',
       planetas: [
         {
-          id: 'registro-N02',
-          nombre: 'REGISTRO N-02',
-          subtitulo: 'Clasificación pendiente',
-          clasificacion: 'Expediente en preparación',
-          codigo: 'OBS-S01',
-          estado: 'DATOS PENDIENTES',
+          id: 'l1159-16-b',
+          nombre: 'L1159-16 b',
+          subtitulo: 'Mundo de las cinco lunas',
+          clasificacion: 'Mundo hídrico de alta gravedad',
+          codigo: 'L1159-16 · OBS-L16-01',
+          estado: 'DESCENSO TRIPULADO · EXPLORACIÓN PRELIMINAR',
           apariciones: 'Primera aparición: Sombras sobre Thalara',
-          primeraAparicion: 'SOMBRAS SOBRE THALARA',
-          descripcion: 'Registro reservado para un mundo relacionado con Sombras sobre Thalara.',
-          superficie: 'radial-gradient(circle at 30% 25%, #e5e7ea 0 7%, #9ba8b8 23%, #596878 49%, #252c37 74%)',
-          datos: [['TIPO', 'PENDIENTE'], ['ATMÓSFERA', 'PENDIENTE'], ['GRAVEDAD', 'PENDIENTE'], ['ESTADO', 'ARCHIVADO']]
+          primeraAparicion: 'SOMBRAS SOBRE THALARA · CAPÍTULO 29 · «PARALLAX»',
+          ordenAparicion: 29,
+          descripcion: 'Único planeta detectado alrededor de la enana roja L1159-16. Es aproximadamente un cincuenta por ciento mayor que la Tierra y posee una gravedad sensiblemente superior. Una enorme reserva de agua líquida forma océanos, mares interiores y lagos separados por amplias extensiones de tierra. El clima es frío en términos generales, con grandes casquetes polares, aunque el cinturón ecuatorial mantiene temperaturas cercanas a los 20 °C. Sus cinco grandes lunas provocan mareas complejas, corrientes impredecibles y cambios meteorológicos muy rápidos. La atmósfera contiene oxígeno, pero requiere protección respiratoria. En la superficie se ha observado vida simple semejante al musgo, sin indicios confirmados de fauna compleja.',
+          superficie: 'url("assets/img/observatorio/l1159-16-b-mapa.webp")',
+          usaTextura: true,
+          usaAtmosfera: true,
+          atmosfera: 'url("assets/img/observatorio/l1159-16-b-atmosfera.webp")',
+          mezclaAtmosfera: 'normal',
+          opacidadAtmosfera: '.88',
+          velocidadAtmosfera: '46s',
+          archivos: [
+            {
+              id: 'descenso',
+              etiqueta: 'DESCENSO',
+              titulo: 'Exploración de Olga y Audrey',
+              referencia: 'SOMBRAS SOBRE THALARA · CAPÍTULO 29 · «PARALLAX»',
+              tipoRegistro: 'REGISTRO DE EXPLORACIÓN',
+              notaCanon: 'La designación L1159-16 b sigue el criterio astronómico estándar. La novela identifica el sistema y describe el planeta, pero no le asigna un nombre propio.',
+              parrafos: [
+                'Olga Petrov y Audrey realizaron el primer descenso conocido mientras ARCTURUS intentaba reconstruir su posición. Aterrizaron junto a un mar interior y comprobaron que la gravedad superficial era entre un diez y un veinte por ciento superior a la terrestre.',
+                'La exploración confirmó la presencia de agua líquida y de organismos verdes semejantes al musgo. No detectaron insectos, aves ni otros animales, aunque las capacidades científicas de ARCTURUS eran limitadas y no permiten descartar formas de vida más complejas.',
+                'Las cinco lunas generaban mareas simultáneas y difíciles de predecir. El agua avanzaba desde distintas direcciones y las corrientes profundas no coincidían con las superficiales. En pocas horas, el tiempo pasó de la calma a una tormenta eléctrica; al día siguiente, la temperatura había descendido bajo cero y una zona costera inundada aparecía completamente seca.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/l1159-16-b-superficie-01.webp',
+                  alt: 'ARCTURUS sobre una planicie mareal de L1159-16 b bajo el cielo rojizo, las cinco lunas y una tormenta próxima',
+                  pie: 'REGISTRO DE SUPERFICIE · PRIMER DESCENSO DE OLGA PETROV Y AUDREY'
+                }
+              ]
+            }
+          ],
+          datos: [
+            ['SISTEMA', 'L1159-16'],
+            ['ESTRELLA', 'ENANA ROJA'],
+            ['TIPO', 'MUNDO HÍDRICO'],
+            ['TAMAÑO', '1,5 × TIERRA'],
+            ['GRAVEDAD ESTIMADA', '1,1–1,2 g'],
+            ['ATMÓSFERA', 'OXÍGENO · REQUIERE MÁSCARA'],
+            ['HIDROSFERA', 'OCÉANOS · MARES · LAGOS'],
+            ['CLIMA', 'FRÍO · MUY VARIABLE'],
+            ['TEMPERATURA ECUATORIAL', '≈ 20 °C'],
+            ['CASQUETES POLARES', 'EXTENSOS'],
+            ['SATÉLITES', '5 · GRAN TAMAÑO'],
+            ['MAREAS', 'EXTREMAS · IMPREDECIBLES'],
+            ['BIOSFERA', 'VIDA SIMPLE CONFIRMADA'],
+            ['EXPLORADORES', 'OLGA PETROV · AUDREY']
+          ]
         }
       ]
     },
@@ -220,17 +311,189 @@ document.addEventListener('DOMContentLoaded', () => {
       color: '#d8d8d9',
       planetas: [
         {
-          id: 'registro-N03',
-          nombre: 'REGISTRO N-03',
-          subtitulo: 'Clasificación pendiente',
-          clasificacion: 'Expediente en preparación',
-          codigo: 'OBS-S01',
-          estado: 'DATOS PENDIENTES',
+          id: 'yz-ceti-e',
+          nombre: 'YZ CETI e',
+          subtitulo: 'Mundo magnético',
+          clasificacion: 'Planeta terrestre de magnetismo extremo',
+          codigo: 'YZ CETI · OBS-YZE-01',
+          estado: 'DESCENSO TRIPULADO · RIESGO MAGNÉTICO EXTREMO',
           apariciones: 'Primera aparición: La cuarta sonda',
-          primeraAparicion: 'LA CUARTA SONDA',
-          descripcion: 'Registro reservado para un mundo relacionado con La cuarta sonda.',
-          superficie: 'radial-gradient(circle at 30% 25%, #e5e7ea 0 7%, #9ba8b8 23%, #596878 49%, #252c37 74%)',
-          datos: [['TIPO', 'PENDIENTE'], ['ATMÓSFERA', 'PENDIENTE'], ['GRAVEDAD', 'PENDIENTE'], ['ESTADO', 'ARCHIVADO']]
+          primeraAparicion: 'LA CUARTA SONDA · CAPÍTULO 3 · «LA TRAMPA MAGNÉTICA»',
+          ordenAparicion: 3,
+          descripcion: 'Cuarto mundo identificado en el sistema YZ Ceti. Pese a su masa reducida, presenta una gravedad próxima a la terrestre, atmósfera respirable y grandes masas de agua salina. Su superficie oscura contiene extensas regiones metálicas sometidas a un campo magnético extraordinariamente intenso y desigual. En las zonas de máxima concentración, el planeta puede inmovilizar una nave, saturar sensores y corromper sistemas incluso desde la órbita. Las tormentas mantienen hierro en suspensión y forman granizo azul translúcido con vetas rojizas. Una bacteria adquirida durante la expedición confirma la existencia de vida microbiana autóctona.',
+          superficie: 'url("assets/img/observatorio/yz-ceti-e-mapa-v1.webp")',
+          usaTextura: true,
+          usaAtmosfera: true,
+          atmosfera: 'url("assets/img/observatorio/yz-ceti-e-atmosfera-v3.webp")',
+          mezclaAtmosfera: 'screen',
+          opacidadAtmosfera: '.72',
+          velocidadAtmosfera: '68s',
+          archivos: [
+            {
+              id: 'mision-magnetica',
+              etiqueta: 'MISIÓN',
+              titulo: 'La trampa magnética',
+              referencia: 'LA CUARTA SONDA · CAPÍTULOS 3–7',
+              tipoRegistro: 'REGISTRO DE EXPLORACIÓN',
+              parrafos: [
+                'Olga Petrov dirige el primer descenso junto con Corban y su equipo científico. ARCTURUS queda atrapada sobre una región de magnetismo extremo durante casi tres semanas, sin capacidad para despegar y con graves interferencias en sus sistemas.',
+                'Haru Akiyama desciende posteriormente en una cápsula no metálica. La liberación exige combinar corriente alterna en el casco, calentamiento del terreno, motores gravitatorios y cohetes sólidos de emergencia.',
+                'Tras el rescate se descubre que Olga contrajo una bacteria local. El microorganismo responde a antibióticos, pero dificulta la cicatrización y produce alteraciones neurológicas y conductuales mediante sus metabolitos.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/yz-ceti-e-superficie-01.webp',
+                  alt: 'Tormenta de granizo magnético sobre la superficie oscura y húmeda de YZ Ceti e.',
+                  pie: 'REGISTRO DE SUPERFICIE · TORMENTA DE GRANIZO MAGNÉTICO'
+                }
+              ]
+            }
+          ],
+          datos: [
+            ['SISTEMA', 'YZ CETI'],
+            ['ESTRELLA', 'ENANA ROJA FULGURANTE'],
+            ['TIPO', 'TERRESTRE METÁLICO'],
+            ['MASA', 'MUY BAJA'],
+            ['GRAVEDAD', 'PRÓXIMA A 1 g'],
+            ['ATMÓSFERA', 'RESPIRABLE'],
+            ['HIDROSFERA', 'AGUA LÍQUIDA SALINA'],
+            ['CAMPO MAGNÉTICO', 'EXTREMO · IRREGULAR'],
+            ['TORMENTAS', 'HIERRO · GRANIZO MAGNÉTICO'],
+            ['BIOSFERA', 'VIDA MICROBIANA CONFIRMADA'],
+            ['PRIMER DESCENSO', 'OLGA PETROV · CORBAN'],
+            ['PERMANENCIA EN SUPERFICIE', 'CASI 3 SEMANAS']
+          ]
+        },
+        {
+          id: 'planeta-sismico',
+          nombre: 'PLANETA SÍSMICO',
+          subtitulo: 'Mundo de mareas extremas',
+          clasificacion: 'Planeta terrestre con biosfera y actividad tectónica permanente',
+          codigo: 'SISTEMA SIN DESIGNAR · OBS-SIS-02',
+          estado: 'EXPLORACIÓN TRIPULADA · SEGUNDA SONDA RECUPERADA',
+          apariciones: 'Primera aparición: La cuarta sonda',
+          primeraAparicion: 'LA CUARTA SONDA · CAPÍTULO 16 · «EL PLANETA SÍSMICO»',
+          ordenAparicion: 16,
+          descripcion: 'Mundo de gravedad y temperatura similares a las terrestres, protegido por un campo magnético potente y cubierto parcialmente por océanos polares de azul oscuro. Su atmósfera es respirable, aunque el azufre volcánico, el polvo y la lluvia corrosiva convierten algunas regiones en entornos peligrosos. Una luna cercana de enorme tamaño aparente somete la corteza a fuerzas de marea continuas. El resultado es un planeta arrugado: cordilleras casi ininterrumpidas, valles profundos, cascadas, volcanes, fallas y terremotos constantes. Pese a esa inestabilidad, alberga plantas, líquenes e insectos adaptados al movimiento del terreno.',
+          superficie: 'url("assets/img/observatorio/planeta-sismico-mapa-v2.webp")',
+          usaTextura: true,
+          usaAtmosfera: true,
+          atmosfera: 'url("assets/img/observatorio/planeta-sismico-atmosfera-v1.webp")',
+          mezclaAtmosfera: 'screen',
+          opacidadAtmosfera: '.74',
+          velocidadAtmosfera: '52s',
+          archivos: [
+            {
+              id: 'luna-extrema',
+              etiqueta: 'SATÉLITE',
+              titulo: 'La luna que deforma un mundo',
+              referencia: 'LA CUARTA SONDA · CAPÍTULO 16 · «EL PLANETA SÍSMICO»',
+              tipoRegistro: 'MODELO ORBITAL Y GEOLÓGICO',
+              parrafos: [
+                'El satélite mide aproximadamente la mitad que la Luna terrestre, pero orbita a una cuarta parte de su distancia y se desplaza entre tres y cuatro veces más rápido. Desde la superficie cruza el cielo con un movimiento visible y un diámetro aparente desmesurado.',
+                'Sus fuerzas de marea, estimadas en unas treinta veces las terrestres, afectan tanto a los océanos como a la corteza. Cada paso estira y comprime el planeta, alimentando las fallas, el volcanismo y los terremotos permanentes.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/planeta-sismico-superficie-01.webp',
+                  alt: 'Valle plegado, cascadas y actividad volcánica bajo la enorme luna cercana del planeta sísmico.',
+                  pie: 'REGISTRO DE SUPERFICIE · RELIEVE, CASCADAS Y SATÉLITE CERCANO'
+                }
+              ]
+            },
+            {
+              id: 'segunda-sonda',
+              etiqueta: 'SONDA II',
+              titulo: 'La caverna de fuego',
+              referencia: 'LA CUARTA SONDA · CAPÍTULOS 19–22',
+              tipoRegistro: 'REGISTRO DE RECUPERACIÓN',
+              notaCanon: 'El embrión recuperado de esta sonda se pierde posteriormente al quedar interrumpida su refrigeración tras los daños sufridos por PRAETORIAE.',
+              parrafos: [
+                'La segunda sonda ancestral aparece dentro de una galería volcánica, parcialmente incrustada en lava solidificada. Probablemente penetró en la atmósfera, desacopló su motor y empleó bolsas inflables para amortiguar el impacto.',
+                'Pese a llevar entre cien y doscientos años atrapada, continúa funcionando. En su interior se encuentra un sistema criogénico todavía activo que conserva un embrión ancestral potencialmente vivo.'
+              ]
+            }
+          ],
+          datos: [
+            ['SISTEMA', 'SIN DESIGNACIÓN'],
+            ['ESTRELLA', 'ENANA AMARILLA ESTABLE'],
+            ['TIPO', 'TERRESTRE BIÓTICO'],
+            ['GRAVEDAD', 'SIMILAR A LA TIERRA'],
+            ['ATMÓSFERA', 'RESPIRABLE · DENSA'],
+            ['HIDROSFERA', 'OCÉANOS POLARES · RÍOS'],
+            ['RELIEVE', 'CORDILLERAS CASI CONTINUAS'],
+            ['ACTIVIDAD', 'SÍSMICA Y VOLCÁNICA EXTREMA'],
+            ['SATÉLITES', '1 · ÓRBITA MUY CERCANA'],
+            ['FUERZA MAREAL', '≈ 30 × TIERRA'],
+            ['BIOSFERA', 'PLANTAS · LÍQUENES · INSECTOS'],
+            ['RIESGOS', 'RADIACIÓN · AZUFRE · LLUVIA CORROSIVA']
+          ]
+        },
+        {
+          id: 'mundo-violeta',
+          nombre: 'MUNDO VIOLETA',
+          subtitulo: 'Planeta de 3,6 g',
+          clasificacion: 'Mundo de alta gravedad y órbita extrema',
+          codigo: 'SISTEMA SIN DESIGNAR · OBS-E0-03',
+          estado: 'PROSPECCIÓN REMOTA · EXTRACCIÓN DE ELEMENTO CERO',
+          apariciones: 'Primera aparición: La cuarta sonda',
+          primeraAparicion: 'LA CUARTA SONDA · CAPÍTULO 30 · «ÓRBITA EXTREMA»',
+          ordenAparicion: 30,
+          descripcion: 'Planeta masivo atrapado en una órbita de enorme excentricidad. A lo largo de sus ochocientos días alterna una congelación generalizada, dos pasos por la zona habitable y episodios de sobrecalentamiento cerca de la estrella. La atmósfera densa oculta una superficie violácea sometida a 3,6 g. Bajo el hielo existen depósitos de elemento cero, una materia capaz de absorber radiación y anular sensores. Grandes surcos rectilíneos revelan que otra civilización extrajo millones de toneladas antes de la llegada humana. No se ha detectado vida.',
+          superficie: 'url("assets/img/observatorio/mundo-violeta-mapa-v1.webp")',
+          usaTextura: true,
+          usaAtmosfera: true,
+          atmosfera: 'url("assets/img/observatorio/mundo-violeta-atmosfera-v1.webp")',
+          mezclaAtmosfera: 'screen',
+          opacidadAtmosfera: '.60',
+          velocidadAtmosfera: '108s',
+          archivos: [
+            {
+              id: 'elemento-cero',
+              etiqueta: 'ELEMENTO 0',
+              titulo: 'Materia que absorbe la radiación',
+              referencia: 'LA CUARTA SONDA · CAPÍTULOS 30–34',
+              tipoRegistro: 'ANÁLISIS DE MATERIALES',
+              parrafos: [
+                'El elemento cero absorbe radiación sin reemitirla en forma detectable. En concentraciones altas interrumpe comunicaciones, radar y telemetría hasta hacer desaparecer por completo una nave de los instrumentos.',
+                'Necesita frío y presión para conservar su estado sólido. Disuelto en agua exótica forma una película de ocultación estable durante veinte o treinta minutos. Cuando se satura, cristaliza, pierde sus propiedades y se desintegra.',
+                'No ha podido sintetizarse. Sus posibles aplicaciones incluyen blindaje de reactores, contención de residuos nucleares y protección frente a fugas de radiación.'
+              ]
+            },
+            {
+              id: 'mision-36g',
+              etiqueta: 'MISIÓN',
+              titulo: 'Veinticinco minutos en 3,6 g',
+              referencia: 'LA CUARTA SONDA · CAPÍTULOS 31–33',
+              tipoRegistro: 'REGISTRO DE SUPERFICIE',
+              parrafos: [
+                'Olga Petrov y Marcus Lowe realizan el primer descenso con trajes HÉRCULES H-10 y una lanzadera reducida a sus componentes esenciales. La gravedad, la presión atmosférica y el esfuerzo circulatorio limitan la permanencia humana a veinticinco minutos.',
+                'Marcus obtiene muestras de elemento cero y recupera una aleación perteneciente a una estructura mayor. El hallazgo demuestra la existencia de un tercer actor tecnológico, distinto de la humanidad y de los Ancestros.',
+                'Las operaciones posteriores se realizan con un vehículo oruga y una lanzadera no tripulada, sometidos a mantenimiento después de cada ciclo de extracción.'
+              ],
+              imagenes: [
+                {
+                  src: 'assets/img/observatorio/mundo-violeta-superficie-02.webp',
+                  alt: 'Olga y Marcus con trajes HÉRCULES junto al surco de extracción abierto en la superficie violeta.',
+                  pie: 'RECONSTRUCCIÓN VISUAL · PRIMER DESCENSO EN 3,6 g'
+                }
+              ]
+            }
+          ],
+          datos: [
+            ['SISTEMA', 'SIN DESIGNACIÓN'],
+            ['TIPO', 'MUNDO DE ALTA GRAVEDAD'],
+            ['GRAVEDAD', '3,6 g'],
+            ['PERIODO ORBITAL', '≈ 800 DÍAS'],
+            ['ÓRBITA', 'EXTREMADAMENTE EXCÉNTRICA'],
+            ['AGUA LÍQUIDA', '≈ 300 DÍAS POR CICLO'],
+            ['ATMÓSFERA', 'MUY DENSA'],
+            ['SUPERFICIE', 'HIELO · TERRENO VIOLETA'],
+            ['BIOSFERA', 'NO DETECTADA'],
+            ['RECURSO', 'ELEMENTO CERO'],
+            ['PERMANENCIA HUMANA', 'MÁXIMO 25 MINUTOS'],
+            ['EVIDENCIA', 'EXTRACCIÓN ALIENÍGENA ANTERIOR']
+          ]
         }
       ]
     }
