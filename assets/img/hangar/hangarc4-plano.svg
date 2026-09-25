@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1040"
+   height="1040"
+   viewBox="0 0 1040 1040"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="hangarc4-plano.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#c2c2c2"
+     showguides="false"
+     inkscape:zoom="0.99999996"
+     inkscape:cx="577.00003"
+     inkscape:cy="441.00002"
+     inkscape:window-width="1920"
+     inkscape:window-height="1010"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6" />
+  <title
+     id="title1">ALÉTHEIA módulo 50m, interior 49m</title>
+  <desc
+     id="desc1">Escala 10 px = 1 m. Puertas de 4 m centradas en cada arista. Zonas interiores libres con rayado técnico tenue.</desc>
+  <defs
+     id="defs6">
+    <pattern
+       id="rayado-tecnico"
+       width="12"
+       height="12"
+       patternUnits="userSpaceOnUse"
+       patternTransform="rotate(45)">
+      <line
+         x1="0"
+         y1="0"
+         x2="0"
+         y2="12"
+         style="stroke:#8a8a8a;stroke-width:1;stroke-opacity:0.18"
+         id="line1" />
+    </pattern>
+    <rect
+       x="712.5"
+       y="276.09382"
+       width="58.75"
+       height="20.906181"
+       id="rect157" />
+    <rect
+       x="826.84576"
+       y="59.39697"
+       width="152.49714"
+       height="122.43413"
+       id="rect142" />
+    <rect
+       x="619.5"
+       y="144"
+       width="67.980412"
+       height="18.34439"
+       id="rect8" />
+    <mask
+       id="puertas">
+      <rect
+         width="1040"
+         height="1040"
+         fill="white"
+         id="rect1" />
+      <polygon
+         points="728.185869,119.412213 762.827131,139.411787 744.827131,170.587787 710.185869,150.588213"
+         fill="black"
+         id="polygon1" />
+      <polygon
+         points="971.013,500.000 971.013,540.000 935.013,540.000 935.013,500.000"
+         fill="black"
+         id="polygon2" />
+      <polygon
+         points="762.827131,900.588213 728.185869,920.587787 710.185869,889.411787 744.827131,869.412213"
+         fill="black"
+         id="polygon3" />
+      <polygon
+         points="311.814131,920.587787 277.172869,900.588213 295.172869,869.412213 329.814131,889.411787"
+         fill="black"
+         id="polygon4" />
+      <polygon
+         points="68.987,540.000 68.987,500.000 104.987,500.000 104.987,540.000"
+         fill="black"
+         id="polygon5" />
+      <polygon
+         points="277.172869,139.411787 311.814131,119.412213 329.814131,150.588213 295.172869,170.587787"
+         fill="black"
+         id="polygon6" />
+    </mask>
+    <rect
+       x="619.5"
+       y="144"
+       width="67.980415"
+       height="18.344391"
+       id="rect8-5" />
+    <rect
+       x="619.5"
+       y="144"
+       width="67.980415"
+       height="18.344391"
+       id="rect8-5-6" />
+    <rect
+       x="619.5"
+       y="144"
+       width="67.980415"
+       height="18.344391"
+       id="rect8-8" />
+  </defs>
+  <polygon
+     id="zonas-tecnicas-rayadas"
+     points="520,30 944.352,275 944.352,765 520,1010 95.648,765 95.648,275"
+     fill="#ffffff" />
+  <path
+     id="rect3-7-6"
+     style="fill:#999999;fill-opacity:0.819608;stroke:#000000;stroke-width:0.27395;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 618.375 86.796875 L 618.96484 96.835938 L 404.61523 96.835938 L 264.41992 177.25391 L 279.46094 203.41797 L 412.47852 126.62109 L 627.9082 126.62109 L 916.05273 293.11328 L 915.94141 746.94531 L 627.05078 913.73633 L 412.71289 913.73633 L 279.68164 836.83203 L 264.56641 863.01172 L 404.61523 943.52148 L 635.20898 943.52148 L 635.20898 943.28516 L 635.26367 943.3125 L 944.35156 765 L 944.35156 275 L 618.375 86.796875 z " />
+  <path
+     id="sector-a-rect101-9-7-9-4-3-3-rot240-1-15-7-01-1-3-7-2-0-5-9-8-6-2-5-5-8-7-7-2-7-3-7-5-6-22-7-1-78-8-9-7-6"
+     style="fill:#ff0000;fill-opacity:0.819608;stroke:#62cfe5;stroke-width:0.3;stroke-dasharray:none"
+     class="cabin"
+     d="M 405.06629,96.477503 520,30 634.75719,96.477553 Z"
+     sodipodi:nodetypes="cccc" />
+  <path
+     id="estructura-perimetral"
+     d="M 520,20 953.013,270 V 770 L 520,1020 86.987,770 V 270 Z m 0,10 424.352,245 V 765 L 732.176,887.5 520,1010 307.824,887.5 95.648,765 V 520 275 Z"
+     fill="#666666"
+     fill-rule="evenodd"
+     mask="url(#puertas)"
+     sodipodi:nodetypes="ccccccccccccccccc" />
+  <g
+     id="guias"
+     fill="none"
+     stroke="#222"
+     stroke-width="1"
+     opacity=".65">
+    <polygon
+       id="hexagono-exterior-50m"
+       points="520.000,20.000 953.013,270.000 953.013,770.000 520.000,1020.000 86.987,770.000 86.987,270.000" />
+    <polygon
+       id="hexagono-interior-49m"
+       points="520.000,30.000 944.352,275.000 944.352,765.000 520.000,1010.000 95.648,765.000 95.648,275.000" />
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-size:8px;writing-mode:lr-tb;direction:ltr;fill:#28220b;fill-opacity:0.941176;stroke-width:1;stroke-miterlimit:0;stroke-dasharray:none"
+     x="701.5"
+     y="93.875"
+     id="text9"><tspan
+       sodipodi:role="line"
+       id="tspan9"
+       x="701.5"
+       y="93.875" /></text>
+  <g
+     id="sector-c-8"
+     transform="matrix(1.1172361,0,0,1.0157084,-588.17245,-600.70357)"
+     style="stroke-width:0.50904;stroke-dasharray:none">
+    <g
+       id="nucleo-ascensor-escalera-8"
+       stroke="#91e9ff"
+       stroke-width="1.4"
+       stroke-linejoin="miter"
+       transform="translate(758.78286,615.34569)"
+       style="stroke-width:0.50904;stroke-dasharray:none">
+      <!-- contorno del hueco disponible -->
+      <!-- hueco de ascensor: 3.0 &#215; 4.0 m, suficiente para un ascensor grande -->
+      <!-- escalera protegida: 3.7 &#215; 5.0 m; pelda&#241;os esquem&#225;ticos -->
+      <rect
+         id="caja-escalera-1-7"
+         x="234.5885"
+         y="30.143406"
+         width="29.096502"
+         height="40.909775"
+         fill="#10485c"
+         style="stroke-width:0.440674;stroke-dasharray:none" />
+      <path
+         id="peldaños-7-4"
+         d="m 236.69693,32.809233 h 24.45794 m -24.45794,3.554435 h 24.45794 m -24.45794,3.554437 h 24.45794 m -24.45794,3.554435 h 24.45794 m -24.45794,3.554436 h 24.45794 m -24.45794,3.554436 h 24.45794 m -24.45794,3.554435 h 24.45794 m -24.45794,3.554436 h 24.45794 m -24.45794,3.554435 h 24.45794 m -24.45794,3.554436 h 24.45794 m -24.45794,3.554436 h 24.45794"
+         fill="none"
+         stroke="#91e9ff"
+         stroke-width="0.9"
+         style="stroke-width:0.440674;stroke-dasharray:none" />
+      <path
+         d="M 248.9259,65.687763 V 35.47506 m -4.21689,4.443045 4.21689,-4.443045 4.21689,4.443045 m -8.43378,21.326613 4.21689,4.443045 4.21689,-4.443045"
+         fill="none"
+         stroke="#ffffff"
+         stroke-width="1.4"
+         id="path2-4-1-5"
+         style="stroke-width:0.440674;stroke-dasharray:none" />
+      <rect
+         id="hueco-ascensor-4-9"
+         x="201.9649"
+         y="32.165642"
+         width="29.043333"
+         height="38.887539"
+         rx="0"
+         fill="#a75cc5"
+         style="stroke-width:0.493844;stroke-dasharray:none" />
+      <rect
+         id="cabina-ascensor-5-8"
+         x="204.86923"
+         y="36.054398"
+         width="23.234667"
+         height="31.110031"
+         fill="#d09ae3"
+         stroke="#eec8ff"
+         stroke-width="0.8"
+         style="stroke-width:0.493844;stroke-dasharray:none" />
+      <path
+         d="m 216.48656,41.887526 v 19.443769 m -4.84056,-14.582826 4.84056,-4.860943 4.84056,4.860943 m -9.68112,9.721884 4.84056,4.860942 4.84056,-4.860942"
+         fill="none"
+         stroke="#ffffff"
+         stroke-width="1.5"
+         id="path1-5-5-3"
+         style="stroke-width:0.493844;stroke-dasharray:none" />
+      <rect
+         id="hueco-ascensor-4-2"
+         x="266.79138"
+         y="41.923607"
+         width="22.004396"
+         height="29.163784"
+         rx="0"
+         fill="#a75cc5"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+      <rect
+         id="cabina-ascensor-5-2"
+         x="268.99182"
+         y="44.839989"
+         width="17.603518"
+         height="23.331026"
+         fill="#d09ae3"
+         stroke="#eec8ff"
+         stroke-width="0.8"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+      <path
+         d="m 277.7936,49.214552 v 14.581892 m -3.6674,-10.936419 3.6674,-3.645473 3.6674,3.645473 m -7.3348,7.290946 3.6674,3.645473 3.6674,-3.645473"
+         fill="none"
+         stroke="#ffffff"
+         stroke-width="1.5"
+         id="path1-5-5-36"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+      <rect
+         id="hueco-ascensor-4-2-0"
+         x="177.26183"
+         y="41.919426"
+         width="22.004396"
+         height="29.163784"
+         rx="0"
+         fill="#a75cc5"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+      <rect
+         id="cabina-ascensor-5-2-2"
+         x="179.46227"
+         y="44.835808"
+         width="17.603518"
+         height="23.331026"
+         fill="#d09ae3"
+         stroke="#eec8ff"
+         stroke-width="0.8"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+      <path
+         d="m 188.26404,49.210372 v 14.581892 m -3.6674,-10.936419 3.6674,-3.645473 3.6674,3.645473 m -7.3348,7.290946 3.6674,3.645473 3.6674,-3.645473"
+         fill="none"
+         stroke="#ffffff"
+         stroke-width="1.5"
+         id="path1-5-5-36-6"
+         style="stroke-width:0.372253;stroke-dasharray:none" />
+    </g>
+  </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>ALÉTHEIA módulo 50m, interior 49m</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <text
+     xml:space="preserve"
+     id="text142"
+     style="font-size:8px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect142);display:inline;fill:#21638e;fill-opacity:0.819608;stroke:#136474;stroke-width:0.5;stroke-miterlimit:0" />
+  <text
+     xml:space="preserve"
+     id="text157"
+     style="font-size:16px;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect157);display:inline;fill:#11354a;fill-opacity:0.819608;stroke:#136474;stroke-width:0.5;stroke-miterlimit:0" />
+  <path
+     id="sector-a-rect101-9-7-9-4-3-3-rot240-1-15-7-01-1-3-7-2-0-5-9-8-6-2-5-5-8-7-7-2-7-3-7-5-6-22-7-1-78-8-9-7-6-6"
+     style="fill:#ff0000;fill-opacity:0.819608;stroke:#62cfe5;stroke-width:0.3;stroke-dasharray:none"
+     class="cabin"
+     d="M 405.06629,943.5225 520,1010 634.75719,943.5224 Z"
+     sodipodi:nodetypes="cccc" />
+  <rect
+     id="caja-escalera-1-7-1"
+     x="521.6579"
+     y="-985.07489"
+     width="32.507664"
+     height="41.552402"
+     fill="#10485c"
+     style="stroke-width:0.469434;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <path
+     id="peldaños-7-4-1"
+     d="m 524.0135,982.36716 h 27.3253 m -27.3253,-3.61027 h 27.3253 m -27.3253,-3.61027 h 27.3253 m -27.3253,-3.61027 h 27.3253 m -27.3253,-3.61027 h 27.3253 m -27.3253,-3.61028 h 27.3253 m -27.3253,-3.6103 h 27.3253 m -27.3253,-3.6102 h 27.3253 m -27.3253,-3.6103 h 27.3253 m -27.3253,-3.6103 h 27.3253 m -27.3253,-3.6102 h 27.3253"
+     fill="none"
+     stroke="#91e9ff"
+     stroke-width="0.9"
+     style="stroke-width:0.469434;stroke-dasharray:none" />
+  <path
+     d="m 537.67615,948.9722 v 30.68725 m -4.71126,-4.51283 4.71126,4.51283 4.71126,-4.51283 m -9.42252,-21.66162 4.71126,-4.5128 4.71126,4.5128"
+     fill="none"
+     stroke="#ffffff"
+     stroke-width="1.4"
+     id="path2-4-1-5-7"
+     style="stroke-width:0.469434;stroke-dasharray:none" />
+  <rect
+     id="hueco-ascensor-4-9-3"
+     x="485.20963"
+     y="-983.02087"
+     width="32.448261"
+     height="39.498402"
+     rx="0"
+     fill="#a75cc5"
+     style="stroke-width:0.526074;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <rect
+     id="cabina-ascensor-5-8-0"
+     x="488.45444"
+     y="-979.07104"
+     width="25.958609"
+     height="31.598721"
+     fill="#d09ae3"
+     stroke="#eec8ff"
+     stroke-width="0.8"
+     style="stroke-width:0.526074;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <path
+     d="M 501.43375,973.14626 V 953.3971 m -5.40805,14.81186 5.40805,4.9373 5.40805,-4.9373 m -10.8161,-9.87456 5.40805,-4.9373 5.40805,4.9373"
+     fill="none"
+     stroke="#ffffff"
+     stroke-width="1.5"
+     id="path1-5-5-3-0"
+     style="stroke-width:0.526074;stroke-dasharray:none" />
+  <rect
+     id="hueco-ascensor-4-2-4"
+     x="557.63611"
+     y="-973.10968"
+     width="24.584106"
+     height="29.621901"
+     rx="0"
+     fill="#a75cc5"
+     style="stroke-width:0.396547;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <rect
+     id="cabina-ascensor-5-2-8"
+     x="560.09454"
+     y="-970.14746"
+     width="19.667286"
+     height="23.697519"
+     fill="#d09ae3"
+     stroke="#eec8ff"
+     stroke-width="0.8"
+     style="stroke-width:0.396547;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <path
+     d="M 569.92819,965.70414 V 950.8932 m -4.09735,11.1082 4.09735,3.70274 4.09735,-3.70274 m -8.1947,-7.4055 4.09735,-3.7027 4.09735,3.7027"
+     fill="none"
+     stroke="#ffffff"
+     stroke-width="1.5"
+     id="path1-5-5-36-3"
+     style="stroke-width:0.396547;stroke-dasharray:none" />
+  <rect
+     id="hueco-ascensor-4-2-0-0"
+     x="457.61044"
+     y="-973.11389"
+     width="24.584106"
+     height="29.621901"
+     rx="0"
+     fill="#a75cc5"
+     style="stroke-width:0.396547;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <rect
+     id="cabina-ascensor-5-2-2-1"
+     x="460.06888"
+     y="-970.15173"
+     width="19.667286"
+     height="23.697519"
+     fill="#d09ae3"
+     stroke="#eec8ff"
+     stroke-width="0.8"
+     style="stroke-width:0.396547;stroke-dasharray:none"
+     transform="scale(1,-1)" />
+  <path
+     d="M 469.90253,965.70838 V 950.8974 m -4.09735,11.10824 4.09735,3.70274 4.09735,-3.70274 m -8.1947,-7.40544 4.09735,-3.7028 4.09735,3.7028"
+     fill="none"
+     stroke="#ffffff"
+     stroke-width="1.5"
+     id="path1-5-5-36-6-2"
+     style="stroke-width:0.396547;stroke-dasharray:none" />
+  <g
+     id="guias-2"
+     fill="none"
+     stroke="#222222"
+     stroke-width="1"
+     opacity="0.65"
+     transform="matrix(0.1997712,0,0,0.1997672,416.11898,416.08899)"
+     style="fill:#28220b" />
+  <path
+     id="rect2"
+     style="fill:#00ffff;fill-opacity:0.819608;stroke:#000000;stroke-width:0.283369;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 395.14168,594.85831 H 644.85831 V 445.14168 H 395.14168 Z" />
+  <path
+     id="rect2-8"
+     style="fill:#66ff00;fill-opacity:0.819608;stroke:#000000;stroke-width:0.186242;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 717.50485,564.90688 H 897.31862 V 475.09312 H 717.50485 Z" />
+  <path
+     id="rect2-8-5"
+     style="fill:#66ff00;fill-opacity:0.819608;stroke:#000000;stroke-width:0.186242;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 430.09311,564.90688 H 609.90688 V 475.09311 H 430.09311 Z" />
+  <path
+     id="rect2-9-2"
+     style="fill:#666666;fill-opacity:0.819608;stroke:#000000;stroke-width:0.346957;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 95.821478,632.32652 H 345.31092 V 407.67347 H 95.821478 Z" />
+  <path
+     id="rect2-9"
+     style="fill:#ffff00;fill-opacity:0.819608;stroke:#000000;stroke-width:0.327219;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 95.648,619.83639 H 345.32079 V 420.16361 H 95.648 Z" />
+  <path
+     id="rect3"
+     style="fill:#d35f5f;fill-opacity:0.819608;stroke:#000000;stroke-width:0.3;stroke-linecap:square;stroke-miterlimit:0"
+     d="m 95.648,765 3e-6,-38.08423 820.264607,0.24359 0.0288,19.78595 -288.89063,166.79102 H 412.71289 l -133.03125,-76.9043 -15.11523,26.17969 z"
+     sodipodi:nodetypes="ccccccccc" />
+  <path
+     id="rect5"
+     style="fill:#d35f5f;fill-opacity:0.819608;stroke:#000000;stroke-width:0.3;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 412.47852,126.62109 H 627.9082 l 288.14453,166.49219 -0.5,19.49343 -819.866001,0.2436 L 95.648,275 l 168.77192,-97.74609 15.04102,26.16406 z"
+     sodipodi:nodetypes="ccccccccc" />
+  <path
+     style="fill:#666666;fill-opacity:0.819608;stroke:#000000;stroke-width:0.349556;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 370.78885,613.90241 V 726.13005 H 345.65918 V 613.90241 Z"
+     id="rect4"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     style="fill:#666666;fill-opacity:0.819608;stroke:#000000;stroke-width:0.349556;stroke-linecap:square;stroke-miterlimit:0"
+     d="m 345.65918,313.67477 h 25.12967 v 112.22764 h -25.12967 z"
+     id="rect4-9"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     style="fill:#666666;fill-opacity:0.819608;stroke:#000000;stroke-width:0.349556;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 108.38631,520.09888 V 632.32652 H 83.256643 V 520.09888 Z"
+     id="rect4-8"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     style="fill:#666666;fill-opacity:0.819608;stroke:#000000;stroke-width:0.349556;stroke-linecap:square;stroke-miterlimit:0"
+     d="M 83.256643,407.67347 H 108.38631 V 519.90111 H 83.256643 Z"
+     id="rect4-9-8"
+     sodipodi:nodetypes="ccccc" />
+</svg>

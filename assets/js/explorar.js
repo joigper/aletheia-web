@@ -512,6 +512,7 @@ L1_017: {
         L1_073: {
     nombre: "HANGAR 1-1",
     area: "Operaciones espaciales",
+    enlace: "hangar.html",
     imagen: "assets/img/HANGAR0101.jpg",
     imagenAlt:
         "Hangar pesado HANGAR 1-1 de ALÉTHEIA",
@@ -653,6 +654,7 @@ L1_061: {
         L1_083: {
     nombre: "HANGAR 1-3",
     area: "Operaciones de vuelo",
+    enlace: "hangar.html",
     imagen: "assets/img/HANGAR0103.jpg",
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
@@ -662,6 +664,7 @@ L1_061: {
         L2_019: {
     nombre: "HANGAR 2-01",
     area: "Operaciones de vuelo",
+    enlace: "hangar.html",
     imagen: "assets/img/HANGAR0201.jpg",
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
@@ -671,6 +674,7 @@ L1_061: {
         L1_063: {
     nombre: "HANGAR 1-2",
     area: "Operaciones de vuelo",
+    enlace: "hangar.html",
     imagen: "assets/img/HANGAR0102.jpg",
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
