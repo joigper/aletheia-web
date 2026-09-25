@@ -46,9 +46,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (seconds < 10) return "APERTURA DE COMPUERTAS INTERIORES";
     if (seconds < 14) return "TRANSFERENCIA AL ASCENSOR CENTRAL";
     if (seconds < 16) return "CIERRE DEL SECTOR DE RECEPCIÓN";
-    if (seconds < 20) return "DESCENSO A CUBIERTA 3";
-    if (seconds < 26) return "TRASLADO SAGH A ESTACIONAMIENTO";
+    if (seconds < 18) return "DESCENSO DEL DISCO DE MANIOBRA";
+    if (seconds < 22) return "GIRO CONTROLADO DE 180°";
+    if (seconds < 24) return "LIBERACIÓN Y RETIRADA DEL DISCO";
+    if (seconds < 28) return "DESCENSO A CUBIERTA 3";
+    if (seconds < 34) return "TRASLADO SAGH A ESTACIONAMIENTO";
     return "CICLO COMPLETADO";
+  };
+
+  let statusFrame = null;
+  let cycleRunning = false;
+
+  const updateCycleStatus = () => {
+    status.textContent = stageAt(modelViewer.currentTime || 0);
+    if (cycleRunning) {
+      statusFrame = requestAnimationFrame(updateCycleStatus);
+    }
   };
 
   modelViewer.addEventListener("load", () => {
@@ -66,11 +79,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     status.textContent = "SISTEMA PREPARADO";
   });
 
-  modelViewer.addEventListener("timeupdate", () => {
-    if (!modelViewer.paused) status.textContent = stageAt(modelViewer.currentTime);
-  });
-
   modelViewer.addEventListener("finished", () => {
+    if (statusFrame) cancelAnimationFrame(statusFrame);
+    statusFrame = null;
+    cycleRunning = false;
     status.textContent = "CICLO COMPLETADO";
     playButton.textContent = "REPETIR CICLO";
   });
@@ -80,7 +92,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     modelViewer.currentTime = 0;
     modelViewer.play({ repetitions: 1 });
     playButton.textContent = "REINICIAR CICLO";
-    status.textContent = stageAt(0);
+    if (statusFrame) cancelAnimationFrame(statusFrame);
+    cycleRunning = true;
+    updateCycleStatus();
   });
 
   modelViewer.src = "assets/img/hangar/hangar-estructura.glb";
