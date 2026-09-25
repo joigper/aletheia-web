@@ -42,6 +42,50 @@
   font-size: clamp(1rem, 2.2vw, 1.6rem);
 }
 
+.hangar-cycle {
+  position: absolute;
+  z-index: 3;
+  top: clamp(16px, 2.5vw, 30px);
+  right: clamp(16px, 2.5vw, 30px);
+  display: flex;
+  max-width: min(340px, 42%);
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.hangar-cycle__button {
+  padding: 11px 14px;
+  border: 1px solid #e8b34b;
+  background: rgba(24, 31, 35, .9);
+  color: #ffd46f;
+  font-family: Tektur, sans-serif;
+  font-size: .68rem;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+
+.hangar-cycle__button:hover, .hangar-cycle__button:focus-visible {
+  background: rgba(113, 77, 13, .92);
+  color: #fff4c9;
+  outline: none;
+}
+
+.hangar-cycle__button:disabled {
+  cursor: wait;
+  opacity: .48;
+}
+
+.hangar-cycle__status {
+  min-height: 1.3em;
+  margin: 0;
+  color: #ffd46f;
+  font-family: Tektur, sans-serif;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  text-align: right;
+}
+
 .hangar-structure__hint {
   position: absolute;
   z-index: 2;
@@ -72,6 +116,29 @@
   .hangar-structure__title {
     top: 16px;
     left: 16px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hangar-cycle {
+    top: 84px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hangar-cycle__button {
+    padding: 9px 11px;
+    font-size: .58rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hangar-cycle__status {
+    text-align: left;
   }
 }
 
