@@ -284,20 +284,6 @@
   background: linear-gradient(145deg, rgba(21, 46, 65, 0.72), rgba(7, 15, 25, 0.9));
 }
 
-.nave-ficha__comparacion-visual {
-  margin-top: 1.25rem;
-  overflow: hidden;
-  border: 1px solid rgba(111, 214, 255, 0.18);
-  border-radius: 10px;
-  background: #051723;
-}
-
-.nave-ficha__comparacion-visual img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .nave-ficha__curiosidad-dato {
   margin-top: 1.25rem;
   padding: 1.25rem;
@@ -339,6 +325,366 @@
   margin: 0;
   color: #ffffff;
   font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+/* =========================================   ANIMACIÓN DE ESCALA   ========================================= */
+
+.curiosidades-animacion {
+  margin-top: 1.25rem;
+}
+
+.curiosidades-animacion__escena {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(430px, 0.9fr);
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(111, 214, 255, 0.2);
+  border-radius: 10px;
+  background: #03131f;
+}
+
+.curiosidades-animacion__escena svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  align-self: center;
+  color: rgba(77, 158, 184, 0.35);
+}
+
+.curiosidades-animacion__grid {
+  opacity: 0.62;
+}
+
+.curiosidades-animacion__crucero {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(2.15);
+  color: #ffc766;
+}
+
+.curiosidades-animacion__crucero path:first-child {
+  fill: rgba(181, 132, 53, 0.34);
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.curiosidades-animacion__crucero .detalle {
+  fill: none;
+  stroke: #ffe1a2;
+  stroke-width: 1.2;
+}
+
+.curiosidades-animacion__crucero text, .curiosidades-animacion__aletheia text, .curiosidades-animacion__cotas-finales text {
+  fill: currentColor;
+  font-family: "Tektur", sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-anchor: middle;
+}
+
+.curiosidades-animacion__aletheia {
+  color: #6fd6ff;
+  opacity: 0;
+}
+
+.curiosidades-animacion__aletheia rect {
+  fill: rgba(22, 137, 169, 0.16);
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-dasharray: 2200;
+  stroke-dashoffset: 2200;
+}
+
+.curiosidades-animacion__aletheia path {
+  fill: none;
+  stroke: rgba(190, 245, 255, 0.6);
+  stroke-width: 1;
+}
+
+.curiosidades-animacion__cotas-finales {
+  color: #a4d9e8;
+  opacity: 0;
+}
+
+.curiosidades-animacion__cotas-finales line {
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.curiosidades-animacion__datos {
+  position: static;
+  width: 100%;
+  padding: 1.15rem 1rem;
+  border-left: 1px solid rgba(111, 214, 255, 0.2);
+  background: linear-gradient(135deg, rgba(7, 25, 39, 0.98), rgba(3, 15, 25, 0.98));
+  color: #ffffff;
+}
+
+.curiosidades-animacion__datos-cabecera, .curiosidades-animacion__dato {
+  display: grid;
+  grid-template-columns: minmax(108px, 0.9fr) minmax(135px, 1fr) minmax(155px, 1.2fr);
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.curiosidades-animacion__datos-cabecera {
+  padding: 0 0.65rem 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.44);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.curiosidades-animacion__datos-cabecera strong:nth-child(2) {
+  color: #ffc766;
+}
+
+.curiosidades-animacion__datos-cabecera strong:nth-child(3) {
+  color: #6fd6ff;
+  opacity: 0;
+}
+
+.curiosidades-animacion__revelacion {
+  position: absolute;
+  right: 40%;
+  bottom: 1.15rem;
+  left: 0;
+  text-align: center;
+  opacity: 0;
+}
+
+.curiosidades-animacion__dato {
+  min-height: 2.55rem;
+  padding: 0.48rem 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.curiosidades-animacion__dato span {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.curiosidades-animacion__dato strong {
+  font-size: clamp(0.68rem, 1.05vw, 0.92rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.curiosidades-animacion__valor-legend {
+  color: #ffc766;
+}
+
+.curiosidades-animacion__valor-aletheia {
+  color: #6fd6ff;
+  opacity: 0;
+  transform: translateX(8px);
+}
+
+.curiosidades-animacion__revelacion {
+  color: #ffffff;
+  font-family: "Tektur", sans-serif;
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
+  letter-spacing: 0.18em;
+}
+
+.curiosidades-animacion__controles {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.65rem;
+}
+
+.curiosidades-animacion__controles button {
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(111, 214, 255, 0.3);
+  border-radius: 7px;
+  background: rgba(12, 17, 24, 0.78);
+  color: #d5dbe2;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__crucero {
+  animation: crucero-alejar 10.5s ease-in-out forwards;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__dato {
+  animation: dato-fijar 0.45s ease forwards;
+  animation-delay: calc(0.55s + var(--dato-indice) * 0.58s);
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__datos-cabecera strong:nth-child(3), .curiosidades-animacion.is-playing .curiosidades-animacion__valor-aletheia {
+  animation: columna-aletheia 0.8s ease 6.8s forwards;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__revelacion {
+  animation: revelacion-texto 1.25s ease 6.3s both;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__aletheia {
+  animation: aletheia-aparecer 2.2s ease 7.1s forwards;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__aletheia rect {
+  animation: contorno-dibujar 2.2s ease 7.1s forwards;
+}
+
+.curiosidades-animacion.is-playing .curiosidades-animacion__cotas-finales {
+  animation: cotas-aparecer 1s ease 9s forwards;
+}
+
+.curiosidades-animacion.is-complete .curiosidades-animacion__crucero {
+  transform: scale(1);
+}
+
+.curiosidades-animacion.is-complete .curiosidades-animacion__aletheia, .curiosidades-animacion.is-complete .curiosidades-animacion__cotas-finales {
+  opacity: 1;
+}
+
+.curiosidades-animacion.is-complete .curiosidades-animacion__dato, .curiosidades-animacion.is-complete .curiosidades-animacion__datos-cabecera strong:nth-child(3), .curiosidades-animacion.is-complete .curiosidades-animacion__valor-aletheia {
+  opacity: 1;
+  transform: none;
+}
+
+.curiosidades-animacion.is-complete .curiosidades-animacion__aletheia rect {
+  stroke-dashoffset: 0;
+}
+
+@keyframes dato-fijar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes columna-aletheia {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes revelacion-texto {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  35%, 75% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes crucero-alejar {
+  0%, 66% {
+    transform: scale(2.15);
+  }
+  82%, 100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes aletheia-aparecer {
+  0% {
+    opacity: 0;
+  }
+  30%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes contorno-dibujar {
+  from {
+    stroke-dashoffset: 2200;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cotas-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curiosidades-animacion__crucero {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curiosidades-animacion__aletheia, .curiosidades-animacion__cotas-finales {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curiosidades-animacion__aletheia rect {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curiosidades-animacion__dato, .curiosidades-animacion__datos-cabecera strong:nth-child(3), .curiosidades-animacion__valor-aletheia {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .curiosidades-animacion__escena {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .curiosidades-animacion__datos {
+    position: static;
+    width: 100%;
+    padding: 0.75rem;
+    border-top: 1px solid rgba(111, 214, 255, 0.2);
+    border-left: 0;
+    background: rgba(3, 19, 31, 0.96);
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .curiosidades-animacion__datos-cabecera, .curiosidades-animacion__dato {
+    grid-template-columns: minmax(90px, 1.15fr) repeat(2, minmax(85px, 1fr));
+  }
+}
+
+@media (max-width: 1099.98px) {
+  .curiosidades-animacion__revelacion {
+    display: none;
+  }
 }
 
 .nave-ficha__curiosidades-cifra {

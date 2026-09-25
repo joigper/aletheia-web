@@ -90,6 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         : "";
 
+    const datosAnimacionHtml = nave.curiosidad?.referencia?.datos
+        ?.map((dato, indice) => `
+            <div
+                class="curiosidades-animacion__dato"
+                style="--dato-indice: ${indice}"
+            >
+                <span>${dato.etiqueta}</span>
+                <strong class="curiosidades-animacion__valor-legend">${dato.valor}</strong>
+                <strong class="curiosidades-animacion__valor-aletheia">${dato.aletheia}</strong>
+            </div>
+        `).join("") || "";
+
     const panelCuriosidadesHtml = nave.curiosidad
         ? `
             <div class="nave-ficha__curiosidades">
@@ -102,12 +114,79 @@ document.addEventListener("DOMContentLoaded", () => {
                         Comparaciones visuales
                     </p>
                     <h3>ALÉTHEIA frente a escalas terrestres</h3>
-                    <div class="nave-ficha__comparacion-visual">
-                        <img
-                            src="${nave.curiosidad.imagen}"
-                            alt="${nave.curiosidad.imagenAlt}"
-                        >
+
+                    <div
+                        id="curiosidades-animacion"
+                        class="curiosidades-animacion"
+                        aria-label="Animación comparativa entre el USS Gerald R. Ford y ALÉTHEIA"
+                    >
+                        <div class="curiosidades-animacion__escena">
+                            <svg
+                                viewBox="0 0 1000 560"
+                                role="img"
+                                aria-labelledby="comparacion-titulo comparacion-descripcion"
+                            >
+                                <title id="comparacion-titulo">
+                                    USS Gerald R. Ford dentro de ALÉTHEIA
+                                </title>
+                                <desc id="comparacion-descripcion">
+                                    Vista lateral esquemática a escala. El portaaviones mide aproximadamente 333 metros frente a los 953 metros de ALÉTHEIA.
+                                </desc>
+                                <defs>
+                                    <pattern id="curiosidades-grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                                        <path d="M 25 0 L 0 0 0 25" fill="none" stroke="currentColor" stroke-width="0.6"></path>
+                                    </pattern>
+                                </defs>
+
+                                <rect class="curiosidades-animacion__grid" width="1000" height="560" fill="url(#curiosidades-grid)"></rect>
+
+                                <g class="curiosidades-animacion__aletheia">
+                                    <rect x="23.5" y="330" width="953" height="50" rx="3"></rect>
+                                    <rect x="283.5" y="280" width="433" height="50" rx="3"></rect>
+                                    <path d="M23.5 330H976.5M283.5 280H716.5"></path>
+                                    <text x="500" y="250">ALÉTHEIA · 953 m · DOS NIVELES</text>
+                                </g>
+
+                                <g class="curiosidades-animacion__crucero">
+                                    <path d="M333.5 350 L354 322 L643 322 L666.5 342 L645 366 L368 366 Z"></path>
+                                    <path class="detalle" d="M350 318 H654 M382 340 H640 M414 355 H610"></path>
+                                    <path class="detalle" d="M525 318 L530 286 H568 L579 318 Z"></path>
+                                    <line class="detalle" x1="551" y1="286" x2="551" y2="253"></line>
+                                    <line class="detalle" x1="551" y1="263" x2="572" y2="263"></line>
+                                    <text x="500" y="410">USS GERALD R. FORD · ≈ 333 m</text>
+                                </g>
+
+                                <g class="curiosidades-animacion__cotas-finales">
+                                    <line x1="23.5" y1="440" x2="976.5" y2="440"></line>
+                                    <line x1="23.5" y1="430" x2="23.5" y2="450"></line>
+                                    <line x1="976.5" y1="430" x2="976.5" y2="450"></line>
+                                    <text x="500" y="470">ALÉTHEIA ES APROXIMADAMENTE 2,6 VECES MÁS LARGA</text>
+                                </g>
+                            </svg>
+
+                            <div class="curiosidades-animacion__datos" aria-hidden="true">
+                                <div class="curiosidades-animacion__datos-cabecera">
+                                    <span>Dato</span>
+                                    <strong>USS FORD</strong>
+                                    <strong>ALÉTHEIA</strong>
+                                </div>
+                                ${datosAnimacionHtml}
+                                <div class="curiosidades-animacion__revelacion">
+                                    Y AUN ASÍ…
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="curiosidades-animacion__controles">
+                            <button id="curiosidades-repetir" type="button">
+                                Repetir
+                            </button>
+                            <button id="curiosidades-saltar" type="button">
+                                Saltar animación
+                            </button>
+                        </div>
                     </div>
+
                     <div class="nave-ficha__curiosidad-dato">
                         <h4>${nave.curiosidad.titulo}</h4>
                         <p class="nave-ficha__curiosidades-cifra">
@@ -218,6 +297,35 @@ ${imagenHtml}
         "nave-curiosidades-panel"
     );
 
+    const animacionCuriosidades = document.getElementById(
+        "curiosidades-animacion"
+    );
+
+    const botonRepetirCuriosidades = document.getElementById(
+        "curiosidades-repetir"
+    );
+
+    const botonSaltarCuriosidades = document.getElementById(
+        "curiosidades-saltar"
+    );
+
+    function iniciarAnimacionCuriosidades() {
+        if (!animacionCuriosidades) return;
+
+        animacionCuriosidades.classList.remove(
+            "is-playing",
+            "is-complete"
+        );
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            animacionCuriosidades.classList.add("is-complete");
+            return;
+        }
+
+        void animacionCuriosidades.offsetWidth;
+        animacionCuriosidades.classList.add("is-playing");
+    }
+
     if (botonCuriosidades && panelCuriosidades) {
         botonCuriosidades.addEventListener("click", () => {
             const estaAbierto = !panelCuriosidades.hidden;
@@ -231,6 +339,24 @@ ${imagenHtml}
                 "is-open",
                 !estaAbierto
             );
+
+            if (!estaAbierto) {
+                iniciarAnimacionCuriosidades();
+            }
+        });
+    }
+
+    if (botonRepetirCuriosidades) {
+        botonRepetirCuriosidades.addEventListener(
+            "click",
+            iniciarAnimacionCuriosidades
+        );
+    }
+
+    if (botonSaltarCuriosidades && animacionCuriosidades) {
+        botonSaltarCuriosidades.addEventListener("click", () => {
+            animacionCuriosidades.classList.remove("is-playing");
+            animacionCuriosidades.classList.add("is-complete");
         });
     }
         

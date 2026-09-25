@@ -14,8 +14,12 @@ window.naves = [
             { etiqueta: "Configuración", valor: "2 niveles estructurales" },
             { etiqueta: "Módulos", valor: "110 módulos hexagonales" },
             { etiqueta: "Superficie acumulada", valor: "≈ 714.000 m²" },
-            { etiqueta: "Población habitual", valor: "+15.000 personas" },
-            { etiqueta: "Desplazamiento / masa", valor: "Por determinar" },
+            { etiqueta: "Población", valor: "≈ 15.000 habitual · hasta 80.000" },
+            { etiqueta: "Flota embarcada", valor: "41 naves" },
+            { etiqueta: "Propulsión", valor: "2 motores gravitatorios NEXUS" },
+            { etiqueta: "Planta energética", valor: "8 reactores de fusión ZEUS" },
+            { etiqueta: "Potencia instalada", valor: "≈ 12 TW nominales · 24 TW en modo ULTRA" },
+            { etiqueta: "Masa operativa estimada", valor: "≈ 11,76 millones t" },
             { etiqueta: "Capacidad de salto", valor: "Sí" }
         ],
 
@@ -34,8 +38,23 @@ window.naves = [
             cifra: "≈ 35.700 millones de litros",
             equivalencia: "≈ 14.300 piscinas olímpicas",
             nota: "Comparación basada en el volumen geométrico bruto de los 110 prismas estructurales, imaginados completamente vacíos.",
-            imagen: "assets/img/comparacion-aletheia-legend-of-the-seas.png",
-            imagenAlt: "Comparación en planta y a la misma escala entre ALÉTHEIA y el crucero Legend of the Seas"
+            imagen: "assets/img/comparacion-aletheia-uss-gerald-r-ford.png",
+            imagenAlt: "Comparación en planta y a la misma escala entre ALÉTHEIA y el portaaviones USS Gerald R. Ford",
+            referencia: {
+                nombre: "USS GERALD R. FORD",
+                datos: [
+                    { etiqueta: "Eslora", valor: "≈ 333 m", aletheia: "≈ 953 m" },
+                    { etiqueta: "Manga máxima", valor: "≈ 78 m", aletheia: "≈ 850 m" },
+                    { etiqueta: "Altura", valor: "≈ 41 m", aletheia: "≈ 100 m" },
+                    { etiqueta: "Masa / desplazamiento", valor: "≈ 100.000 t", aletheia: "≈ 11,76 millones t" },
+                    { etiqueta: "Dotación / población", valor: "≈ 4.539", aletheia: "≈ 15.000 · máx. 80.000" },
+                    { etiqueta: "Aeronaves / naves", valor: "75+", aletheia: "41 embarcadas" },
+                    { etiqueta: "Propulsión", valor: "Turbinas de vapor · 4 ejes", aletheia: "2 motores gravitatorios NEXUS" },
+                    { etiqueta: "Planta energética", valor: "2 reactores nucleares A1B", aletheia: "8 reactores de fusión ZEUS" },
+                    { etiqueta: "Potencia instalada", valor: "104 MW eléctricos", aletheia: "≈ 12 TW nominales" },
+                    { etiqueta: "Sobrecarga", valor: "—", aletheia: "≈ 24 TW · modo ULTRA" }
+                ]
+            }
         }
     },
 
@@ -50,9 +69,9 @@ window.naves = [
         longitud: "18 m",
         anchura: "9 m",
         capacidad: "12 personas",
-        unidades: "Varias unidades",
+        unidades: "32 unidades",
         salto: "No",
-        hangar: "Hangar estándar",
+        hangar: "HANGARES 0-0, 1-2, 1-3 y 2-1",
 
         imagenes: [
             {
@@ -84,9 +103,9 @@ window.naves = [
         longitud: "20 m",
         anchura: "11 m",
         capacidad: "4 personas",
-        unidades: "Varias unidades",
+        unidades: "6 unidades",
         salto: "No",
-        hangar: "Hangar industrial",
+        hangar: "INDUSTRIAL",
 
         imagenes: [
             {
@@ -112,7 +131,7 @@ window.naves = [
         capacidad: "12 personas",
         unidades: "1 unidad",
         salto: "Sí",
-        hangar: "Hangar pesado",
+        hangar: "HANGAR 1-1",
 
         imagenes: [
             {
@@ -126,7 +145,7 @@ window.naves = [
         ],
 
         descripcion:
-            "ARCTURUS es una lanzadera de gran tamaño concebida para misiones que requieren mayor autonomía que una lanzadera convencional. Dispone de varios camarotes, sistemas informáticos propios y sensores avanzados. Su motor gravitatorio permite realizar saltos y superar la velocidad de la luz."
+            "ARCTURUS es una nave de gran tamaño concebida para misiones que requieren mayor autonomía que una lanzadera convencional. Dispone de varios camarotes, sistemas informáticos propios y sensores avanzados. Su motor gravitatorio y su reactor de fusión miniaturizado le permiten realizar saltos y superar la velocidad de la luz. Solo existe una unidad y debe alojarse en el HANGAR 1-1, el único con una apertura amplia sin la doble esclusa instalada en los demás hangares."
     },
 
     {
