@@ -1,5 +1,45 @@
 window.naves = [
     {
+        id: "aletheia",
+        nombre: "ALÉTHEIA",
+        icono: "assets/img/aletheia-alternativa-orbita.png",
+
+        tipo: "Ciudad-nave interestelar",
+        funcion: "Exploración científica y asentamiento humano",
+
+        datos: [
+            { etiqueta: "Eslora", valor: "≈ 953 m" },
+            { etiqueta: "Manga máxima", valor: "≈ 850 m" },
+            { etiqueta: "Altura estructural", valor: "≈ 100 m" },
+            { etiqueta: "Configuración", valor: "2 niveles estructurales" },
+            { etiqueta: "Módulos", valor: "110 módulos hexagonales" },
+            { etiqueta: "Superficie acumulada", valor: "≈ 714.000 m²" },
+            { etiqueta: "Población habitual", valor: "+15.000 personas" },
+            { etiqueta: "Desplazamiento / masa", valor: "Por determinar" },
+            { etiqueta: "Capacidad de salto", valor: "Sí" }
+        ],
+
+        imagenes: [
+            {
+                src: "assets/img/aletheia-alternativa-orbita.png",
+                alt: "Ciudad-nave interestelar ALÉTHEIA en órbita"
+            }
+        ],
+
+        descripcion:
+            "ALÉTHEIA es una ciudad-nave interestelar concebida para la exploración científica y el asentamiento humano. Su estructura principal está formada por 110 prismas hexagonales de 50 metros de lado y 50 metros de altura: 91 módulos en el nivel inferior y 19 en el superior. Las dimensiones indicadas describen la estructura principal y excluyen torres, antenas y otros elementos de comunicaciones.",
+
+        curiosidad: {
+            titulo: "¿Cuánta agua cabría en ALÉTHEIA?",
+            cifra: "≈ 35.700 millones de litros",
+            equivalencia: "≈ 14.300 piscinas olímpicas",
+            nota: "Comparación basada en el volumen geométrico bruto de los 110 prismas estructurales, imaginados completamente vacíos.",
+            imagen: "assets/img/comparacion-aletheia-legend-of-the-seas.png",
+            imagenAlt: "Comparación en planta y a la misma escala entre ALÉTHEIA y el crucero Legend of the Seas"
+        }
+    },
+
+    {
         id: "estandar",
         nombre: "LANZADERA ESTÁNDAR",
         icono: "assets/img/ICONOESTANDAR.png",

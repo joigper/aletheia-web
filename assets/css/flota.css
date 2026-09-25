@@ -217,6 +217,151 @@
   line-height: 1.75;
 }
 
+/* =========================================   CURIOSIDADES DE ALÉTHEIA   ========================================= */
+
+.nave-ficha__curiosidades {
+  margin: 0 0 1.75rem;
+}
+
+.nave-ficha__curiosidades-boton {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: min(100%, 360px);
+  min-height: 84px;
+  padding: 0.9rem 1.25rem;
+  border: 1px solid rgba(111, 214, 255, 0.45);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(111, 214, 255, 0.14), rgba(72, 87, 255, 0.08));
+  color: #dff7ff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.nave-ficha__curiosidades-boton small {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.nave-ficha__curiosidades-icono {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border: 1px solid rgba(111, 214, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(111, 214, 255, 0.09);
+  color: #6fd6ff;
+  font-size: 1.35rem;
+}
+
+.nave-ficha__curiosidades-boton:hover {
+  border-color: #6fd6ff;
+  background: rgba(111, 214, 255, 0.14);
+}
+
+.nave-ficha__curiosidades-boton.is-open {
+  border-color: #6fd6ff;
+  background: rgba(111, 214, 255, 0.18);
+  box-shadow: 0 0 24px rgba(54, 173, 221, 0.12);
+}
+
+.nave-ficha__curiosidades-panel {
+  margin-top: 0.8rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(111, 214, 255, 0.2);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(21, 46, 65, 0.72), rgba(7, 15, 25, 0.9));
+}
+
+.nave-ficha__comparacion-visual {
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(111, 214, 255, 0.18);
+  border-radius: 10px;
+  background: #051723;
+}
+
+.nave-ficha__comparacion-visual img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nave-ficha__curiosidad-dato {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border-left: 3px solid #6fd6ff;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.nave-ficha__curiosidad-dato h4 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 767.98px) {
+  .nave-ficha__cabecera {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nave-ficha__curiosidades-boton {
+    width: 100%;
+  }
+}
+
+.nave-ficha__curiosidades-panel[hidden] {
+  display: none;
+}
+
+.nave-ficha__curiosidades-etiqueta {
+  margin: 0 0 0.55rem;
+  color: rgba(111, 214, 255, 0.72);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nave-ficha__curiosidades-panel h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+.nave-ficha__curiosidades-cifra {
+  margin: 1.25rem 0 0;
+  color: #6fd6ff;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.nave-ficha__curiosidades-equivalencia {
+  margin: 0.4rem 0 0;
+  color: #ffffff;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+.nave-ficha__curiosidades-nota {
+  margin: 1.25rem 0 0;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
 /* =========================================   PIE   ========================================= */
 
 .nave-ficha__pie {

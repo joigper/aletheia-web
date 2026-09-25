@@ -52,6 +52,79 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         : "";
 
+    const datosPredeterminados = [
+        { etiqueta: "Longitud", valor: nave.longitud || "No indicada" },
+        { etiqueta: "Anchura", valor: nave.anchura || "No indicada" },
+        { etiqueta: "Capacidad", valor: nave.capacidad || "No indicada" },
+        { etiqueta: "Unidades", valor: nave.unidades || "No indicado" },
+        { etiqueta: "Capacidad de salto", valor: nave.salto || "No indicada" },
+        { etiqueta: "Alojamiento", valor: nave.hangar || "No indicado" }
+    ];
+
+    const datosFicha = Array.isArray(nave.datos)
+        ? nave.datos
+        : datosPredeterminados;
+
+    const datosHtml = datosFicha.map((dato) => `
+        <div class="nave-ficha__dato">
+            <dt>${dato.etiqueta}</dt>
+            <dd>${dato.valor}</dd>
+        </div>
+    `).join("");
+
+    const botonCuriosidadesHtml = nave.curiosidad
+        ? `
+            <button
+                id="nave-curiosidades-boton"
+                class="nave-ficha__curiosidades-boton"
+                type="button"
+                aria-expanded="false"
+                aria-controls="nave-curiosidades-panel"
+            >
+                <span class="nave-ficha__curiosidades-icono" aria-hidden="true">✦</span>
+                <span>
+                    <small>Archivo de escala</small>
+                    Curiosidades de ALÉTHEIA
+                </span>
+            </button>
+        `
+        : "";
+
+    const panelCuriosidadesHtml = nave.curiosidad
+        ? `
+            <div class="nave-ficha__curiosidades">
+                <section
+                    id="nave-curiosidades-panel"
+                    class="nave-ficha__curiosidades-panel"
+                    hidden
+                >
+                    <p class="nave-ficha__curiosidades-etiqueta">
+                        Comparaciones visuales
+                    </p>
+                    <h3>ALÉTHEIA frente a escalas terrestres</h3>
+                    <div class="nave-ficha__comparacion-visual">
+                        <img
+                            src="${nave.curiosidad.imagen}"
+                            alt="${nave.curiosidad.imagenAlt}"
+                        >
+                    </div>
+                    <div class="nave-ficha__curiosidad-dato">
+                        <h4>${nave.curiosidad.titulo}</h4>
+                        <p class="nave-ficha__curiosidades-cifra">
+                            ${nave.curiosidad.cifra}
+                        </p>
+                        <p class="nave-ficha__curiosidades-equivalencia">
+                            ${nave.curiosidad.equivalencia}
+                        </p>
+                        <p class="nave-ficha__curiosidades-nota">
+                            ${nave.curiosidad.nota}
+                        </p>
+                    </div>
+                </section>
+            </div>
+        `
+        : "";
+
     fichaNave.innerHTML = `
         <article class="nave-ficha">
 
@@ -98,9 +171,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${nave.tipo || ""}
                     </p>
                 </div>
+
+                ${botonCuriosidadesHtml}
             </header>
 
             <div class="nave-ficha__separador"></div>
+
+            ${panelCuriosidadesHtml}
 
 <p class="nave-ficha__funcion">
     ${nave.funcion || ""}
@@ -115,37 +192,7 @@ ${imagenHtml}
 <div class="nave-ficha__separador"></div>
 
 <dl class="nave-ficha__datos">
-
-    <div class="nave-ficha__dato">
-        <dt>Longitud</dt>
-        <dd>${nave.longitud || "No indicada"}</dd>
-    </div>
-
-    <div class="nave-ficha__dato">
-        <dt>Anchura</dt>
-        <dd>${nave.anchura || "No indicada"}</dd>
-    </div>
-
-    <div class="nave-ficha__dato">
-        <dt>Capacidad</dt>
-        <dd>${nave.capacidad || "No indicada"}</dd>
-    </div>
-
-    <div class="nave-ficha__dato">
-        <dt>Unidades</dt>
-        <dd>${nave.unidades || "No indicado"}</dd>
-    </div>
-
-    <div class="nave-ficha__dato">
-        <dt>Capacidad de salto</dt>
-        <dd>${nave.salto || "No indicada"}</dd>
-    </div>
-
-    <div class="nave-ficha__dato">
-        <dt>Alojamiento</dt>
-        <dd>${nave.hangar || "No indicado"}</dd>
-    </div>
-
+    ${datosHtml}
 </dl>
 
             <div class="nave-ficha__separador"></div>
@@ -162,6 +209,30 @@ ${imagenHtml}
 
         </article>
     `;
+
+    const botonCuriosidades = document.getElementById(
+        "nave-curiosidades-boton"
+    );
+
+    const panelCuriosidades = document.getElementById(
+        "nave-curiosidades-panel"
+    );
+
+    if (botonCuriosidades && panelCuriosidades) {
+        botonCuriosidades.addEventListener("click", () => {
+            const estaAbierto = !panelCuriosidades.hidden;
+
+            panelCuriosidades.hidden = estaAbierto;
+            botonCuriosidades.setAttribute(
+                "aria-expanded",
+                String(!estaAbierto)
+            );
+            botonCuriosidades.classList.toggle(
+                "is-open",
+                !estaAbierto
+            );
+        });
+    }
         
     const botonAnteriorFicha = document.getElementById(
     "anterior-ficha-nave"
