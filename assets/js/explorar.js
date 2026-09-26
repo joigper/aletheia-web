@@ -517,7 +517,7 @@ L1_017: {
     imagenAlt:
         "Hangar pesado HANGAR 1-1 de ALÉTHEIA",
     descripcion:
-        "El HANGAR 1-1 es el principal hangar pesado de ALÉTHEIA y el único preparado para operar la lanzadera ARCTURUS, cuyas dimensiones impiden el uso del sistema de doble esclusa instalado posteriormente en los hangares estándar. Además de servir como plataforma de despegue y aterrizaje, dispone de puentes grúa, equipos de mantenimiento, salas técnicas de control y un ascensor de gran capacidad que traslada las naves a los niveles inferiores de almacenamiento y reparación. Al menos una lanzadera permanece siempre lista para despegar, garantizando una respuesta inmediata ante cualquier emergencia o misión exterior."
+        "El HANGAR 1-1 es el hangar pesado de ALÉTHEIA y el único preparado para alojar ARCTURUS. Su cuarta cubierta carece de doble esclusa: durante una entrada o salida se despresuriza por completo, una solución que conserva el espacio de maniobra necesario para una nave de 42 metros. ARCTURUS permanece estacionada lateralmente y la zona de control se concentra en la pared este, dejando libre el ascensor central para las lanzaderas convencionales. Las cubiertas 2 y 3 mantienen hasta doce plazas de estacionamiento, además de talleres ligeros, almacenes y equipos de manipulación; las reparaciones de mayor entidad se realizan en el módulo ASTILLERO."
 },
         L1_030: {
     nombre: "HOME-03",
@@ -659,7 +659,7 @@ L1_061: {
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
     descripcion:
-        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. A diferencia del Hangar 1-1, incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
+        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. Incorporan un sistema de doble esclusa que permite mantener presurizado el volumen principal mientras una aeronave entra o abandona la nave, reduciendo al mínimo el aire intercambiado en cada maniobra. Cada módulo dispone de hasta quince plazas: seis en la cubierta 2, seis en la cubierta 3 y tres en la cubierta 4. Ascensores, paneles SAGH, grúas de perfil bajo, almacenes y zonas de mantenimiento ligero sostienen la operación diaria; los trabajos de mayor entidad se derivan al módulo ASTILLERO."
 },
         L2_019: {
     nombre: "HANGAR 2-01",
@@ -669,7 +669,7 @@ L1_061: {
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
     descripcion:
-        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. Incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
+        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. Incorporan un sistema de doble esclusa que permite mantener presurizado el volumen principal mientras una aeronave entra o abandona la nave, reduciendo al mínimo el aire intercambiado en cada maniobra. Cada módulo dispone de hasta quince plazas: seis en la cubierta 2, seis en la cubierta 3 y tres en la cubierta 4. Ascensores, paneles SAGH, grúas de perfil bajo, almacenes y zonas de mantenimiento ligero sostienen la operación diaria; los trabajos de mayor entidad se derivan al módulo ASTILLERO."
 },
         L1_063: {
     nombre: "HANGAR 1-2",
@@ -679,7 +679,7 @@ L1_061: {
     imagenAlt:
         "Hangar estándar de ALÉTHEIA",
     descripcion:
-        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. A diferencia del Hangar 1-1, incorporan un sistema de doble esclusa que permite mantener el hangar completamente operativo mientras una aeronave entra o abandona la nave, reduciendo al mínimo el volumen de aire intercambiado en cada maniobra. Cada módulo puede albergar hasta siete lanzaderas repartidas en sus tres cubiertas, manteniendo siempre una de ellas preparada para despegar de inmediato ante cualquier emergencia o misión programada."
+        "Los hangares estándar de ALÉTHEIA están diseñados para las operaciones habituales de las lanzaderas de transporte y exploración. Incorporan un sistema de doble esclusa que permite mantener presurizado el volumen principal mientras una aeronave entra o abandona la nave, reduciendo al mínimo el aire intercambiado en cada maniobra. Cada módulo dispone de hasta quince plazas: seis en la cubierta 2, seis en la cubierta 3 y tres en la cubierta 4. Ascensores, paneles SAGH, grúas de perfil bajo, almacenes y zonas de mantenimiento ligero sostienen la operación diaria; los trabajos de mayor entidad se derivan al módulo ASTILLERO."
 },
         L2_009: {
     nombre: "ASTILLERO",

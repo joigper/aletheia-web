@@ -3,6 +3,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const fichaNave = document.getElementById("ficha-nave");
     const flotaContenido = document.querySelector(".flota-contenido");
     let naveActual = null;
+    let promesaVisor3d = null;
+
+    function asegurarVisor3d() {
+        if (customElements.get("model-viewer")) {
+            return Promise.resolve();
+        }
+
+        if (!promesaVisor3d) {
+            let script = document.querySelector('script[src*="@google/model-viewer"]');
+
+            if (!script) {
+                script = document.createElement("script");
+                script.type = "module";
+                script.src = "https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js";
+                document.head.append(script);
+            }
+
+            promesaVisor3d = customElements.whenDefined("model-viewer");
+        }
+
+        return promesaVisor3d;
+    }
 
     if (!listaNaves || !fichaNave) {
         console.error("No se encontraron #lista-naves o #ficha-nave.");
@@ -27,15 +49,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imagenPrincipal = imagenes[0];
 
+    const tienePlano3d = nave.id === "arcturus";
+
     const imagenHtml = imagenPrincipal
         ? `
-            <div class="nave-ficha__imagen-wrap">
+            <div class="nave-ficha__imagen-wrap${tienePlano3d ? " nave-ficha__imagen-wrap--3d" : ""}">
                 <img
                     id="nave-imagen"
                     class="nave-ficha__imagen"
                     src="${imagenPrincipal.src}"
                     alt="${imagenPrincipal.alt || nave.nombre}"
                 >
+                ${tienePlano3d ? `
+                    <model-viewer
+                        id="arcturus-modelo-3d"
+                        class="nave-ficha__modelo-3d"
+                        src="assets/img/hangar/arcturus-estructura-v25.glb"
+                        alt="Plano tridimensional interior de ARCTURUS"
+                        loading="eager"
+                        camera-controls
+                        touch-action="pan-y"
+                        shadow-intensity="0.7"
+                        exposure="1.05">
+                    </model-viewer>
+                    <video
+                        id="arcturus-transicion-3d"
+                        class="nave-ficha__transicion-3d"
+                        src="assets/img/hangar/transicionarcturus.mp4"
+                        preload="auto"
+                        muted
+                        playsinline>
+                    </video>
+                    <button id="nave-plano-cerrar" class="nave-ficha__plano-cerrar" type="button">Cerrar</button>
+                ` : ""}
             </div>
         `
         : "";
@@ -48,6 +94,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 type="button"
             >
                 Más imágenes
+            </button>
+        `
+        : "";
+
+    const botonPlanoHtml = tienePlano3d
+        ? `
+            <button id="nave-plano-3d" class="nave-ficha__mas-imagenes" type="button" aria-pressed="false">
+                Plano 3D
+            </button>
+            <button id="nave-plano-ampliar" class="nave-ficha__mas-imagenes" type="button" hidden>
+                Ampliar
             </button>
         `
         : "";
@@ -266,6 +323,7 @@ ${imagenHtml}
 
 <div class="nave-ficha__acciones">
     ${botonImagenesHtml}
+    ${botonPlanoHtml}
 </div>
 
 <div class="nave-ficha__separador"></div>
@@ -539,12 +597,126 @@ if (fichaActiva) {
         "nave-imagen"
     );
 
+    const botonPlano3d = document.getElementById("nave-plano-3d");
+    const botonPlanoAmpliar = document.getElementById("nave-plano-ampliar");
+    const botonPlanoCerrar = document.getElementById("nave-plano-cerrar");
+    const modeloArcturus = document.getElementById("arcturus-modelo-3d");
+    const videoTransicionArcturus = document.getElementById("arcturus-transicion-3d");
+    const envoltorioImagen = imagenNave?.closest(".nave-ficha__imagen-wrap");
+
+    const vistaInicialArcturus = () => {
+        if (!modeloArcturus) return;
+        modeloArcturus.cameraOrbit = "-47deg 76deg 66%";
+        modeloArcturus.cameraTarget = "22m 4.55m -11m";
+        modeloArcturus.fieldOfView = "30deg";
+        if (typeof modeloArcturus.jumpCameraToGoal === "function") {
+            modeloArcturus.jumpCameraToGoal();
+        }
+    };
+
+    if (modeloArcturus) {
+        modeloArcturus.addEventListener("load", vistaInicialArcturus, { once: true });
+        modeloArcturus.addEventListener("error", (evento) => {
+            console.error("No se pudo cargar el modelo 3D de ARCTURUS:", evento.detail);
+        });
+        asegurarVisor3d().catch((error) => {
+            console.error("No se pudo iniciar el visor 3D de ARCTURUS:", error);
+        });
+    }
+
+    const completarTransicionArcturus = () => {
+        if (!envoltorioImagen?.classList.contains("is-transicionando")) return;
+        envoltorioImagen.classList.remove("is-transicionando");
+        envoltorioImagen.classList.add("is-plano-3d");
+        if (botonPlano3d) {
+            botonPlano3d.disabled = false;
+            botonPlano3d.textContent = "Ver fotografía";
+            botonPlano3d.setAttribute("aria-pressed", "true");
+        }
+        if (botonPlanoAmpliar) botonPlanoAmpliar.hidden = false;
+        vistaInicialArcturus();
+    };
+
+    videoTransicionArcturus?.addEventListener("ended", completarTransicionArcturus);
+    videoTransicionArcturus?.addEventListener("error", completarTransicionArcturus);
+
+    if (botonPlano3d && envoltorioImagen) {
+        botonPlano3d.addEventListener("click", async () => {
+            if (envoltorioImagen.classList.contains("is-plano-3d")) {
+                mostrarFotografia();
+                return;
+            }
+
+            botonPlano3d.disabled = true;
+            botonPlano3d.textContent = "Abriendo plano…";
+
+            try {
+                await asegurarVisor3d();
+                vistaInicialArcturus();
+
+                if (
+                    !videoTransicionArcturus ||
+                    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                ) {
+                    envoltorioImagen.classList.add("is-transicionando");
+                    completarTransicionArcturus();
+                    return;
+                }
+
+                videoTransicionArcturus.currentTime = 0;
+                envoltorioImagen.classList.add("is-transicionando");
+                await videoTransicionArcturus.play();
+            } catch (error) {
+                console.error("No se pudo reproducir la transición de ARCTURUS:", error);
+                envoltorioImagen.classList.add("is-transicionando");
+                completarTransicionArcturus();
+            }
+        });
+    }
+
+    if (botonPlanoAmpliar && envoltorioImagen) {
+        botonPlanoAmpliar.addEventListener("click", () => {
+            const ampliado = envoltorioImagen.classList.toggle("is-ampliado");
+            botonPlanoAmpliar.textContent = ampliado ? "Reducir" : "Ampliar";
+            document.body.classList.toggle("flota-visor-abierto", ampliado);
+            if (ampliado) vistaInicialArcturus();
+        });
+    }
+
+    const cerrarPlanoAmpliado = () => {
+        if (!envoltorioImagen?.classList.contains("is-ampliado")) return;
+        envoltorioImagen.classList.remove("is-ampliado");
+        document.body.classList.remove("flota-visor-abierto");
+        if (botonPlanoAmpliar) botonPlanoAmpliar.textContent = "Ampliar";
+    };
+
+    const mostrarFotografia = () => {
+        cerrarPlanoAmpliado();
+        envoltorioImagen?.classList.remove("is-plano-3d", "is-transicionando");
+        if (videoTransicionArcturus) {
+            videoTransicionArcturus.pause();
+            videoTransicionArcturus.currentTime = 0;
+        }
+        if (botonPlano3d) {
+            botonPlano3d.disabled = false;
+            botonPlano3d.textContent = "Plano 3D";
+            botonPlano3d.setAttribute("aria-pressed", "false");
+        }
+        if (botonPlanoAmpliar) botonPlanoAmpliar.hidden = true;
+    };
+
+    botonPlanoCerrar?.addEventListener("click", cerrarPlanoAmpliado);
+    document.addEventListener("keydown", (evento) => {
+        if (evento.key === "Escape") cerrarPlanoAmpliado();
+    }, { once: true });
+
     if (
         botonMasImagenes &&
         imagenNave &&
         imagenes.length > 1
     ) {
         botonMasImagenes.addEventListener("click", () => {
+            mostrarFotografia();
             indiceImagen =
                 (indiceImagen + 1) % imagenes.length;
 
@@ -554,6 +726,15 @@ if (fichaActiva) {
             imagenNave.alt =
                 imagenes[indiceImagen].alt ||
                 nave.nombre;
+
+            if (botonPlano3d) {
+                const esVistaExterior = indiceImagen === 0;
+                botonPlano3d.disabled = !esVistaExterior;
+                botonPlano3d.title = esVistaExterior
+                    ? "Abrir plano tridimensional"
+                    : "Disponible desde la vista exterior de ARCTURUS";
+            }
+
         });
     }
 

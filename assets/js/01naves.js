@@ -123,15 +123,20 @@ window.naves = [
         nombre: "ARCTURUS",
         icono: "assets/img/ICONOARCTURUS.png",
 
-        tipo: "Lanzadera de largo alcance",
-        funcion: "Exploración y transporte interplanetario",
+        tipo: "Nave expedicionaria de salto",
+        funcion: "Exploración científica de largo alcance",
 
-        longitud: "35 m",
-        anchura: "18 m",
-        capacidad: "12 personas",
-        unidades: "1 unidad",
-        salto: "Sí",
-        hangar: "HANGAR 1-1",
+        datos: [
+            { etiqueta: "Longitud", valor: "42 m" },
+            { etiqueta: "Anchura", valor: "18 m" },
+            { etiqueta: "Altura", valor: "11,5 m" },
+            { etiqueta: "Alojamiento actual", valor: "6–8 personas" },
+            { etiqueta: "Ocupación histórica", valor: "23 · antes de la reforma" },
+            { etiqueta: "Origen", valor: "EXOWORLDS" },
+            { etiqueta: "Unidades", valor: "1 unidad" },
+            { etiqueta: "Capacidad de salto", valor: "Sí" },
+            { etiqueta: "Alojamiento", valor: "HANGAR 1-1" }
+        ],
 
         imagenes: [
             {
@@ -145,7 +150,7 @@ window.naves = [
         ],
 
         descripcion:
-            "ARCTURUS es una nave de gran tamaño concebida para misiones que requieren mayor autonomía que una lanzadera convencional. Dispone de varios camarotes, sistemas informáticos propios y sensores avanzados. Su motor gravitatorio y su reactor de fusión miniaturizado le permiten realizar saltos y superar la velocidad de la luz. Solo existe una unidad y debe alojarse en el HANGAR 1-1, el único con una apertura amplia sin la doble esclusa instalada en los demás hangares."
+            "ARCTURUS es un antiguo yate ejecutivo de salto de EXOWORLDS, incorporado posteriormente a ALÉTHEIA y reconvertido para misiones de exploración científica de largo alcance. Su configuración original reservaba un espacio desproporcionado a dos grandes camarotes VIP, mientras la tripulación se alojaba en un barracón de literas; también disponía de gimnasio, sala común con cocina, puesto de control, almacén con esclusa propia al exterior y compartimentos de armamento. Antes de la reforma llegó a transportar a 23 personas en condiciones muy ajustadas. Posteriormente se retiró el armamento para instalar un laboratorio, se sustituyó aquella distribución por alojamiento para una dotación de 6 a 8 personas y se mejoraron profundamente los sistemas de guiado y navegación. La configuración actual ya no dispone de camas para 23 ocupantes. Su motor gravitatorio y su reactor de fusión le proporcionan capacidad de salto independiente, una característica de la que carecen las lanzaderas convencionales. Permanece alojada lateralmente en el HANGAR 1-1, manteniendo libre el ascensor central para las demás aeronaves."
     },
 
     {

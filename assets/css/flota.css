@@ -61,7 +61,7 @@
   object-fit: contain;
 }
 
-/* =========================================   FICHA DE FLOTA   ========================================= */
+/* =========================================   FICHA DE FLOTA   ========================================= */
 
 #ficha-nave {
   min-height: 700px;
@@ -78,7 +78,7 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* =========================================   CABECERA   ========================================= */
+/* =========================================   CABECERA   ========================================= */
 
 .nave-ficha__cabecera {
   display: flex;
@@ -118,7 +118,7 @@
   line-height: 1.55;
 }
 
-/* =========================================   SEPARADORES   ========================================= */
+/* =========================================   SEPARADORES   ========================================= */
 
 .nave-ficha__separador {
   width: 100%;
@@ -127,7 +127,7 @@
   background: linear-gradient( 90deg, #6fd6ff, rgba(255, 255, 255, 0.04) );
 }
 
-/* =========================================   DATOS TÉCNICOS   ========================================= */
+/* =========================================   DATOS TÉCNICOS   ========================================= */
 
 .nave-ficha__datos {
   display: grid;
@@ -158,7 +158,7 @@
   line-height: 1.35;
 }
 
-/* =========================================   IMAGEN   ========================================= */
+/* =========================================   IMAGEN   ========================================= */
 
 .nave-ficha__imagen-wrap {
   width: min(100%, 720px);
@@ -178,11 +178,12 @@
   object-position: center;
 }
 
-/* =========================================   BOTÓN MÁS IMÁGENES   ========================================= */
+/* =========================================   BOTÓN MÁS IMÁGENES   ========================================= */
 
 .nave-ficha__acciones {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
   width: min(100%, 720px);
   margin: 10px auto 0;
 }
@@ -205,7 +206,97 @@
   border-color: rgba(111, 214, 255, 0.75);
 }
 
-/* =========================================   DESCRIPCIÓN   ========================================= */
+.nave-ficha__mas-imagenes:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  color: #9aa3ad;
+  border-color: rgba(111, 214, 255, 0.22);
+}
+
+/* =========================================   ARCTURUS · FOTOGRAFÍA / PLANO 3D   ========================================= */
+
+.nave-ficha__imagen-wrap--3d {
+  position: relative;
+  background: radial-gradient(circle at 48% 42%, #123243 0, #06141d 50%, #010609 100%);
+}
+
+.nave-ficha__modelo-3d {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+
+.nave-ficha__transicion-3d {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+  opacity: 0;
+  transition: opacity .12s linear;
+  pointer-events: none;
+}
+
+.nave-ficha__imagen-wrap--3d.is-transicionando .nave-ficha__transicion-3d {
+  opacity: 1;
+}
+
+.nave-ficha__imagen-wrap--3d.is-plano-3d .nave-ficha__imagen {
+  opacity: 0;
+}
+
+.nave-ficha__imagen-wrap--3d.is-plano-3d .nave-ficha__modelo-3d {
+  opacity: 1;
+}
+
+.nave-ficha__imagen-wrap--3d.is-ampliado {
+  position: fixed;
+  z-index: 10000;
+  inset: 16px;
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  aspect-ratio: auto;
+  border-color: rgba(111, 214, 255, .75);
+  box-shadow: 0 0 0 100vmax rgba(0, 5, 9, .94), 0 0 60px rgba(71, 194, 235, .25);
+}
+
+.nave-ficha__plano-cerrar {
+  display: none;
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  right: 16px;
+  padding: 9px 13px;
+  border: 1px solid rgba(111, 214, 255, .65);
+  border-radius: 8px;
+  background: rgba(3, 15, 23, .88);
+  color: #e6f9ff;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.nave-ficha__imagen-wrap--3d.is-ampliado .nave-ficha__plano-cerrar {
+  display: block;
+}
+
+body.flota-visor-abierto {
+  overflow: hidden;
+}
+
+/* =========================================   DESCRIPCIÓN   ========================================= */
 
 .nave-ficha__descripcion {
   max-width: 900px;
@@ -708,7 +799,7 @@
   line-height: 1.55;
 }
 
-/* =========================================   PIE   ========================================= */
+/* =========================================   PIE   ========================================= */
 
 .nave-ficha__pie {
   margin-top: 2rem;
@@ -719,7 +810,7 @@
   text-transform: uppercase;
 }
 
-/* =========================================   TABLET / MÓVIL   ========================================= */
+/* =========================================   TABLET / MÓVIL   ========================================= */
 
 @media (max-width: 991.98px) {
   .nave-ficha__datos {
@@ -752,7 +843,7 @@
   }
 }
 
-/* =========================================   NAVEGACIÓN MÓVIL DE FLOTA   ========================================= */
+/* =========================================   NAVEGACIÓN MÓVIL DE FLOTA   ========================================= */
 
 /* Estado inicial: lista a pantalla completa */
 
@@ -816,15 +907,15 @@
   }
 }
 
-/* =========================================   BOTÓN CERRAR FICHA   Oculto en escritorio   ========================================= */
+/* =========================================   BOTÓN CERRAR FICHA   Oculto en escritorio   ========================================= */
 
-/* =========================================   BOTÓN CERRAR FICHA   ========================================= */
+/* =========================================   BOTÓN CERRAR FICHA   ========================================= */
 
 .nave-ficha__cerrar {
   display: none;
 }
 
-/* =========================================   FLOTA - PRESENTACIÓN MÓVIL   ========================================= */
+/* =========================================   FLOTA - PRESENTACIÓN MÓVIL   ========================================= */
 
 /* La fila principal utiliza todo el ancho */
 
@@ -928,7 +1019,7 @@
   }
 }
 
-/* =========================================   CORRECCIÓN COLUMNAS FLOTA EN MÓVIL   ========================================= */
+/* =========================================   CORRECCIÓN COLUMNAS FLOTA EN MÓVIL   ========================================= */
 
 /* Columna que contiene la lista */
 
@@ -968,7 +1059,7 @@
   }
 }
 
-/* =========================================   FLOTA - ANCHO DE ESCRITORIO   ========================================= */
+/* =========================================   FLOTA - ANCHO DE ESCRITORIO   ========================================= */
 
 .flota-contenedor {
   width: 100% !important;
@@ -982,7 +1073,7 @@
   max-width: none;
 }
 
-/* =========================================   FLOTA - ESCRITORIO A ANCHO COMPLETO   ========================================= */
+/* =========================================   FLOTA - ESCRITORIO A ANCHO COMPLETO   ========================================= */
 
 /* Localizamos directamente el container que contiene FLOTA */
 
@@ -1002,7 +1093,7 @@ body > .container:has(#lista-naves) .flota-contenido {
   max-width: none !important;
 }
 
-/* =========================================   FLOTA - DISTRIBUCIÓN EN PC   ========================================= */
+/* =========================================   FLOTA - DISTRIBUCIÓN EN PC   ========================================= */
 
 /* Lista algo más estrecha */
 
@@ -1031,7 +1122,7 @@ body > .container:has(#lista-naves) .flota-contenido {
   }
 }
 
-/* =========================================   FLOTA - CABECERA MÓVIL   ========================================= */
+/* =========================================   FLOTA - CABECERA MÓVIL   ========================================= */
 
 /* Fila superior de FLOTA */
 
@@ -1083,7 +1174,7 @@ body > .container:has(#lista-naves) .flota-contenido {
   }
 }
 
-/* =========================================   FLOTA - ANTERIOR / SIGUIENTE EN MÓVIL   ========================================= */
+/* =========================================   FLOTA - ANTERIOR / SIGUIENTE EN MÓVIL   ========================================= */
 
 /* En escritorio no aparece la navegación móvil */
 
@@ -1091,9 +1182,9 @@ body > .container:has(#lista-naves) .flota-contenido {
   display: none;
 }
 
-/* =========================================   MÓVIL   ========================================= */
+/* =========================================   MÓVIL   ========================================= */
 
-/* * La cabecera se coloca en vertical:   * controles arriba, nombre debajo. */
+/* * La cabecera se coloca en vertical:   * controles arriba, nombre debajo. */
 
 @media (max-width: 575.98px) {
   .nave-ficha__cabecera {
@@ -1136,7 +1227,7 @@ body > .container:has(#lista-naves) .flota-contenido {
   }
 }
 
-/* * Sobrescribimos únicamente el margen   * del botón Cerrar que ya existía. */
+/* * Sobrescribimos únicamente el margen   * del botón Cerrar que ya existía. */
 
 @media (max-width: 575.98px) {
   .nave-ficha__cerrar {
@@ -1152,7 +1243,7 @@ body > .container:has(#lista-naves) .flota-contenido {
   }
 }
 
-/* =========================================   MÓVILES MUY ESTRECHOS   ========================================= */
+/* =========================================   MÓVILES MUY ESTRECHOS   ========================================= */
 
 @media (max-width: 360px) {
   .nave-ficha__nav-boton, .nave-ficha__cerrar {

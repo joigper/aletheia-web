@@ -3,7 +3,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("hangar-model-container");
   const playButton = document.getElementById("hangar-play-cycle");
   const status = document.getElementById("hangar-cycle-status");
-  if (!container || !playButton || !status) return;
+  const cyclePanel = document.querySelector(".hangar-cycle");
+  const title = document.getElementById("hangar-structure-title");
+  const selectorButtons = document.querySelectorAll("[data-hangar-variant]");
+  if (!container || !playButton || !status || !cyclePanel || !title) return;
 
   if (!customElements.get("model-viewer")) {
     let script = document.querySelector('script[src*="@google/model-viewer"]');
@@ -56,6 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let statusFrame = null;
   let cycleRunning = false;
+  let currentVariant = "standard";
 
   const updateCycleStatus = () => {
     status.textContent = stageAt(modelViewer.currentTime || 0);
@@ -65,6 +69,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   modelViewer.addEventListener("load", () => {
+    if (currentVariant !== "standard") return;
+
     const animation = modelViewer.availableAnimations.find(
       (name) => name === "CICLO_ENTRADA_ALMACENAMIENTO"
     );
@@ -97,6 +103,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateCycleStatus();
   });
 
-  modelViewer.src = "assets/img/hangar/hangar-estructura.glb";
   container.replaceChildren(modelViewer);
+
+  const variants = {
+    standard: {
+      src: "assets/img/hangar/hangar-estructura.glb",
+      title: "ESTRUCTURA DEL MÓDULO HANGAR",
+      alt: "Modelo estructural tridimensional del hangar estándar"
+    },
+    heavy: {
+      src: "assets/img/hangar/hangar-pesado-1-1.glb",
+      title: "HANGAR PESADO 1-1 · ARCTURUS",
+      alt: "Modelo estructural tridimensional del hangar pesado 1-1 con ARCTURUS"
+    }
+  };
+
+  const selectVariant = (variantName) => {
+    const variant = variants[variantName];
+    if (!variant || variantName === currentVariant && modelViewer.src) return;
+
+    currentVariant = variantName;
+    cycleRunning = false;
+    if (statusFrame) cancelAnimationFrame(statusFrame);
+    statusFrame = null;
+    modelViewer.pause();
+    modelViewer.removeAttribute("animation-name");
+    modelViewer.setAttribute("alt", variant.alt);
+    title.textContent = variant.title;
+
+    const isStandard = variantName === "standard";
+    cyclePanel.hidden = !isStandard;
+    playButton.disabled = true;
+    playButton.textContent = "CICLO DE ENTRADA Y ALMACENAMIENTO";
+    status.textContent = isStandard ? "CARGANDO MODELO" : "";
+
+    selectorButtons.forEach((button) => {
+      const active = button.dataset.hangarVariant === variantName;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+
+    modelViewer.src = variant.src;
+  };
+
+  selectorButtons.forEach((button) => {
+    button.addEventListener("click", () => selectVariant(button.dataset.hangarVariant));
+  });
+
+  currentVariant = "";
+  selectVariant("standard");
 });
