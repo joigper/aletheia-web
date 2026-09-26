@@ -547,6 +547,7 @@ L1_017: {
     L1_057: {
     nombre: "JARDINES CENTRALES",
     area: "Recreación y bienestar",
+    enlace: "jardines.html",
     imagen: "assets/img/JARDINES.jpg",
     imagenAlt:
         "Jardines Centrales de ALÉTHEIA",
