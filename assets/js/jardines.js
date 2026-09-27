@@ -24,44 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     escena.addEventListener("pointermove", (evento) => { if (escena.hasPointerCapture(evento.pointerId)) actualizar(posicionDesdeEvento(evento)); });
     actualizar(deslizador.value);
 
-    document.querySelectorAll("[data-jc-pase]").forEach((pase) => {
-        const diapositivas = [...pase.querySelectorAll("[data-jc-slide]")];
-        const indices = [...pase.querySelectorAll("[data-jc-ir]")];
-        if (!diapositivas.length) return;
-
-        let indiceActual = 0;
-        let temporizador;
-        const mostrar = (nuevoIndice) => {
-            indiceActual = (nuevoIndice + diapositivas.length) % diapositivas.length;
-            diapositivas.forEach((diapositiva, indice) => {
-                const activa = indice === indiceActual;
-                diapositiva.classList.toggle("is-active", activa);
-                diapositiva.setAttribute("aria-hidden", String(!activa));
-            });
-            indices.forEach((boton, indice) => {
-                const activo = indice === indiceActual;
-                boton.classList.toggle("is-active", activo);
-                boton.setAttribute("aria-selected", String(activo));
-            });
-        };
-        const detener = () => window.clearInterval(temporizador);
-        const iniciar = () => {
-            detener();
-            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-                temporizador = window.setInterval(() => mostrar(indiceActual + 1), 6500);
-            }
-        };
-        pase.querySelector("[data-jc-anterior]")?.addEventListener("click", () => { mostrar(indiceActual - 1); iniciar(); });
-        pase.querySelector("[data-jc-siguiente]")?.addEventListener("click", () => { mostrar(indiceActual + 1); iniciar(); });
-        indices.forEach((boton) => boton.addEventListener("click", () => { mostrar(Number(boton.dataset.jcIr)); iniciar(); }));
-        pase.addEventListener("mouseenter", detener);
-        pase.addEventListener("mouseleave", iniciar);
-        pase.addEventListener("focusin", detener);
-        pase.addEventListener("focusout", iniciar);
-        mostrar(0);
-        iniciar();
-    });
-
     document.querySelectorAll("[data-jc-arboles]").forEach((carrusel) => {
         const pista = carrusel.querySelector("[data-jc-arbol-pista]");
         const slides = [...carrusel.querySelectorAll("[data-jc-arbol-slide]")];
@@ -87,11 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
         let gestoHorizontal = false;
         let ajustePendiente = null;
 
-        const distancia = () => {
-            const estilos = window.getComputedStyle(pista);
-            return todosLosSlides[0].getBoundingClientRect().width + (parseFloat(estilos.columnGap || estilos.gap) || 0);
+        const distancia = () => todosLosSlides[indiceFisico]?.getBoundingClientRect().width || 0;
+        const posicion = () => {
+            const primera = todosLosSlides[0];
+            const actual = todosLosSlides[indiceFisico];
+            return primera && actual ? -(actual.offsetLeft - primera.offsetLeft) : 0;
         };
-        const posicion = () => -(indiceFisico * distancia());
         const dibujar = (animar = true) => {
             pista.style.transition = animar ? "" : "none";
             pista.style.transform = `translate3d(${posicion()}px,0,0)`;
@@ -183,4 +146,5 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener("resize", () => dibujar(false));
         dibujar(false);
     });
+
 });
