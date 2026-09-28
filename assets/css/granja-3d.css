@@ -142,10 +142,10 @@
   pointer-events: none;
 }
 
-.granja-obras img {
+.granja-obras svg {
   width: 38px;
   height: 38px;
-  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .granja-obras span {
@@ -174,7 +174,7 @@
 }
 
 @media (max-width:700px) {
-  .granja-obras img {
+  .granja-obras svg {
     width: 30px;
     height: 30px;
   }

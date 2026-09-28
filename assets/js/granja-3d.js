@@ -573,11 +573,52 @@
         sueloC4.material = pradera.clone("pradera-pbr-final-c4");
 
         const crearTaludRampa = () => {
-            const inicioRampa = new BABYLON.Vector3(43.5, alturaSobre(sueloC2, 43.5, 49.5, 10) ?? 0, 49.5);
-            const finalRampa = new BABYLON.Vector3(94.6, alturaSobre(sueloC4, 94.6, 102.7, 36) ?? 25, 102.7);
+            const mallaRampa = superficies.find(mesh => /^GRANJA_Rampa$/i.test(mesh.name));
+            const vertices = mallaRampa?.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+            if (!mallaRampa || !vertices?.length) return;
+            mallaRampa.computeWorldMatrix(true);
+            const matrizMundo = mallaRampa.getWorldMatrix();
+            const puntos = [];
+            for (let i = 0; i < vertices.length; i += 3) {
+                puntos.push(BABYLON.Vector3.TransformCoordinates(
+                    new BABYLON.Vector3(vertices[i], vertices[i + 1], vertices[i + 2]),
+                    matrizMundo
+                ));
+            }
+            const centroX = puntos.reduce((suma, punto) => suma + punto.x, 0) / puntos.length;
+            const centroZ = puntos.reduce((suma, punto) => suma + punto.z, 0) / puntos.length;
+            let xx = 0, zz = 0, xz = 0;
+            puntos.forEach(punto => {
+                const x = punto.x - centroX;
+                const z = punto.z - centroZ;
+                xx += x * x; zz += z * z; xz += x * z;
+            });
+            const anguloPrincipal = 0.5 * Math.atan2(2 * xz, xx - zz);
+            let eje = new BABYLON.Vector3(Math.cos(anguloPrincipal), 0, Math.sin(anguloPrincipal));
+            let lateral = new BABYLON.Vector3(-eje.z, 0, eje.x);
+            const proyectados = puntos.map(punto => ({
+                punto,
+                p: (punto.x - centroX) * eje.x + (punto.z - centroZ) * eje.z,
+                q: (punto.x - centroX) * lateral.x + (punto.z - centroZ) * lateral.z
+            }));
+            const minP = Math.min(...proyectados.map(dato => dato.p));
+            const maxP = Math.max(...proyectados.map(dato => dato.p));
+            const minQ = Math.min(...proyectados.map(dato => dato.q));
+            const maxQ = Math.max(...proyectados.map(dato => dato.q));
+            const margenExtremo = (maxP - minP) * 0.08;
+            const alturaA = Math.max(...proyectados.filter(dato => dato.p <= minP + margenExtremo).map(dato => dato.punto.y));
+            const alturaB = Math.max(...proyectados.filter(dato => dato.p >= maxP - margenExtremo).map(dato => dato.punto.y));
+            const qCentro = (minQ + maxQ) / 2;
+            let inicioRampa = new BABYLON.Vector3(centroX + eje.x * minP + lateral.x * qCentro, alturaA, centroZ + eje.z * minP + lateral.z * qCentro);
+            let finalRampa = new BABYLON.Vector3(centroX + eje.x * maxP + lateral.x * qCentro, alturaB, centroZ + eje.z * maxP + lateral.z * qCentro);
+            if (inicioRampa.y > finalRampa.y) {
+                [inicioRampa, finalRampa] = [finalRampa, inicioRampa];
+                eje = eje.scale(-1);
+                lateral = new BABYLON.Vector3(-eje.z, 0, eje.x);
+            }
+            const mediaAnchuraRampa = (maxQ - minQ) / 2;
             const direccion = finalRampa.subtract(inicioRampa);
             const longitud = Math.hypot(direccion.x, direccion.z) || 1;
-            const lateral = new BABYLON.Vector3(-direccion.z / longitud, 0, direccion.x / longitud);
             const crearLado = (signo, nombre) => {
                 const posiciones = [];
                 const indices = [];
@@ -590,7 +631,7 @@
                     const centro = BABYLON.Vector3.Lerp(inicioRampa, finalRampa, t);
                     for (let j = 0; j < franjas; j++) {
                         const s = j / (franjas - 1);
-                        const distancia = 7.2 + s * 11.5;
+                        const distancia = mediaAnchuraRampa + 0.18 + s * 11.5;
                         const x = centro.x + lateral.x * distancia * signo;
                         const z = centro.z + lateral.z * distancia * signo;
                         const sueloInferior = alturaSobre(sueloC2, x, z, 10) ?? inicioRampa.y;
