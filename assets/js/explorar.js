@@ -557,6 +557,7 @@ L1_017: {
         L1_043: { 
     nombre: "GRANJA", 
     area: "Agricultura y ecosistemas", 
+    enlace: "granja.html",
     imagen: "assets/img/GRANJA.jpg", 
     imagenAlt:
         "Interpretación visual del módulo GRANJA", 
