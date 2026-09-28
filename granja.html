@@ -49,12 +49,13 @@
         <div class="mt-4" style="width:100%;height:1px;background:#3a3a3a;"></div>
     </div>
     <main class="granja-visor"><canvas id="granjaCanvas" aria-label="Recorrido tridimensional por el módulo GRANJA"></canvas>
+        <aside class="granja-obras" aria-label="Aviso de módulo en desarrollo"><img src="assets/img/granja/obras-granja.svg" alt="" width="38" height="38"><span><strong>MÓDULO EN OBRAS</strong><small>Prototipo navegable en desarrollo</small></span></aside>
         <section id="granjaPortada" class="granja-portada">
             <p class="granja-kicker">PROTOTIPO NAVEGABLE</p>
             <h2>Dos praderas. Un único paisaje.</h2>
-            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled" id="granjaEntrar" type="button" disabled="">CARGANDO MAQUETA…</button><small>Ratón para mirar · WASD para caminar · ESC para liberar el cursor</small>
+            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled" id="granjaEntrar" type="button" disabled="">CARGANDO MAQUETA…</button><small>Ratón para mirar · WASD para caminar · R para regresar · ESC para liberar el cursor</small>
         </section>
-        <div id="granjaHud" class="granja-hud" hidden=""><span id="granjaCubierta">CUBIERTA C2</span><span id="granjaFps">-- FPS</span><button type="button">MODO LOW</button></div>
+        <div id="granjaHud" class="granja-hud" hidden=""><span id="granjaCubierta">CUBIERTA C2</span><span id="granjaFps">-- FPS</span><button type="button" id="granjaCalidad">MODO LOW</button></div>
         <div class="granja-punto" aria-hidden="true"></div>
         <p id="granjaError" class="granja-error" hidden=""></p>
     </main>
