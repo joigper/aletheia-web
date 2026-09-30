@@ -97,7 +97,6 @@
     let actualizarMandarinos = null;
     let actualizarAgapantos = null;
     let actualizarOlmo = null;
-    let actualizarVacas = null;
     const movimientoTactil = { x: 0, y: 0 };
     const miradaTactil = { x: 0, y: 0 };
     let multiplicadorTactil = 1;
@@ -1049,160 +1048,6 @@
             radio: (maximo.z - minimo.z) * 0.5 + 1.5,
             cubierta: "c2"
         });
-    }
-
-    async function crearVacas(sueloC2, zonasExcluidas) {
-        if (!sueloC2) return;
-        const contenedor = await BABYLON.SceneLoader.LoadAssetContainerAsync(
-            "assets/img/granja/", "vaca.glb", scene
-        );
-        const zonas = [
-            { x: -78, z: -166, radio: 10 },
-            { x: -43, z: -166, radio: 11 },
-            { x: -75, z: -112, radio: 12 },
-            { x: -30, z: -91, radio: 11 },
-            { x: 20, z: -87, radio: 10 },
-            { x: 50, z: -50, radio: 10 },
-            { x: -78, z: -18, radio: 11 },
-            { x: -31, z: 67, radio: 12 },
-            { x: 31, z: 116, radio: 11 },
-            { x: 88, z: 139, radio: 10 }
-        ];
-        const vacas = [];
-
-        const puntoPermitido = (x, z) => dentroDelContorno(x, z) &&
-            !zonasExcluidas.some(zona => zona.cubierta === "c2" &&
-                distanciaASegmento(x, z, zona.segmento) < zona.radio + 1.8);
-
-        const buscarObjetivo = vaca => {
-            for (let intento = 0; intento < 20; intento++) {
-                const angulo = vaca.aleatorio() * Math.PI * 2;
-                const distancia = (0.25 + vaca.aleatorio() * 0.75) * vaca.zona.radio;
-                const x = vaca.zona.x + Math.cos(angulo) * distancia;
-                const z = vaca.zona.z + Math.sin(angulo) * distancia;
-                if (puntoPermitido(x, z)) return new BABYLON.Vector3(x, 0, z);
-            }
-            return new BABYLON.Vector3(vaca.zona.x, 0, vaca.zona.z);
-        };
-
-        const reproducir = (vaca, estado) => {
-            vaca.animaciones.forEach(animacion => animacion.stop());
-            const nombres = {
-                caminar: "caminar",
-                comer: "comer",
-                reposo: "reposo",
-                variacion: "reposo_variacion"
-            };
-            const buscado = nombres[estado];
-            const animacion = vaca.animaciones.find(grupo =>
-                grupo.name.toLowerCase().includes(buscado)
-            );
-            animacion?.start(true, estado === "caminar" ? 0.85 : 1);
-            vaca.estado = estado;
-        };
-
-        for (let indice = 0; indice < zonas.length; indice++) {
-            const zona = zonas[indice];
-            const y = alturaSobre(sueloC2, zona.x, zona.z, 10);
-            if (y === null) continue;
-            const instancia = contenedor.instantiateModelsToScene(
-                nombre => `vaca-${indice + 1}-${nombre}`, false
-            );
-            const pivote = new BABYLON.TransformNode(`vaca-${indice + 1}`, scene);
-            const mallas = [];
-            instancia.rootNodes.forEach(raiz => {
-                // Se emparenta con el pivote aún neutro: así Babylon no genera una
-                // compensación local que la animación pueda sobrescribir después.
-                raiz.setParent(pivote);
-                raiz.getChildMeshes().forEach(malla => {
-                    mallas.push(malla);
-                    malla.isPickable = true;
-                    malla.receiveShadows = true;
-                    // El esqueleto puede salir de la caja estática y provocar parpadeos por culling.
-                    malla.alwaysSelectAsActiveMesh = true;
-                });
-            });
-            pivote.position.set(zona.x, 0, zona.z);
-            pivote.scaling.setAll(1.5);
-            pivote.rotation.y = indice * 0.73;
-            pivote.computeWorldMatrix(true);
-            const minimoInicial = limitesMallas(mallas).minimo.y;
-            const separacionSuelo = -minimoInicial - 0.08;
-            pivote.position.y = y + separacionSuelo;
-
-            const colision = BABYLON.MeshBuilder.CreateBox(`colision-vaca-${indice + 1}`, {
-                width: 1.15,
-                height: 1.65,
-                depth: 2.85
-            }, scene);
-            colision.visibility = 0;
-            colision.isPickable = true;
-            obstaculosSolidos.add(colision);
-
-            let semilla = (0x9e3779b9 ^ ((indice + 1) * 2654435761)) >>> 0;
-            const vaca = {
-                zona,
-                pivote,
-                colision,
-                animaciones: instancia.animationGroups,
-                estado: "",
-                restante: 4 + indice * 0.7,
-                objetivo: null,
-                separacionSuelo,
-                aleatorio: () => {
-                    semilla = (semilla * 1664525 + 1013904223) >>> 0;
-                    return semilla / 4294967296;
-                }
-            };
-            vaca.objetivo = buscarObjetivo(vaca);
-            reproducir(vaca, indice % 3 === 0 ? "comer" : (indice % 3 === 1 ? "reposo" : "variacion"));
-            vacas.push(vaca);
-        }
-
-        actualizarVacas = () => {
-            const delta = Math.min(engine.getDeltaTime() / 1000, 0.05);
-            vacas.forEach(vaca => {
-                if (vaca.estado === "caminar") {
-                    const dx = vaca.objetivo.x - vaca.pivote.position.x;
-                    const dz = vaca.objetivo.z - vaca.pivote.position.z;
-                    const distancia = Math.hypot(dx, dz);
-                    if (distancia < 0.35) {
-                        vaca.restante = 7 + vaca.aleatorio() * 10;
-                        reproducir(vaca, vaca.aleatorio() < 0.55 ? "comer" :
-                            (vaca.aleatorio() < 0.5 ? "reposo" : "variacion"));
-                    } else {
-                        const paso = Math.min(distancia, 0.52 * delta);
-                        vaca.pivote.position.x += dx / distancia * paso;
-                        vaca.pivote.position.z += dz / distancia * paso;
-                        const deseado = Math.atan2(dx, dz);
-                        let diferencia = deseado - vaca.pivote.rotation.y;
-                        diferencia = Math.atan2(Math.sin(diferencia), Math.cos(diferencia));
-                        vaca.pivote.rotation.y += diferencia * Math.min(1, delta * 3.2);
-                    }
-                } else {
-                    vaca.restante -= delta;
-                    if (vaca.restante <= 0) {
-                        vaca.objetivo = buscarObjetivo(vaca);
-                        reproducir(vaca, "caminar");
-                    }
-                }
-
-                const altura = alturaSobre(
-                    sueloC2, vaca.pivote.position.x, vaca.pivote.position.z, 10
-                );
-                if (altura !== null) {
-                    const alturaObjetivo = altura + vaca.separacionSuelo;
-                    vaca.pivote.position.y += (alturaObjetivo - vaca.pivote.position.y) *
-                        Math.min(1, delta * 10);
-                }
-                vaca.colision.position.set(
-                    vaca.pivote.position.x,
-                    vaca.pivote.position.y + 0.75,
-                    vaca.pivote.position.z
-                );
-                vaca.colision.rotation.y = vaca.pivote.rotation.y;
-            });
-        };
     }
 
     async function crearManzanos(sueloC2, sueloC4, zonasExcluidas) {
@@ -2371,8 +2216,6 @@
             await crearAdornosCasa(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
             actualizarCarga(50, "CARGANDO ESTABLO…");
             await crearEstablo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
-            actualizarCarga(51, "SOLTANDO VACAS…");
-            await crearVacas(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
             actualizarCarga(52, "CARGANDO MANZANOS…");
             await crearManzanos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(64, "CARGANDO OLMO…");
@@ -2561,7 +2404,6 @@
             actualizarMandarinos?.();
             actualizarAgapantos?.();
             actualizarOlmo?.();
-            actualizarVacas?.();
 
             const delta = Math.min(engine.getDeltaTime() / 1000, 0.05);
             const origenRayo = new BABYLON.Vector3(camera.position.x, camera.position.y + 0.6, camera.position.z);
