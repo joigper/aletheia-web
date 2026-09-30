@@ -2,10 +2,24 @@
     const canvas = document.querySelector("#granjaCanvas");
     const portada = document.querySelector("#granjaPortada");
     const entrar = document.querySelector("#granjaEntrar");
+    const cargaTexto = document.querySelector("#granjaCargaTexto");
     const hud = document.querySelector("#granjaHud");
     const fps = document.querySelector("#granjaFps");
     const cubierta = document.querySelector("#granjaCubierta");
     const error = document.querySelector("#granjaError");
+    const controlesTactiles = document.querySelector("#granjaControlesTactiles");
+    const joystickMover = document.querySelector("#granjaMover");
+    const joystickMirar = document.querySelector("#granjaMirar");
+    const botonRapido = document.querySelector("#granjaRapido");
+    const esTactil = window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+
+    const actualizarCarga = (porcentaje, mensaje) => {
+        const valor = Math.max(0, Math.min(100, porcentaje));
+        entrar.style.setProperty("--progreso-carga", `${valor}%`);
+        entrar.setAttribute("aria-valuenow", Math.round(valor));
+        cargaTexto.textContent = `${mensaje} ${Math.round(valor)} %`;
+    };
+    actualizarCarga(2, "INICIANDO…");
 
     if (!window.BABYLON) {
         error.hidden = false;
@@ -22,11 +36,16 @@
     scene.imageProcessingConfiguration.toneMappingType = BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
     scene.imageProcessingConfiguration.exposure = 1.08;
     scene.imageProcessingConfiguration.contrast = 1.14;
+    // Bruma atmosférica: integra el LOD lejano con el horizonte sin ocultar edificios.
+    scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogStart = 45;
+    scene.fogEnd = 145;
+    scene.fogColor = new BABYLON.Color3(0.44, 0.60, 0.73);
 
     const camera = new BABYLON.UniversalCamera("visitante", new BABYLON.Vector3(0, 1.72, 0), scene);
     camera.rotation.y = 0.72;
     camera.minZ = 0.08;
-    camera.speed = 0.24;
+    camera.speed = 0.48;
     camera.angularSensibility = 4800;
     camera.inertia = 0.12;
     camera.applyGravity = false;
@@ -34,6 +53,7 @@
     camera.ellipsoid = new BABYLON.Vector3(0.42, 0.86, 0.42);
     camera.ellipsoidOffset = new BABYLON.Vector3(0, -0.86, 0);
     camera.inputs.removeByType("FreeCameraKeyboardMoveInput");
+    camera.inputs.removeByType("FreeCameraTouchInput");
     scene.activeCamera = camera;
 
     const luz = new BABYLON.HemisphericLight("luz", new BABYLON.Vector3(0, 1, 0), scene);
@@ -66,11 +86,20 @@
     luzC4.range = 260;
 
     const superficiesTransitables = new Set();
+    const obstaculosSolidos = new Set();
     // Inicio junto al pie de la rampa para comprobarla inmediatamente.
     let inicio = new BABYLON.Vector3(43.5, 1.72, 49.5);
     let visitaActiva = false;
     let velocidadVertical = 0;
     let actualizarHierbaProxima = null;
+    let actualizarPraderaBromus = null;
+    let actualizarManzanos = null;
+    let actualizarMandarinos = null;
+    let actualizarAgapantos = null;
+    let actualizarOlmo = null;
+    const movimientoTactil = { x: 0, y: 0 };
+    const miradaTactil = { x: 0, y: 0 };
+    let multiplicadorTactil = 1;
     const contorno = [
         [156.967,159.375],[156.967,109.375],[113.666,84.375],[113.666,34.375],
         [70.365,9.375],[70.365,-40.625],[27.063,-65.625],[27.063,-115.625],
@@ -243,12 +272,20 @@
         pared.roughness = 0.76;
         pared.metallic = 0.02;
 
-        const rampa = new BABYLON.PBRMaterial("material-rampa", scene);
-        rampa.albedoTexture = textura("camino-albedo-v1.webp", 12, 4);
-        rampa.bumpTexture = textura("camino-normal-v1.webp", 12, 4);
-        rampa.albedoColor = new BABYLON.Color3(0.72, 0.68, 0.60);
-        rampa.emissiveColor = new BABYLON.Color3(0.10, 0.075, 0.045);
-        rampa.roughness = 0.94;
+        const rampa = new BABYLON.StandardMaterial("material-rampa", scene);
+        rampa.bumpTexture = textura("rampa-antideslizante-v1.webp", 5, 14);
+        rampa.diffuseColor = new BABYLON.Color3(0.43, 0.44, 0.43);
+        rampa.emissiveColor = new BABYLON.Color3(0.38, 0.39, 0.38);
+        rampa.specularColor = BABYLON.Color3.Black();
+        rampa.disableLighting = true;
+
+        const tierraRampa = new BABYLON.StandardMaterial("material-tierra-rampa", scene);
+        tierraRampa.diffuseTexture = textura("camino-albedo-v1.webp", 7, 16);
+        tierraRampa.diffuseColor = new BABYLON.Color3(0.62, 0.46, 0.30);
+        tierraRampa.emissiveColor = new BABYLON.Color3(0.31, 0.19, 0.09);
+        tierraRampa.specularColor = BABYLON.Color3.Black();
+        tierraRampa.backFaceCulling = false;
+        tierraRampa.disableLighting = true;
 
         const laterales = new BABYLON.PBRMaterial("material-laterales-rampa", scene);
         laterales.albedoTexture = textura("pared-v2-albedo-v1.webp", 1, 1);
@@ -306,12 +343,16 @@
                 uvHorizontal(mesh, true);
                 mesh.material = cieloC4;
             }
-            else if (/GRANJA_Paredes/i.test(nombre)) {
+            else if (/GRANJA_(?:Paredes|Pared_Trasera_Rampa)/i.test(nombre)) {
                 uvVertical(mesh, 8);
                 mesh.material = pared;
             }
-            else if (/GRANJA_Rampa$/i.test(nombre)) {
-                uvHorizontal(mesh, false, 5);
+            else if (/GRANJA_Rampa$|Cubo\.025/i.test(nombre)) {
+                uvHorizontal(mesh, false, 4);
+                mesh.material = tierraRampa;
+            }
+            else if (/GRANJA_Rampa_Calzada_Central/i.test(nombre)) {
+                uvHorizontal(mesh, false, 4);
                 mesh.material = rampa;
             }
             else if (/GRANJA_(?:Lateral_Rampa|Fondo_Hueco_Rampa)/i.test(nombre)) {
@@ -555,18 +596,32 @@
         if (!sueloC2 || !sueloC4) return;
 
         const ruta = "assets/img/granja/";
+        const aplicarUvMetrico = (malla, metrosPorRepeticion = 3.2) => {
+            const posiciones = malla.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+            if (!posiciones?.length) return;
+            const uvs = [];
+            for (let i = 0; i < posiciones.length; i += 3) {
+                uvs.push(posiciones[i] / metrosPorRepeticion, posiciones[i + 2] / metrosPorRepeticion);
+            }
+            malla.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true);
+        };
         const crearMapa = (archivo, escala) => {
             const mapa = new BABYLON.Texture(`${ruta}${archivo}`, scene, false, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
             mapa.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
             mapa.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+            mapa.anisotropicFilteringLevel = 8;
             mapa.uScale = escala;
             mapa.vScale = escala;
             return mapa;
         };
         const pradera = new BABYLON.PBRMaterial("pradera-pbr-final", scene);
-        pradera.albedoTexture = crearMapa("pradera-albedo-v1.webp", 34);
-        pradera.bumpTexture = crearMapa("pradera-normal-v1.webp", 34);
-        pradera.albedoColor = new BABYLON.Color3(0.72, 0.78, 0.67);
+        aplicarUvMetrico(sueloC2);
+        aplicarUvMetrico(sueloC4);
+        pradera.albedoTexture = crearMapa("pradera-albedo-v1.webp", 1);
+        pradera.albedoTexture.anisotropicFilteringLevel = 16;
+        pradera.bumpTexture = crearMapa("pradera-normal-v1.webp", 1);
+        pradera.bumpTexture.anisotropicFilteringLevel = 16;
+        pradera.albedoColor = new BABYLON.Color3(1, 1, 1);
         pradera.roughness = 0.98;
         pradera.metallic = 0;
         sueloC2.material = pradera;
@@ -614,7 +669,6 @@
             if (inicioRampa.y > finalRampa.y) {
                 [inicioRampa, finalRampa] = [finalRampa, inicioRampa];
                 eje = eje.scale(-1);
-                lateral = new BABYLON.Vector3(-eje.z, 0, eje.x);
             }
             const mediaAnchuraRampa = (maxQ - minQ) / 2;
             const direccion = finalRampa.subtract(inicioRampa);
@@ -624,14 +678,21 @@
                 const indices = [];
                 const uvs = [];
                 const normales = [];
-                const tramos = 28;
+                const tramos = 34;
                 const franjas = 5;
                 for (let i = 0; i <= tramos; i++) {
-                    const t = i / tramos;
-                    const centro = BABYLON.Vector3.Lerp(inicioRampa, finalRampa, t);
+                    const avance = (i / tramos) * 1.20;
+                    const t = Math.min(avance, 1);
+                    const centro = avance <= 1
+                        ? BABYLON.Vector3.Lerp(inicioRampa, finalRampa, avance)
+                        : new BABYLON.Vector3(
+                            finalRampa.x + eje.x * longitud * (avance - 1),
+                            finalRampa.y,
+                            finalRampa.z + eje.z * longitud * (avance - 1)
+                        );
                     for (let j = 0; j < franjas; j++) {
                         const s = j / (franjas - 1);
-                        const distancia = mediaAnchuraRampa + 0.18 + s * 11.5;
+                        const distancia = mediaAnchuraRampa + 0.08 + s * 14;
                         const x = centro.x + lateral.x * distancia * signo;
                         const z = centro.z + lateral.z * distancia * signo;
                         const sueloInferior = alturaSobre(sueloC2, x, z, 10) ?? inicioRampa.y;
@@ -643,7 +704,7 @@
                             centro.y + (baseTalud - centro.y) * Math.pow(s, 1.25) + Math.sin(t * 17 + s * 5) * 0.12 * s,
                             z
                         );
-                        uvs.push(t * 8, s * 2.4);
+                        uvs.push(avance * 8, s * 2.4);
                     }
                 }
                 for (let i = 0; i < tramos; i++) {
@@ -669,8 +730,57 @@
             crearLado(-1, "talud-rampa-izquierdo");
             crearLado(1, "talud-rampa-derecho");
 
+            const direccionNormalizada = new BABYLON.Vector3(direccion.x / longitud, 0, direccion.z / longitud);
+            const bordeIzquierdo = [];
+            const bordeDerecho = [];
+            const tramosEntrada = 12;
+            for (let i = 0; i <= tramosEntrada; i++) {
+                const t = i / tramosEntrada;
+                const distanciaAtras = (1 - t) * 11;
+                const xCentro = inicioRampa.x - direccionNormalizada.x * distanciaAtras;
+                const zCentro = inicioRampa.z - direccionNormalizada.z * distanciaAtras;
+                const sueloEntrada = alturaSobre(sueloC2, xCentro, zCentro, 10) ?? inicioRampa.y;
+                const suave = t * t * (3 - 2 * t);
+                const y = sueloEntrada + (inicioRampa.y - sueloEntrada) * suave + 0.025;
+                bordeIzquierdo.push(new BABYLON.Vector3(xCentro - lateral.x * mediaAnchuraRampa, y, zCentro - lateral.z * mediaAnchuraRampa));
+                bordeDerecho.push(new BABYLON.Vector3(xCentro + lateral.x * mediaAnchuraRampa, y, zCentro + lateral.z * mediaAnchuraRampa));
+            }
+            const prolongacion = BABYLON.MeshBuilder.CreateRibbon("prolongacion-enterrada-rampa", {
+                pathArray: [bordeIzquierdo, bordeDerecho],
+                sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+                updatable: false
+            }, scene);
+            prolongacion.material = mallaRampa.material;
+            prolongacion.isPickable = true;
+            prolongacion.receiveShadows = true;
+            superficiesTransitables.add(prolongacion);
+
+            const anchoTrasero = mediaAnchuraRampa + 11.7;
+            const xIzq = finalRampa.x - lateral.x * anchoTrasero;
+            const zIzq = finalRampa.z - lateral.z * anchoTrasero;
+            const xDer = finalRampa.x + lateral.x * anchoTrasero;
+            const zDer = finalRampa.z + lateral.z * anchoTrasero;
+            const baseTrasera = alturaSobre(sueloC2, finalRampa.x, finalRampa.z, 10) ?? inicioRampa.y;
+            const posicionesPared = [
+                xIzq, baseTrasera, zIzq, xDer, baseTrasera, zDer,
+                xDer, finalRampa.y, zDer, xIzq, finalRampa.y, zIzq
+            ];
+            const indicesPared = [0, 1, 2, 0, 2, 3, 2, 1, 0, 3, 2, 0];
+            const normalesPared = [];
+            BABYLON.VertexData.ComputeNormals(posicionesPared, indicesPared, normalesPared);
+            const datosPared = new BABYLON.VertexData();
+            datosPared.positions = posicionesPared;
+            datosPared.indices = indicesPared;
+            datosPared.normals = normalesPared;
+            datosPared.uvs = [0, 0, 1, 0, 1, 1, 0, 1];
+            const paredTrasera = new BABYLON.Mesh("pared-trasera-rampa", scene);
+            datosPared.applyToMesh(paredTrasera);
+            paredTrasera.material = superficies.find(mesh => /GRANJA_Paredes/i.test(mesh.name))?.material;
+            paredTrasera.isPickable = false;
+            paredTrasera.receiveShadows = true;
+
         };
-        crearTaludRampa();
+        // Los taludes, la prolongación y la pared posterior ya forman parte del GLB v5.
 
         const tierra = new BABYLON.PBRMaterial("tierra-caminos-pbr", scene);
         tierra.albedoTexture = crearMapa("camino-albedo-v1.webp", 4.5);
@@ -718,21 +828,1349 @@
         crearCamino("camino-central-c4", caminoC4, 5.0, sueloC4, 36, tierra);
 
         const zonasExcluidas = [];
-        const registrarTramos = (puntos, radio, cerrado = false) => {
+        const registrarTramos = (puntos, radio, cerrado = false, cubierta = "c2") => {
             const limite = cerrado ? puntos.length : puntos.length - 1;
             for (let i = 0; i < limite; i++) {
-                zonasExcluidas.push({ segmento: [puntos[i], puntos[(i + 1) % puntos.length]], radio });
+                zonasExcluidas.push({ segmento: [puntos[i], puntos[(i + 1) % puntos.length]], radio, cubierta });
             }
         };
         registrarTramos(anillo, 4.2, true);
         accesosC2.forEach(acceso => registrarTramos(acceso, 3.6));
         registrarTramos(caminoC2, 4.4);
-        registrarTramos(caminoC4, 4.2);
-        crearHierbaProxima({ c2: sueloC2, c4: sueloC4 }, zonasExcluidas);
+        registrarTramos(caminoC4, 4.2, false, "c4");
+        return { sueloC2, sueloC4, zonasExcluidas };
     }
 
-    BABYLON.SceneLoader.ImportMeshAsync("", "assets/img/granja/", "granja-pradera-pbr-v4.glb", scene)
-        .then(({ meshes }) => {
+    async function crearCasaJeanPierre(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        const posicion = { x: 0, z: -30 };
+        const y = alturaSobre(sueloC2, posicion.x, posicion.z, 10);
+        if (y === null) return;
+
+        // Modelo provisional: Lost Gecko, CC BY 4.0.
+        // https://sketchfab.com/3d-models/tramain-house-1-france-ba987b3d4a1e4b96822048f5cc32c4ec
+        const contenedor = await BABYLON.SceneLoader.LoadAssetContainerAsync(
+            "assets/img/granja/", "tramain_house_1_france.glb", scene
+        );
+        const casa = contenedor.instantiateModelsToScene(nombre => `casa-jean-pierre-${nombre}`, false);
+        casa.rootNodes.forEach(raiz => {
+            raiz.position.set(posicion.x, y, posicion.z);
+            // El GLB ya incluye internamente la conversión de centímetros a metros.
+            raiz.scaling.setAll(1);
+            raiz.rotationQuaternion = null;
+            raiz.rotation.y = Math.PI * 0.12;
+            raiz.getChildMeshes().forEach(malla => {
+                malla.isPickable = true;
+                malla.receiveShadows = true;
+                obstaculosSolidos.add(malla);
+            });
+        });
+
+        const huella = [[-11, -39], [11, -39], [11, -21], [-11, -21]];
+        for (let i = 0; i < huella.length; i++) {
+            zonasExcluidas.push({ segmento: [huella[i], huella[(i + 1) % huella.length]], radio: 5, cubierta: "c2" });
+        }
+    }
+
+    function limitesMallas(mallas) {
+        let minimo = new BABYLON.Vector3(Infinity, Infinity, Infinity);
+        let maximo = new BABYLON.Vector3(-Infinity, -Infinity, -Infinity);
+        mallas.forEach(malla => {
+            malla.computeWorldMatrix(true);
+            const caja = malla.getBoundingInfo().boundingBox;
+            minimo = BABYLON.Vector3.Minimize(minimo, caja.minimumWorld);
+            maximo = BABYLON.Vector3.Maximize(maximo, caja.maximumWorld);
+        });
+        return { minimo, maximo };
+    }
+
+    function apoyarModeloEnSuelo(raices, mallas, alturaSuelo) {
+        const desplazamiento = alturaSuelo - limitesMallas(mallas).minimo.y;
+        raices.forEach(raiz => {
+            raiz.position.y += desplazamiento;
+            raiz.computeWorldMatrix(true);
+        });
+    }
+
+    function crearColisionEnvolvente(nombre, mallas) {
+        const { minimo, maximo } = limitesMallas(mallas);
+        const tamano = maximo.subtract(minimo);
+        const colision = BABYLON.MeshBuilder.CreateBox(nombre, {
+            width: Math.max(0.35, tamano.x),
+            height: Math.max(0.35, tamano.y),
+            depth: Math.max(0.35, tamano.z)
+        }, scene);
+        colision.position = minimo.add(maximo).scale(0.5);
+        colision.visibility = 0;
+        colision.isPickable = true;
+        obstaculosSolidos.add(colision);
+        return colision;
+    }
+
+    async function crearTractor(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        const posicion = { x: 17, z: -31 };
+        const y = alturaSobre(sueloC2, posicion.x, posicion.z, 10);
+        if (y === null) return;
+
+        const contenedor = await BABYLON.SceneLoader.LoadAssetContainerAsync(
+            "assets/img/granja/", "tractor.glb", scene
+        );
+        const tractor = contenedor.instantiateModelsToScene(nombre => `tractor-${nombre}`, false);
+        const mallasTractor = [];
+        tractor.rootNodes.forEach(raiz => {
+            raiz.position.set(posicion.x, 0, posicion.z);
+            // El FBX original mide aproximadamente 1,35 unidades de largo.
+            raiz.scaling.scaleInPlace(3);
+            raiz.rotationQuaternion = null;
+            raiz.rotation.y = Math.PI * 0.42;
+            raiz.getChildMeshes().forEach(malla => {
+                mallasTractor.push(malla);
+                malla.isPickable = true;
+                malla.receiveShadows = true;
+                obstaculosSolidos.add(malla);
+            });
+        });
+        apoyarModeloEnSuelo(tractor.rootNodes, mallasTractor, y);
+        crearColisionEnvolvente("colision-tractor", mallasTractor);
+
+        zonasExcluidas.push({
+            segmento: [[14.5, -31], [19.5, -31]],
+            radio: 2.4,
+            cubierta: "c2"
+        });
+    }
+
+    async function crearAdornosCasa(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        const [contenedorBala, contenedorSaco] = await Promise.all([
+            BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "bale.glb", scene),
+            BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "bag.glb", scene)
+        ]);
+
+        const crearAdorno = (contenedor, prefijo, datos, indice) => {
+            const y = alturaSobre(sueloC2, datos.x, datos.z, 10);
+            if (y === null) return;
+            const instancia = contenedor.instantiateModelsToScene(
+                nombre => `${prefijo}-${indice}-${nombre}`, false
+            );
+            const mallas = [];
+            instancia.rootNodes.forEach(raiz => {
+                raiz.position.set(datos.x, datos.elevacion || 0, datos.z);
+                raiz.scaling.scaleInPlace(datos.escala || 1);
+                raiz.rotationQuaternion = null;
+                raiz.rotation.y = datos.rotacion;
+                raiz.getChildMeshes().forEach(malla => {
+                    mallas.push(malla);
+                    malla.isPickable = true;
+                    malla.receiveShadows = true;
+                    obstaculosSolidos.add(malla);
+                });
+            });
+            apoyarModeloEnSuelo(instancia.rootNodes, mallas, y + (datos.elevacion || 0));
+            crearColisionEnvolvente(`colision-${prefijo}-${indice}`, mallas);
+        };
+
+        const balas = [
+            { x: -16.2, z: -33.8, rotacion: 0.08 },
+            { x: -15.0, z: -33.7, rotacion: -0.05 },
+            { x: -13.8, z: -33.9, rotacion: 0.11 },
+            { x: -15.6, z: -34.0, rotacion: 0.03, elevacion: 0.59 },
+            { x: -14.4, z: -34.0, rotacion: -0.04, elevacion: 0.59 },
+            { x: -18.0, z: -35.2, rotacion: 0.32 }
+        ];
+        const sacos = [
+            { x: -12.8, z: -27.7, rotacion: 0.18 },
+            { x: -12.4, z: -28.2, rotacion: -0.22 },
+            { x: -12.9, z: -28.6, rotacion: 0.05 },
+            { x: -12.6, z: -28.0, rotacion: 0.28, elevacion: 0.32 },
+            { x: -13.3, z: -28.1, rotacion: -0.35 },
+            { x: -13.0, z: -28.4, rotacion: 0.14, elevacion: 0.33 }
+        ];
+        balas.forEach((datos, indice) => crearAdorno(contenedorBala, "bala", datos, indice));
+        sacos.forEach((datos, indice) => crearAdorno(contenedorSaco, "saco", datos, indice));
+
+        zonasExcluidas.push(
+            { segmento: [[-18.5, -34], [-13, -34]], radio: 2.2, cubierta: "c2" },
+            { segmento: [[-13.4, -28], [-12.2, -28]], radio: 1.5, cubierta: "c2" }
+        );
+    }
+
+    async function crearEstablo(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        // Extremo suroeste de C2: separado de la vivienda y fuera de los caminos.
+        const posicion = { x: -61, z: -158 };
+        const y = alturaSobre(sueloC2, posicion.x, posicion.z, 10);
+        if (y === null) return;
+
+        const contenedor = await BABYLON.SceneLoader.LoadAssetContainerAsync(
+            "assets/img/granja/", "establo.glb", scene
+        );
+        const establo = contenedor.instantiateModelsToScene(nombre => `establo-${nombre}`, false);
+        const mallas = [];
+        establo.rootNodes.forEach(raiz => {
+            raiz.position.set(posicion.x, 0, posicion.z);
+            raiz.rotationQuaternion = null;
+            raiz.rotation.y = -Math.PI * 0.08;
+            raiz.getChildMeshes().forEach(malla => {
+                mallas.push(malla);
+                malla.isPickable = true;
+                malla.receiveShadows = true;
+                obstaculosSolidos.add(malla);
+            });
+        });
+        apoyarModeloEnSuelo(establo.rootNodes, mallas, y);
+        crearColisionEnvolvente("colision-establo", mallas);
+
+        const { minimo, maximo } = limitesMallas(mallas);
+        const centroZ = (minimo.z + maximo.z) * 0.5;
+        zonasExcluidas.push({
+            segmento: [[minimo.x - 1, centroZ], [maximo.x + 1, centroZ]],
+            radio: (maximo.z - minimo.z) * 0.5 + 1.5,
+            cubierta: "c2"
+        });
+    }
+
+    async function crearManzanos(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) return;
+        const [near, mid] = await Promise.all([
+            BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "manzano_near.glb", scene),
+            BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "manzano_mid.glb", scene)
+        ]);
+        [near, mid].forEach(contenedor => {
+            contenedor.materials.forEach(material => {
+                material.backFaceCulling = false;
+                material.useAlphaFromAlbedoTexture = true;
+                if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+                material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+                material.alphaCutOff = 0.12;
+            });
+        });
+        const arboles = [];
+
+        const distribuir = (superficie, alturaOrigen, semillaInicial, cubierta) => {
+            let semilla = semillaInicial;
+            const aleatorio = () => {
+                semilla = (semilla * 1664525 + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const posiciones = [];
+            const posicionesVisibles = cubierta === "c2"
+                ? [[25, 48], [43, 28], [58, 45], [30, 68], [61, 67]]
+                : [[25, 48], [43, 28], [58, 45], [30, 68], [61, 67]];
+            posicionesVisibles.forEach(([x, z]) => {
+                const y = alturaSobre(superficie, x, z, alturaOrigen);
+                if (y !== null && !zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                    distanciaASegmento(x, z, zona.segmento) < zona.radio + 6
+                )) posiciones.push({ x, y, z, rotacion: aleatorio() * Math.PI * 2 });
+            });
+            let intentos = 0;
+            while (posiciones.length < 100 && intentos++ < 50000) {
+                const x = -135 + aleatorio() * 280;
+                const z = -200 + aleatorio() * 370;
+                if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 12) continue;
+                if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                    distanciaASegmento(x, z, zona.segmento) < zona.radio + 6)) continue;
+                if (posiciones.some(posicion => Math.hypot(posicion.x - x, posicion.z - z) < 14)) continue;
+                const y = alturaSobre(superficie, x, z, alturaOrigen);
+                if (y === null) continue;
+                posiciones.push({ x, y, z, rotacion: aleatorio() * Math.PI * 2 });
+            }
+
+            posiciones.forEach((posicion, indice) => {
+                const crearNivel = (contenedor, nivel) => {
+                    const instancia = contenedor.instantiateModelsToScene(
+                        nombre => `${nombre}-${nivel}-${cubierta}-${indice + 1}`, false
+                    );
+                    instancia.rootNodes.forEach(raiz => {
+                        raiz.position.set(posicion.x, posicion.y, posicion.z);
+                        // El nodo interno ya tiene escala 0.01; 33 produce unos 5.2 m reales.
+                        raiz.scaling.setAll(33);
+                        raiz.rotationQuaternion = null;
+                        raiz.rotation.y = posicion.rotacion;
+                        raiz.getChildMeshes().forEach(malla => {
+                            malla.isPickable = true;
+                            malla.receiveShadows = true;
+                            obstaculosSolidos.add(malla);
+                        });
+                    });
+                    return instancia.rootNodes;
+                };
+                arboles.push({
+                    x: posicion.x,
+                    z: posicion.z,
+                    near: crearNivel(near, "near"),
+                    mid: crearNivel(mid, "mid")
+                });
+            });
+        };
+
+        distribuir(sueloC2, 10, 0x2c2001, "c2");
+        distribuir(sueloC4, 36, 0x2c4001, "c4");
+
+        actualizarManzanos = () => {
+            arboles.forEach(arbol => {
+                const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
+                const usarNear = distancia2 < 900;
+                arbol.near.forEach(raiz => raiz.setEnabled(usarNear));
+                arbol.mid.forEach(raiz => raiz.setEnabled(!usarNear));
+            });
+        };
+        actualizarManzanos();
+    }
+
+    async function crearOlmo(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        const posicion = { x: -25, z: -25 };
+        const y = alturaSobre(sueloC2, posicion.x, posicion.z, 10);
+        if (y === null) return;
+        const ruta = "assets/img/granja/";
+        const mid = await BABYLON.SceneLoader.LoadAssetContainerAsync(ruta, "elmtree_mid.glb", scene);
+        mid.materials.forEach(material => {
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.18;
+        });
+
+        const crearNivel = (contenedor, nivel) => {
+            const instancia = contenedor.instantiateModelsToScene(nombre => `olmo-${nivel}-${nombre}`, false);
+            const ancla = new BABYLON.TransformNode(`olmo-${nivel}`, scene);
+            ancla.position.set(posicion.x, y, posicion.z);
+            ancla.scaling.setAll(0.75);
+            instancia.rootNodes.forEach(raiz => {
+                raiz.parent = ancla;
+                const mallas = [raiz, ...raiz.getChildMeshes()].filter(malla =>
+                    malla.getTotalVertices && malla.getTotalVertices() > 0
+                );
+                mallas.forEach(malla => {
+                    malla.isPickable = true;
+                    malla.receiveShadows = true;
+                    obstaculosSolidos.add(malla);
+                });
+            });
+            return ancla;
+        };
+        crearNivel(mid, "mid");
+        zonasExcluidas.push({
+            segmento: [[posicion.x, posicion.z], [posicion.x, posicion.z]],
+            radio: 3.2,
+            cubierta: "c2"
+        });
+        actualizarOlmo = () => {};
+        actualizarOlmo();
+    }
+
+    async function crearMandarinos(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) return;
+        const ruta = "assets/img/granja/";
+        const [nearMid, far] = await Promise.all([
+            BABYLON.SceneLoader.LoadAssetContainerAsync(ruta, "mandarino_near_mid.glb", scene),
+            BABYLON.SceneLoader.LoadAssetContainerAsync(ruta, "mandarino_far.glb", scene)
+        ]);
+        [nearMid, far].forEach(contenedor => contenedor.materials.forEach(material => {
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.18;
+        }));
+
+        const arboles = [];
+        const distribuir = (superficie, alturaOrigen, cubierta, semillaInicial) => {
+            let semilla = semillaInicial;
+            const aleatorio = () => {
+                semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const posiciones = [];
+            let intentos = 0;
+            while (posiciones.length < 12 && intentos++ < 20000) {
+                const x = -125 + aleatorio() * 260;
+                const z = -185 + aleatorio() * 340;
+                if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 14) continue;
+                if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                    distanciaASegmento(x, z, zona.segmento) < zona.radio + 7)) continue;
+                if (posiciones.some(punto => Math.hypot(punto.x - x, punto.z - z) < 24)) continue;
+                const y = alturaSobre(superficie, x, z, alturaOrigen);
+                if (y === null) continue;
+                posiciones.push({ x, y, z, giro: aleatorio() * Math.PI * 2, escala: 0.68 + aleatorio() * 0.16 });
+            }
+
+            posiciones.forEach((posicion, indice) => {
+                const crearNivel = (contenedor, nivel) => {
+                    const instancia = contenedor.instantiateModelsToScene(
+                        nombre => `mandarino-${nivel}-${cubierta}-${indice}-${nombre}`, false
+                    );
+                    instancia.rootNodes.forEach(raiz => {
+                        raiz.position.set(posicion.x, posicion.y, posicion.z);
+                        raiz.scaling.scaleInPlace(posicion.escala);
+                        raiz.rotationQuaternion = null;
+                        raiz.rotation.y = posicion.giro;
+                        raiz.getChildMeshes().forEach(malla => {
+                            malla.isPickable = true;
+                            malla.receiveShadows = true;
+                            obstaculosSolidos.add(malla);
+                        });
+                    });
+                    return instancia.rootNodes;
+                };
+                arboles.push({
+                    x: posicion.x,
+                    z: posicion.z,
+                    nearMid: crearNivel(nearMid, "near-mid"),
+                    far: crearNivel(far, "far")
+                });
+            });
+        };
+
+        distribuir(sueloC2, 10, "c2", 0x6d2a01);
+        distribuir(sueloC4, 36, "c4", 0x6d4a01);
+        actualizarMandarinos = () => arboles.forEach(arbol => {
+            const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
+            const usarNearMid = distancia2 < 1156;
+            arbol.nearMid.forEach(raiz => raiz.setEnabled(usarNearMid));
+            arbol.far.forEach(raiz => raiz.setEnabled(!usarNearMid));
+        });
+        actualizarMandarinos();
+    }
+
+    async function crearAgapantos(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) return;
+        const ruta = "assets/img/granja/";
+        const variantes = await Promise.all([
+            BABYLON.SceneLoader.LoadAssetContainerAsync(ruta, "agapanthus_01.glb", scene),
+            BABYLON.SceneLoader.LoadAssetContainerAsync(ruta, "agapanthus_02.glb", scene)
+        ]);
+        variantes.forEach(contenedor => contenedor.materials.forEach(material => {
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.22;
+        }));
+
+        const plantas = [];
+        const centros = {
+            c2: [[-17, -43], [17, -42], [-18, -16], [18, -15], [38, 14], [-42, 18]],
+            c4: [[-38, 22], [35, 26], [-48, -28], [48, -22]]
+        };
+        const distribuir = (superficie, alturaOrigen, cubierta, cantidad, semillaInicial) => {
+            let semilla = semillaInicial;
+            const aleatorio = () => {
+                semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            let creadas = 0;
+            let intentos = 0;
+            while (creadas < cantidad && intentos++ < cantidad * 80) {
+                const centro = centros[cubierta][creadas % centros[cubierta].length];
+                const angulo = aleatorio() * Math.PI * 2;
+                const radio = 1.2 + Math.sqrt(aleatorio()) * 4.2;
+                const x = centro[0] + Math.cos(angulo) * radio;
+                const z = centro[1] + Math.sin(angulo) * radio;
+                if (!dentroDelContorno(x, z)) continue;
+                if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                    distanciaASegmento(x, z, zona.segmento) < zona.radio + 0.45)) continue;
+                const y = alturaSobre(superficie, x, z, alturaOrigen);
+                if (y === null) continue;
+                const contenedor = variantes[creadas % variantes.length];
+                const instancia = contenedor.instantiateModelsToScene(
+                    nombre => `agapanto-${cubierta}-${creadas}-${nombre}`, false
+                );
+                const escala = 0.78 + aleatorio() * 0.34;
+                instancia.rootNodes.forEach(raiz => {
+                    raiz.position.set(x, y, z);
+                    raiz.scaling.scaleInPlace(escala);
+                    raiz.rotationQuaternion = null;
+                    raiz.rotation.y = aleatorio() * Math.PI * 2;
+                    raiz.getChildMeshes().forEach(malla => {
+                        malla.isPickable = false;
+                        malla.receiveShadows = false;
+                    });
+                });
+                plantas.push({ x, z, raices: instancia.rootNodes });
+                creadas++;
+            }
+        };
+
+        distribuir(sueloC2, 10, "c2", 48, 0xa6a2001);
+        distribuir(sueloC4, 36, "c4", 32, 0xa6a4001);
+        actualizarAgapantos = () => plantas.forEach(planta => {
+            const distancia2 = (planta.x - camera.position.x) ** 2 + (planta.z - camera.position.z) ** 2;
+            const visible = distancia2 < 3025;
+            planta.raices.forEach(raiz => raiz.setEnabled(visible));
+        });
+        actualizarAgapantos();
+    }
+
+    async function crearPraderaMixta(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) throw new Error("No se han encontrado las superficies de la pradera.");
+
+        // ✅ FIX WORKER: Inicializar Web Worker para generación async de celdas
+        let worker = null;
+        let siguienteSolicitudWorker = 1;
+        const solicitudesWorker = new Map();
+        try {
+            // Intenta crear el Worker si está disponible
+            worker = new Worker('assets/js/granja-3d-celda-worker.js');
+            console.log("✅ Web Worker inicializado para generación async de celdas");
+
+            worker.onmessage = evento => {
+                const resolver = solicitudesWorker.get(evento.data.solicitudId);
+                if (!resolver) return;
+                solicitudesWorker.delete(evento.data.solicitudId);
+                resolver(evento.data);
+            };
+            worker.onerror = error => {
+                console.warn("⚠️ El worker ha fallado; se activa el cálculo compatible:", error.message);
+                worker = null;
+                solicitudesWorker.forEach(resolver => resolver(null));
+                solicitudesWorker.clear();
+            };
+
+            // Enviar datos iniciales al Worker
+            worker.postMessage({
+                tipo: "inicializar",
+                datos: {
+                    pisos: {},  // Se llena después
+                    contorno: contorno  // Desde función global
+                }
+            });
+        } catch (error) {
+            console.warn("⚠️ Web Worker no disponible, usando thread principal:", error.message);
+            worker = null;  // Fallback: seguir con thread principal
+        }
+
+        const pedirAlWorker = (tipo, datos) => {
+            if (!worker) return Promise.resolve(null);
+            const solicitudId = siguienteSolicitudWorker++;
+            return new Promise(resolver => {
+                solicitudesWorker.set(solicitudId, resolver);
+                worker.postMessage({ tipo, datos, solicitudId });
+            });
+        };
+
+        const ruta = "assets/img/granja/";
+        const especies = [
+            { nombre: "bromus", peso: 0.34 },
+            { nombre: "dactylis", peso: 0.27 },
+            { nombre: "alopecurus", peso: 0.22 },
+            { nombre: "alliaria", peso: 0.17 }
+        ];
+        const niveles = ["near", "mid"];
+        const resultados = await Promise.all(especies.flatMap(especie =>
+            niveles.map(nivel => BABYLON.SceneLoader.ImportMeshAsync(
+                "", ruta, `${especie.nombre}_${nivel}.glb`, scene
+            ))
+        ));
+        const obtenerVariantes = resultado => resultado.meshes.filter(
+            mesh => mesh.getTotalVertices && mesh.getTotalVertices() > 0
+        );
+        const modelos = especies.map((especie, indiceEspecie) => {
+            const fuentes = niveles.map((nivel, indiceNivel) =>
+                obtenerVariantes(resultados[indiceEspecie * niveles.length + indiceNivel])
+            );
+            if (!fuentes[0].length || fuentes.some(variantes => variantes.length !== fuentes[0].length)) {
+                throw new Error(`Los LOD de ${especie.nombre} no contienen las mismas variantes.`);
+            }
+            fuentes[0].forEach((malla, indice) => {
+                fuentes.forEach(variantes => variantes[indice].parent = null);
+                const material = malla.material;
+                if (material) {
+                    material.backFaceCulling = false;
+                    material.useAlphaFromAlbedoTexture = true;
+                    if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+                    material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+                    material.alphaCutOff = 0.05;
+                }
+                fuentes.slice(1).forEach(variantes => variantes[indice].material = material);
+                fuentes.forEach(variantes => {
+                    variantes[indice].isPickable = false;
+                    variantes[indice].alwaysSelectAsActiveMesh = true;
+                    variantes[indice].position.y = -1000;
+                });
+            });
+            return { ...especie, fuentes };
+        });
+
+        const crearImpostor = (nombre, archivo, tinte) => {
+            const ancho = 0.48;
+            const alto = 0.62;
+            const malla = new BABYLON.Mesh(nombre, scene);
+            const posiciones = [
+                -ancho / 2, 0, 0, ancho / 2, 0, 0, ancho / 2, alto, 0, -ancho / 2, alto, 0,
+                0, 0, -ancho / 2, 0, 0, ancho / 2, 0, alto, ancho / 2, 0, alto, -ancho / 2
+            ];
+            const indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7];
+            const uvs = [0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0];
+            const normales = [];
+            BABYLON.VertexData.ComputeNormals(posiciones, indices, normales);
+            const vertices = new BABYLON.VertexData();
+            vertices.positions = posiciones;
+            vertices.indices = indices;
+            vertices.uvs = uvs;
+            vertices.normals = normales;
+            vertices.applyToMesh(malla);
+
+            const material = new BABYLON.StandardMaterial(`${nombre}-material`, scene);
+            const textura = new BABYLON.Texture(
+                `${ruta}${archivo}`, scene, false, false, BABYLON.Texture.TRILINEAR_SAMPLINGMODE
+            );
+            textura.hasAlpha = true;
+            textura.anisotropicFilteringLevel = 8;
+            material.diffuseTexture = textura;
+            material.opacityTexture = textura;
+            material.diffuseColor = tinte;
+            material.useAlphaFromDiffuseTexture = true;
+            material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.18;
+            material.backFaceCulling = false;
+            material.twoSidedLighting = true;
+            material.specularColor = BABYLON.Color3.Black();
+            malla.material = material;
+            malla.isPickable = false;
+            malla.alwaysSelectAsActiveMesh = true;
+            malla.renderingGroupId = 0;
+            return malla;
+        };
+        const impostores = [
+            crearImpostor("impostor-fino", "hierba-fina-alpha-v1.webp", new BABYLON.Color3(0.68, 0.76, 0.38)),
+            crearImpostor("impostor-ancho", "hierba-ancha-alpha-v1.webp", new BABYLON.Color3(0.58, 0.70, 0.35)),
+            crearImpostor("impostor-seco", "hierba-seca-alpha-v1.webp", new BABYLON.Color3(0.78, 0.69, 0.35))
+        ];
+        const impostoresPorCubierta = {
+            c2: impostores,
+            c4: impostores.map((malla, indice) => {
+                const copia = malla.clone(`impostor-c4-${indice}`);
+                copia.setEnabled(false);
+                return copia;
+            })
+        };
+
+        const elegirEspecie = valor => {
+            let acumulado = 0;
+            for (let indice = 0; indice < modelos.length; indice++) {
+                acumulado += modelos[indice].peso;
+                if (valor <= acumulado) return indice;
+            }
+            return modelos.length - 1;
+        };
+        let ultimaCeldaX = Number.POSITIVE_INFINITY;
+        let ultimaCeldaZ = Number.POSITIVE_INFINITY;
+        let ultimaCubierta = "";
+        // Celdas pequeñas: conservan la densidad, pero reducen el tamaño visible de cada cambio LOD.
+        const tamanoCelda = 2.5;
+        const divisiones = 8;
+        const paso = tamanoCelda / divisiones;
+        // La geometría GLB se reserva para el entorno inmediato. El fondo fijo evita huecos.
+        const alcance = 10;
+        const alcancePrecarga = 18;
+        const cache = { c2: new Map(), c4: new Map() };
+        const tamanoCeldaImpostor = 10;
+        const divisionesImpostor = 10;
+        const pasoImpostor = tamanoCeldaImpostor / divisionesImpostor;
+        const cacheImpostores = { c2: new Map(), c4: new Map() };
+        const fragmentosPorGrupo = modelos.map(modelo => modelo.fuentes.map(variantes =>
+            variantes.map(() => [])
+        ));
+        const buffersPorGrupo = modelos.map(modelo => modelo.fuentes.map(variantes =>
+            variantes.map(() => ({ datos: new Float32Array(16 * 2048), inicializado: false }))
+        ));
+        const colaPrecarga = [];
+        const precargaPendiente = new Set();
+        let precargaEnCurso = false;
+        let celdasDesdeRefresco = 0;
+        let c4Activada = false;
+        const umbralActivacionC4 = 14.8;
+
+        const generarCelda = (celdaX, celdaZ, cubierta, superficie, alturaOrigen, candidatosWorker = null) => {
+            const clave = `${celdaX},${celdaZ}`;
+            if (cache[cubierta].has(clave)) return cache[cubierta].get(clave);
+            let semilla = (
+                Math.imul(celdaX, 73856093) ^ Math.imul(celdaZ, 19349663) ^
+                (cubierta === "c2" ? 0x2c2001 : 0x2c4001)
+            ) >>> 0;
+            const aleatorio = () => {
+                semilla = (semilla * 1664525 + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const matricesCelda = modelos.map(modelo => modelo.fuentes[0].map(() => []));
+            const matriz = new BABYLON.Matrix();
+            const escalaVector = new BABYLON.Vector3();
+            const posicion = new BABYLON.Vector3();
+            const rotacion = new BABYLON.Quaternion();
+            let cantidad = 0;
+            const candidatos = candidatosWorker || [];
+            if (!candidatosWorker) {
+                for (let fila = 0; fila < divisiones; fila++) {
+                    for (let columna = 0; columna < divisiones; columna++) {
+                        candidatos.push({
+                            x: celdaX * tamanoCelda + (columna + aleatorio()) * paso,
+                            z: celdaZ * tamanoCelda + (fila + aleatorio()) * paso
+                        });
+                    }
+                }
+            }
+            for (const candidato of candidatos) {
+                    const { x, z } = candidato;
+                    if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 3.5) continue;
+                    if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                        distanciaASegmento(x, z, zona.segmento) < zona.radio)) continue;
+                    const impacto = scene.pickWithRay(
+                        new BABYLON.Ray(new BABYLON.Vector3(x, alturaOrigen, z), BABYLON.Vector3.Down(), 30),
+                        mesh => superficiesTransitables.has(mesh)
+                    );
+                    if (!impacto?.hit || impacto.pickedMesh !== superficie || !impacto.pickedPoint) continue;
+                    const indiceEspecie = elegirEspecie(aleatorio());
+                    const variantesNear = modelos[indiceEspecie].fuentes[0];
+                    const indiceVariante = Math.floor(aleatorio() * variantesNear.length);
+                    const escala = 0.88 + aleatorio() * 0.34;
+                    const boundingBox = variantesNear[indiceVariante].getBoundingInfo().boundingBox;
+                    const base = boundingBox.minimum.y;  // Típicamente -5.0
+                    const altura = boundingBox.maximum.y - base;
+                    escalaVector.set(escala * 1.55, escala, escala * 1.55);
+                    // ✅ FIX 3: ALTURA CORRECTA - invierte el signo del base offset
+                    // base es negativo (-5.0), así que -base * escala coloca el fondo EN el terreno
+                    posicion.set(x, impacto.pickedPoint.y - base * escala, z);
+                    BABYLON.Quaternion.FromEulerAnglesToRef(0, aleatorio() * Math.PI * 2, 0, rotacion);
+                    BABYLON.Matrix.ComposeToRef(escalaVector, rotacion, posicion, matriz);
+                    matriz.copyToArray(matricesCelda[indiceEspecie][indiceVariante],
+                        matricesCelda[indiceEspecie][indiceVariante].length);
+                    cantidad++;
+            }
+            const celda = {
+                matrices: matricesCelda.map(variantes => variantes.map(datos => new Float32Array(datos))),
+                cantidad,
+                transicion: aleatorio()
+            };
+            cache[cubierta].set(clave, celda);
+            return celda;
+        };
+
+        const generarCeldaImpostor = (celdaX, celdaZ, cubierta, superficie, alturaOrigen) => {
+            const clave = `${celdaX},${celdaZ}`;
+            if (cacheImpostores[cubierta].has(clave)) return cacheImpostores[cubierta].get(clave);
+            let semilla = (
+                Math.imul(celdaX, 83492791) ^ Math.imul(celdaZ, 2971215073) ^
+                (cubierta === "c2" ? 0x1f2e3d : 0x4a5b6c)
+            ) >>> 0;
+            const aleatorio = () => {
+                semilla = (semilla * 1664525 + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const matrices = impostores.map(() => []);
+            const matriz = new BABYLON.Matrix();
+            const escalaVector = new BABYLON.Vector3();
+            const posicion = new BABYLON.Vector3();
+            const rotacion = new BABYLON.Quaternion();
+            for (let fila = 0; fila < divisionesImpostor; fila++) {
+                for (let columna = 0; columna < divisionesImpostor; columna++) {
+                    const x = celdaX * tamanoCeldaImpostor + (columna + aleatorio()) * pasoImpostor;
+                    const z = celdaZ * tamanoCeldaImpostor + (fila + aleatorio()) * pasoImpostor;
+                    if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 3.5) continue;
+                    if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                        distanciaASegmento(x, z, zona.segmento) < zona.radio)) continue;
+                    const y = alturaSobre(superficie, x, z, alturaOrigen);
+                    if (y === null) continue;
+                    const eleccion = aleatorio();
+                    const tipo = eleccion < 0.60 ? 0 : eleccion < 0.90 ? 1 : 2;
+                    const escala = 0.72 + aleatorio() * 0.34;
+                    escalaVector.set(escala * (0.85 + aleatorio() * 0.25), escala * (0.72 + aleatorio() * 0.20), escala);
+                    posicion.set(x, y + 0.004, z);
+                    BABYLON.Quaternion.FromEulerAnglesToRef(0, aleatorio() * Math.PI, 0, rotacion);
+                    BABYLON.Matrix.ComposeToRef(escalaVector, rotacion, posicion, matriz);
+                    matriz.copyToArray(matrices[tipo], matrices[tipo].length);
+                }
+            }
+            const celda = {
+                matrices: matrices.map(datos => new Float32Array(datos)),
+                variacion: aleatorio()
+            };
+            cacheImpostores[cubierta].set(clave, celda);
+            return celda;
+        };
+
+        const recorrerCeldas = (radio, callback) => {
+            const centroX = Math.floor(camera.position.x / tamanoCelda);
+            const centroZ = Math.floor(camera.position.z / tamanoCelda);
+            const radioCeldas = Math.ceil((radio + tamanoCelda) / tamanoCelda);
+            for (let dz = -radioCeldas; dz <= radioCeldas; dz++) {
+                for (let dx = -radioCeldas; dx <= radioCeldas; dx++) {
+                    const celdaX = centroX + dx;
+                    const celdaZ = centroZ + dz;
+                    const xCentro = (celdaX + 0.5) * tamanoCelda;
+                    const zCentro = (celdaZ + 0.5) * tamanoCelda;
+                    if (Math.hypot(xCentro - camera.position.x, zCentro - camera.position.z) <= radio + tamanoCelda) {
+                        callback(celdaX, celdaZ);
+                    }
+                }
+            }
+        };
+
+        const recorrerCeldasImpostores = callback => {
+            const minX = Math.floor(Math.min(...contorno.map(punto => punto[0])) / tamanoCeldaImpostor) - 1;
+            const maxX = Math.floor(Math.max(...contorno.map(punto => punto[0])) / tamanoCeldaImpostor) + 1;
+            const minZ = Math.floor(Math.min(...contorno.map(punto => punto[1])) / tamanoCeldaImpostor) - 1;
+            const maxZ = Math.floor(Math.max(...contorno.map(punto => punto[1])) / tamanoCeldaImpostor) + 1;
+            for (let celdaZ = minZ; celdaZ <= maxZ; celdaZ++) {
+                for (let celdaX = minX; celdaX <= maxX; celdaX++) {
+                    const xCentro = (celdaX + 0.5) * tamanoCeldaImpostor;
+                    const zCentro = (celdaZ + 0.5) * tamanoCeldaImpostor;
+                    if (dentroDelContorno(xCentro, zCentro) ||
+                        distanciaAlContorno(xCentro, zCentro) < tamanoCeldaImpostor) {
+                        callback(celdaX, celdaZ);
+                    }
+                }
+            }
+        };
+
+        const precalentarPorLotes = async (cubierta, superficie, alturaOrigen, informar) => {
+            const celdas = [];
+            recorrerCeldas(alcancePrecarga, (celdaX, celdaZ) => celdas.push({ celdaX, celdaZ }));
+            const tamanoLote = 12;
+            for (let inicioLote = 0; inicioLote < celdas.length; inicioLote += tamanoLote) {
+                const lote = celdas.slice(inicioLote, inicioLote + tamanoLote);
+                const respuestaWorker = await pedirAlWorker("generar-lote", {
+                    celdas: lote, tamanoCelda, divisiones, paso, alturaOrigen, cubierta
+                });
+                for (let indice = 0; indice < lote.length; indice++) {
+                    const { celdaX, celdaZ } = lote[indice];
+                    const candidatos = respuestaWorker?.resultados?.[indice]?.resultado?.candidatos || null;
+                    generarCelda(celdaX, celdaZ, cubierta, superficie, alturaOrigen, candidatos);
+                }
+                informar?.(Math.min(1, (inicioLote + lote.length) / celdas.length));
+                await new Promise(resolver => window.requestAnimationFrame(resolver));
+            }
+        };
+
+        const precalentarImpostoresPorLotes = async (cubierta, superficie, alturaOrigen, informar) => {
+            const celdas = [];
+            recorrerCeldasImpostores((celdaX, celdaZ) =>
+                celdas.push({ celdaX, celdaZ })
+            );
+            for (let indice = 0; indice < celdas.length; indice++) {
+                const { celdaX, celdaZ } = celdas[indice];
+                generarCeldaImpostor(celdaX, celdaZ, cubierta, superficie, alturaOrigen);
+                informar?.((indice + 1) / celdas.length);
+                if (indice % 2 === 1) {
+                    await new Promise(resolver => window.requestAnimationFrame(resolver));
+                }
+            }
+        };
+
+        const construirCapaImpostores = cubierta => {
+            const impostoresActivos = impostoresPorCubierta[cubierta];
+            const fragmentos = impostoresActivos.map(() => []);
+            cacheImpostores[cubierta].forEach(celda =>
+                celda.matrices.forEach((datos, tipo) => {
+                    if (datos.length) fragmentos[tipo].push(datos);
+                })
+            );
+            impostoresActivos.forEach((malla, tipo) => {
+                const longitud = fragmentos[tipo].reduce((total, datos) => total + datos.length, 0);
+                const matrices = new Float32Array(longitud);
+                let desplazamiento = 0;
+                fragmentos[tipo].forEach(datos => {
+                    matrices.set(datos, desplazamiento);
+                    desplazamiento += datos.length;
+                });
+                malla.thinInstanceSetBuffer("matrix", matrices, 16, true);
+                malla.thinInstanceCount = longitud / 16;
+                // Son solo tres mallas agrupadas por cubierta. Mantenerlas activas evita
+                // que Babylon descarte todo el campo usando el límite de la malla fuente.
+                malla.alwaysSelectAsActiveMesh = longitud > 0;
+                malla.setEnabled(longitud > 0);
+                malla.renderingGroupId = 0;
+            });
+        };
+
+        // ✅ RESTAURADO: Actualizar impostores dinámicamente SOLO cuando cambia posición
+        let ultimaCeldaImpostorX = null;
+        let ultimaCeldaImpostorZ = null;
+        let ultimosImpostoresGrupo0 = null;
+
+        const actualizarImpostoresDinamicos = (cubierta, camaraX, camaraZ, superficie, alturaOrigen) => {
+            const impostoresActivos = impostoresPorCubierta[cubierta];
+            if (!impostoresActivos || impostoresActivos.length === 0) return;
+
+            // ✅ OPTIMIZACIÓN: Solo recalcular si cambió de celda impostor
+            const celdaImpostorX = Math.floor(camaraX / tamanoCeldaImpostor);
+            const celdaImpostorZ = Math.floor(camaraZ / tamanoCeldaImpostor);
+
+            if (ultimaCeldaImpostorX === celdaImpostorX && ultimaCeldaImpostorZ === celdaImpostorZ && ultimosImpostoresGrupo0 !== null) {
+                return; // Sin cambio, sin recalcular
+            }
+
+            ultimaCeldaImpostorX = celdaImpostorX;
+            ultimaCeldaImpostorZ = celdaImpostorZ;
+
+            const fragmentos = impostoresActivos.map(() => []);
+            const radioCeldas = Math.ceil(100 / tamanoCeldaImpostor);
+
+            for (let dz = -radioCeldas; dz <= radioCeldas; dz++) {
+                for (let dx = -radioCeldas; dx <= radioCeldas; dx++) {
+                    const celdaX = celdaImpostorX + dx;
+                    const celdaZ = celdaImpostorZ + dz;
+                    const xCentro = (celdaX + 0.5) * tamanoCeldaImpostor;
+                    const zCentro = (celdaZ + 0.5) * tamanoCeldaImpostor;
+
+                    const dxDistancia = xCentro - camaraX;
+                    const dzDistancia = zCentro - camaraZ;
+                    const distancia2 = dxDistancia * dxDistancia + dzDistancia * dzDistancia;
+
+                    // Rango 20-100m: obtener (NO generar) impostores del caché
+                    if (distancia2 >= 400 && distancia2 <= 10000) {
+                        const celda = cacheImpostores[cubierta].get(`${celdaX},${celdaZ}`);
+                        if (celda) {  // Solo si existe
+                            celda.matrices.forEach((datos, tipo) => {
+                                if (datos.length) fragmentos[tipo].push(datos);
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Actualizar thin instances de impostores
+            impostoresActivos.forEach((malla, tipo) => {
+                const longitud = fragmentos[tipo].reduce((total, datos) => total + datos.length, 0);
+                const estadoBuffer = malla.__bufferMatrix || {};
+
+                if (!estadoBuffer.datos || estadoBuffer.datos.length < longitud) {
+                    let capacidad = Math.max(longitud * 1.5, 256);
+                    estadoBuffer.datos = new Float32Array(Math.ceil(capacidad));
+                    malla.__bufferMatrix = estadoBuffer;
+                }
+
+                let desplazamiento = 0;
+                fragmentos[tipo].forEach(datos => {
+                    estadoBuffer.datos.set(datos, desplazamiento);
+                    desplazamiento += datos.length;
+                });
+
+                if (!estadoBuffer.inicializado) {
+                    malla.thinInstanceSetBuffer("matrix", estadoBuffer.datos, 16, true);
+                    estadoBuffer.inicializado = true;
+                } else {
+                    malla.thinInstanceBufferUpdated("matrix");
+                }
+
+                malla.thinInstanceCount = longitud / 16;
+                malla.alwaysSelectAsActiveMesh = longitud > 0;
+                malla.setEnabled(longitud > 0);
+                malla.renderingGroupId = 0;  // Fondo
+            });
+        };
+
+
+        const procesarPrecarga = async () => {
+            if (!colaPrecarga.length) {
+                precargaEnCurso = false;
+                window.requestAnimationFrame(() => actualizarPraderaBromus?.(true));
+                return;
+            }
+            const celda = colaPrecarga.shift();
+            precargaPendiente.delete(celda.claveCola);
+            const respuestaWorker = await pedirAlWorker("generar-celda", {
+                celdaX: celda.celdaX,
+                celdaZ: celda.celdaZ,
+                tamanoCelda,
+                divisiones,
+                paso,
+                alturaOrigen: celda.alturaOrigen,
+                cubierta: celda.cubierta
+            });
+            generarCelda(
+                celda.celdaX, celda.celdaZ, celda.cubierta, celda.superficie, celda.alturaOrigen,
+                respuestaWorker?.resultado?.candidatos || null
+            );
+            celdasDesdeRefresco++;
+
+            // ✅ FIX 1: Velocidad de precarga (AUMENTADA a 40 celdas/actualización)
+            if (celdasDesdeRefresco >= 4 && celda.cubierta === ultimaCubierta) {
+                celdasDesdeRefresco = 0;
+                window.requestAnimationFrame(() => actualizarPraderaBromus?.(true));
+            }
+
+            const continuar = () => procesarPrecarga();
+
+            // Una celda por turno: evita ráfagas largas y funciona igual en todos los navegadores.
+            window.setTimeout(continuar, 0);
+        };
+
+        const programarPrecarga = (cubierta, superficie, alturaOrigen) => {
+            const nuevas = [];
+            recorrerCeldas(alcancePrecarga, (celdaX, celdaZ) => {
+                const claveCelda = `${celdaX},${celdaZ}`;
+                const claveCola = `${cubierta}:${claveCelda}`;
+                if (!cache[cubierta].has(claveCelda) && !precargaPendiente.has(claveCola)) {
+                    precargaPendiente.add(claveCola);
+                    nuevas.push({ cubierta, superficie, alturaOrigen, celdaX, celdaZ, claveCola });
+                }
+            });
+            nuevas.sort((a, b) => {
+                const distanciaA = ((a.celdaX + 0.5) * tamanoCelda - camera.position.x) ** 2 +
+                    ((a.celdaZ + 0.5) * tamanoCelda - camera.position.z) ** 2;
+                const distanciaB = ((b.celdaX + 0.5) * tamanoCelda - camera.position.x) ** 2 +
+                    ((b.celdaZ + 0.5) * tamanoCelda - camera.position.z) ** 2;
+                return distanciaA - distanciaB;
+            });
+            colaPrecarga.unshift(...nuevas);
+            if (!precargaEnCurso && colaPrecarga.length) {
+                precargaEnCurso = true;
+                procesarPrecarga();
+            }
+        };
+
+        const activarC4 = () => {
+            c4Activada = true;
+            programarPrecarga("c4", sueloC4, 36);
+        };
+
+        actualizarPraderaBromus = (forzar = false) => {
+            if (!c4Activada && camera.position.y > umbralActivacionC4) {
+                activarC4();
+            }
+            const cubierta = camera.position.y > 18 ? "c4" : "c2";
+            const celdaCamaraX = Math.floor(camera.position.x / tamanoCelda);
+            const celdaCamaraZ = Math.floor(camera.position.z / tamanoCelda);
+            if (!forzar && cubierta === ultimaCubierta &&
+                celdaCamaraX === ultimaCeldaX && celdaCamaraZ === ultimaCeldaZ) return;
+            const superficie = cubierta === "c2" ? sueloC2 : sueloC4;
+            const alturaOrigen = cubierta === "c2" ? 10 : 36;
+            // ✅ ARREGLADO: Renderiza lo que TIENE en caché, no espera a que esté completo
+            // Siempre precarga para anticipar, pero no bloquea el renderizado
+            ultimaCeldaX = celdaCamaraX;
+            ultimaCeldaZ = celdaCamaraZ;
+            ultimaCubierta = cubierta;
+            fragmentosPorGrupo.forEach(nivelesEspecie => nivelesEspecie.forEach(variantes =>
+                variantes.forEach(fragmentos => { fragmentos.length = 0; })
+            ));
+            const camaraX = camera.position.x;
+            const camaraZ = camera.position.z;
+            const recuentos = [0, 0];
+
+            // ✅ LOD FUNCIONAL: Renderiza plantas dentro del alcance (100m)
+            recorrerCeldas(alcance, (celdaX, celdaZ) => {
+                const celda = cache[cubierta].get(`${celdaX},${celdaZ}`);
+                if (!celda) return;
+                const dx = (celdaX + 0.5) * tamanoCelda - camaraX;
+                const dz = (celdaZ + 0.5) * tamanoCelda - camaraZ;
+                const distancia2 = dx * dx + dz * dz;
+
+                // Sistema LOD: divide en 2 niveles
+                const nivel = distancia2 < 16 ? 0 : distancia2 < alcance * alcance ? 1 : -1;
+                if (nivel < 0) return;
+                celda.matrices.forEach((variantes, indiceEspecie) => variantes.forEach((datos, indiceVariante) => {
+                    if (!datos.length) return;
+                    fragmentosPorGrupo[indiceEspecie][nivel][indiceVariante].push(datos);
+                    recuentos[nivel] += datos.length / 16;
+                }));
+            });
+
+            modelos.forEach((modelo, indiceEspecie) => modelo.fuentes.forEach((variantes, indiceNivel) =>
+                variantes.forEach((malla, indiceVariante) => {
+                    const fragmentos = fragmentosPorGrupo[indiceEspecie][indiceNivel][indiceVariante];
+                    const longitud = fragmentos.reduce((total, datos) => total + datos.length, 0);
+                    const estadoBuffer = buffersPorGrupo[indiceEspecie][indiceNivel][indiceVariante];
+                    if (longitud > estadoBuffer.datos.length) {
+                        let capacidad = estadoBuffer.datos.length;
+                        while (capacidad < longitud) capacidad *= 2;
+                        estadoBuffer.datos = new Float32Array(capacidad);
+                        estadoBuffer.inicializado = false;
+                    }
+                    let desplazamiento = 0;
+                    fragmentos.forEach(fragmento => {
+                        estadoBuffer.datos.set(fragmento, desplazamiento);
+                        desplazamiento += fragmento.length;
+                    });
+                    // Las thin instances usan la transformación de la malla fuente como base.
+                    malla.position.set(0, 0, 0);
+                    malla.scaling.setAll(1);
+                    malla.rotationQuaternion = null;
+                    malla.rotation.set(0, 0, 0);
+                    if (!estadoBuffer.inicializado) {
+                        // ✅ CORREGIDO: Buffer UPDATABLE para cambios dinámicos
+                        malla.thinInstanceSetBuffer("matrix", estadoBuffer.datos, 16, true);
+                        estadoBuffer.inicializado = true;
+                    } else {
+                        malla.thinInstanceBufferUpdated("matrix");
+                    }
+                    malla.thinInstanceCount = longitud / 16;
+                    malla.alwaysSelectAsActiveMesh = longitud > 0;
+                    malla.setEnabled(longitud > 0);
+                    // Hierba, árboles y terreno comparten profundidad; nunca se fuerza
+                    // la vegetación por encima de los objetos opacos o recortados.
+                    malla.renderingGroupId = 0;
+                })
+            ));
+
+            programarPrecarga(cubierta, superficie, alturaOrigen);
+            if (forzar) console.log(`Pradera thin instances por LOD: ${JSON.stringify(recuentos)}`);
+        };
+
+        // Solo C2 se calcula al inicio y se reparte entre fotogramas para no bloquear la interfaz.
+        actualizarCarga(84, "GENERANDO C2…");
+        await precalentarPorLotes("c2", sueloC2, 10, progreso =>
+            actualizarCarga(84 + progreso * 6, "GENERANDO C2…")
+        );
+        actualizarCarga(90, "PREPARANDO FONDO…");
+        await precalentarImpostoresPorLotes("c2", sueloC2, 10, progreso =>
+            actualizarCarga(90 + progreso * 2.5, "PREPARANDO FONDO C2…")
+        );
+        construirCapaImpostores("c2");
+        await precalentarImpostoresPorLotes("c4", sueloC4, 36, progreso =>
+            actualizarCarga(92.5 + progreso * 2.5, "PREPARANDO FONDO C4…")
+        );
+        construirCapaImpostores("c4");
+        actualizarPraderaBromus(true);
+        // Calienta las primeras actualizaciones de buffers mientras la portada sigue visible.
+        const xPrecarga = camera.position.x;
+        camera.position.x += tamanoCelda;
+        actualizarPraderaBromus(true);
+        camera.position.x = xPrecarga;
+        actualizarPraderaBromus(true);
+        console.log("Pradera híbrida: base ligera fija y geometría detallada hasta 18 m.");
+        console.log("✅ ESTADÍSTICAS:");
+        console.log("   - Caché C2 celdas:", cache.c2.size);
+        console.log("   - Caché impostores C2:", cacheImpostores.c2.size);
+        console.log("   - Divisiones por celda:", divisiones, "×", divisiones, "=", divisiones * divisiones);
+        console.log("   - Divisiones impostores:", divisionesImpostor, "×", divisionesImpostor, "=", divisionesImpostor * divisionesImpostor);
+    }
+
+    async function crearPraderaMundoAbierto(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) throw new Error("No se han encontrado las superficies de la pradera.");
+        const ruta = "assets/img/granja/";
+        const tamanoCelda = 8;
+        const configuracionLOD = [
+            { nombre: "near", tarjetas: 96, radio: 0.82, ancho: 0.29, alto: 0.64 },
+            { nombre: "mid", tarjetas: 18, radio: 0.94, ancho: 0.40, alto: 0.54 },
+            { nombre: "far", tarjetas: 8, radio: 1.06, ancho: 0.58, alto: 0.42 }
+        ];
+        const tipos = [
+            { archivo: "hierba-fina-alpha-v1.webp", color: new BABYLON.Color3(0.72, 0.78, 0.40) },
+            { archivo: "hierba-ancha-alpha-v1.webp", color: new BABYLON.Color3(0.62, 0.72, 0.36) },
+            { archivo: "hierba-seca-alpha-v1.webp", color: new BABYLON.Color3(0.82, 0.72, 0.38) }
+        ];
+
+        const crearGrupoHierba = (lod, tipo, indiceLOD, indiceTipo) => {
+            let semilla = 0x7183a5 ^ (indiceLOD * 0x9e3779) ^ (indiceTipo * 0x85ebca);
+            const aleatorio = () => {
+                semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const posiciones = [];
+            const indices = [];
+            const uvs = [];
+            const normales = [];
+            for (let tarjeta = 0; tarjeta < lod.tarjetas; tarjeta++) {
+                const distancia = Math.sqrt(aleatorio()) * lod.radio;
+                const direccion = aleatorio() * Math.PI * 2;
+                const centroX = Math.cos(direccion) * distancia;
+                const centroZ = Math.sin(direccion) * distancia;
+                const giro = aleatorio() * Math.PI;
+                const medioAncho = lod.ancho * (0.78 + aleatorio() * 0.44) / 2;
+                const alto = lod.alto * (0.78 + aleatorio() * 0.44);
+                const dx = Math.cos(giro) * medioAncho;
+                const dz = Math.sin(giro) * medioAncho;
+                const base = posiciones.length / 3;
+                posiciones.push(
+                    centroX - dx, 0, centroZ - dz,
+                    centroX + dx, 0, centroZ + dz,
+                    centroX + dx, alto, centroZ + dz,
+                    centroX - dx, alto, centroZ - dz
+                );
+                indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+                uvs.push(0, 1, 1, 1, 1, 0, 0, 0);
+            }
+            BABYLON.VertexData.ComputeNormals(posiciones, indices, normales);
+            const datos = new BABYLON.VertexData();
+            datos.positions = posiciones;
+            datos.indices = indices;
+            datos.uvs = uvs;
+            datos.normals = normales;
+            const malla = new BABYLON.Mesh(`hierba-${lod.nombre}-${indiceTipo}`, scene);
+            datos.applyToMesh(malla);
+            const material = new BABYLON.StandardMaterial(`material-hierba-${lod.nombre}-${indiceTipo}`, scene);
+            const textura = new BABYLON.Texture(`${ruta}${tipo.archivo}`, scene, false, false,
+                BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+            textura.hasAlpha = true;
+            textura.anisotropicFilteringLevel = indiceLOD === 0 ? 8 : 4;
+            material.diffuseTexture = textura;
+            material.opacityTexture = textura;
+            material.diffuseColor = tipo.color;
+            material.specularColor = BABYLON.Color3.Black();
+            material.useAlphaFromDiffuseTexture = true;
+            material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.28;
+            material.forceDepthWrite = true;
+            material.backFaceCulling = false;
+            material.twoSidedLighting = true;
+            malla.material = material;
+            malla.isPickable = false;
+            malla.receiveShadows = false;
+            malla.renderingGroupId = 0;
+            malla.alwaysSelectAsActiveMesh = true;
+            return malla;
+        };
+        const maestros = configuracionLOD.map((lod, indiceLOD) =>
+            tipos.map((tipo, indiceTipo) => crearGrupoHierba(lod, tipo, indiceLOD, indiceTipo))
+        );
+
+        actualizarCarga(77, "CARGANDO MAPA DE HIERBA…");
+        const respuesta = await fetch("assets/img/granja/granja-hierba-celdas-v1.bin");
+        if (!respuesta.ok) throw new Error(`No se ha podido cargar el mapa de hierba (${respuesta.status}).`);
+        const binario = await respuesta.arrayBuffer();
+        const vista = new DataView(binario);
+        if (String.fromCharCode(...new Uint8Array(binario, 0, 4)) !== "ALGC" || vista.getUint32(4, true) !== 1) {
+            throw new Error("El mapa de hierba no es válido.");
+        }
+        const cantidad = vista.getUint32(8, true);
+        const celdas = new Map();
+        const permitida = (x, z, cubierta) =>
+            dentroDelContorno(x, z) && distanciaAlContorno(x, z) >= 3.5 &&
+            !zonasExcluidas.some(zona => zona.cubierta === cubierta &&
+                distanciaASegmento(x, z, zona.segmento) < zona.radio);
+        const matriz = new BABYLON.Matrix();
+        const escalaVector = new BABYLON.Vector3();
+        const posicion = new BABYLON.Vector3();
+        const rotacion = new BABYLON.Quaternion();
+        for (let indice = 0; indice < cantidad; indice++) {
+            const offset = 12 + indice * 16;
+            const x = vista.getFloat32(offset, true);
+            const y = vista.getFloat32(offset + 4, true);
+            const z = vista.getFloat32(offset + 8, true);
+            const atributos = vista.getUint32(offset + 12, true);
+            const cubierta = y > 10 ? "c4" : "c2";
+            if (permitida(x, z, cubierta)) {
+                const tipo = (atributos & 7) % tipos.length;
+                const celdaX = Math.floor(x / tamanoCelda);
+                const celdaZ = Math.floor(z / tamanoCelda);
+                const clave = `${cubierta}:${celdaX}:${celdaZ}`;
+                let celda = celdas.get(clave);
+                if (!celda) {
+                    celda = { cubierta, celdaX, celdaZ, matrices: tipos.map(() => []) };
+                    celdas.set(clave, celda);
+                }
+                const giro = ((atributos >>> 11) & 255) / 256 * Math.PI * 2;
+                const escala = 0.82 + ((atributos >>> 19) & 255) / 255 * 0.38;
+                escalaVector.set(escala, escala * (0.88 + ((atributos >>> 3) & 255) / 255 * 0.18), escala);
+                posicion.set(x, y + 0.008, z);
+                BABYLON.Quaternion.FromEulerAnglesToRef(0, giro, 0, rotacion);
+                BABYLON.Matrix.ComposeToRef(escalaVector, rotacion, posicion, matriz);
+                matriz.copyToArray(celda.matrices[tipo], celda.matrices[tipo].length);
+            }
+            if (indice % 5000 === 4999) {
+                actualizarCarga(77 + (indice / cantidad) * 15, "ORGANIZANDO CELDAS…");
+                await new Promise(resolver => window.requestAnimationFrame(resolver));
+            }
+        }
+        celdas.forEach(celda => {
+            celda.matrices = celda.matrices.map(datos => new Float32Array(datos));
+        });
+
+        const estadosBuffer = maestros.map(nivel => nivel.map(() => ({
+            datos: new Float32Array(16 * 2048), inicializado: false
+        })));
+        const limitar01 = valor => Math.max(0, Math.min(1, valor));
+        const pasoSuave = (inicio, final, valor) => {
+            const t = limitar01((valor - inicio) / (final - inicio));
+            return t * t * (3 - 2 * t);
+        };
+        const factorLOD = (nivel, distancia) => {
+            if (nivel === 0) return 1 - pasoSuave(12, 18, distancia);
+            if (nivel === 1) return pasoSuave(10, 16, distancia) * (1 - pasoSuave(30, 38, distancia));
+            return pasoSuave(28, 36, distancia) * (1 - pasoSuave(52, 65, distancia));
+        };
+        const actualizarBuffer = (malla, estado, fragmentos, nivel) => {
+            const capacidadNecesaria = fragmentos.reduce((total, datos) => total + datos.length, 0);
+            if (capacidadNecesaria > estado.datos.length) {
+                let capacidad = estado.datos.length;
+                while (capacidad < capacidadNecesaria) capacidad *= 2;
+                estado.datos = new Float32Array(capacidad);
+                estado.inicializado = false;
+            }
+            let desplazamiento = 0;
+            fragmentos.forEach(datos => {
+                for (let origen = 0; origen < datos.length; origen += 16) {
+                    const dx = datos[origen + 12] - camera.position.x;
+                    const dz = datos[origen + 14] - camera.position.z;
+                    const factor = factorLOD(nivel, Math.hypot(dx, dz));
+                    if (factor <= 0.002) continue;
+                    for (let componente = 0; componente < 16; componente++) {
+                        estado.datos[desplazamiento + componente] = datos[origen + componente];
+                    }
+                    // Se conserva la posición y se reduce progresivamente la mata desde su base.
+                    estado.datos[desplazamiento] *= factor;
+                    estado.datos[desplazamiento + 1] *= factor;
+                    estado.datos[desplazamiento + 2] *= factor;
+                    estado.datos[desplazamiento + 4] *= factor;
+                    estado.datos[desplazamiento + 5] *= factor;
+                    estado.datos[desplazamiento + 6] *= factor;
+                    estado.datos[desplazamiento + 8] *= factor;
+                    estado.datos[desplazamiento + 9] *= factor;
+                    estado.datos[desplazamiento + 10] *= factor;
+                    desplazamiento += 16;
+                }
+            });
+            if (!estado.inicializado) {
+                malla.thinInstanceSetBuffer("matrix", estado.datos, 16, false);
+                estado.inicializado = true;
+            } else {
+                malla.thinInstanceBufferUpdated("matrix");
+            }
+            malla.thinInstanceCount = desplazamiento / 16;
+            malla.setEnabled(desplazamiento > 0);
+        };
+
+        let ultimaPosicion = new BABYLON.Vector3(Number.POSITIVE_INFINITY, 0, Number.POSITIVE_INFINITY);
+        let ultimaCubierta = "";
+        const actualizar = (forzar = false) => {
+            const cubierta = camera.position.y > 18 ? "c4" : "c2";
+            if (!forzar && cubierta === ultimaCubierta &&
+                BABYLON.Vector3.DistanceSquared(camera.position, ultimaPosicion) < 0.1225) return;
+            ultimaPosicion.copyFrom(camera.position);
+            ultimaCubierta = cubierta;
+            const fragmentos = configuracionLOD.map(() => tipos.map(() => []));
+            celdas.forEach(celda => {
+                if (celda.cubierta !== cubierta) return;
+                const centroX = (celda.celdaX + 0.5) * tamanoCelda;
+                const centroZ = (celda.celdaZ + 0.5) * tamanoCelda;
+                const distancia = Math.hypot(centroX - camera.position.x, centroZ - camera.position.z);
+                const margenCelda = tamanoCelda * Math.SQRT1_2;
+                const niveles = [];
+                if (distancia <= 18 + margenCelda) niveles.push(0);
+                if (distancia >= 10 - margenCelda && distancia <= 38 + margenCelda) niveles.push(1);
+                if (distancia >= 28 - margenCelda && distancia <= 65 + margenCelda) niveles.push(2);
+                niveles.forEach(nivel => celda.matrices.forEach((datos, tipo) => {
+                    if (datos.length) fragmentos[nivel][tipo].push(datos);
+                }));
+            });
+            maestros.forEach((nivel, indiceLOD) => nivel.forEach((malla, indiceTipo) =>
+                actualizarBuffer(
+                    malla,
+                    estadosBuffer[indiceLOD][indiceTipo],
+                    fragmentos[indiceLOD][indiceTipo],
+                    indiceLOD
+                )
+            ));
+        };
+        actualizarPraderaBromus = actualizar;
+        actualizar(true);
+        actualizarCarga(95, "PRADERA PREPARADA…");
+        console.log(`Pradera mundo abierto: ${cantidad} grupos, ${celdas.size} celdas precalculadas.`);
+    }
+
+    BABYLON.SceneLoader.ImportMeshAsync(
+        "", "assets/img/granja/", "granja-pradera-pbr-v20.glb", scene,
+        evento => {
+            const fraccion = evento.lengthComputable && evento.total ? evento.loaded / evento.total : 0;
+            actualizarCarga(4 + fraccion * 26, "CARGANDO TERRENO…");
+        }
+    )
+        .then(async ({ meshes }) => {
+            actualizarCarga(32, "PREPARANDO PAISAJE…");
             const visibles = meshes.filter(mesh => mesh.getTotalVertices && mesh.getTotalVertices() > 0);
 
             visibles.forEach(mesh => {
@@ -741,10 +2179,35 @@
                     mesh.isPickable = true;
                     superficiesTransitables.add(mesh);
                 }
+                if (/talud_rampa|pared_trasera_rampa/i.test(mesh.name)) {
+                    mesh.isPickable = true;
+                    obstaculosSolidos.add(mesh);
+                }
             });
 
             vestirArquitectura(visibles);
-            construirPaisaje(visibles);
+            const paisaje = construirPaisaje(visibles);
+            // La precarga de vegetación debe centrarse en el punto real de aparición.
+            camera.position.copyFrom(inicio);
+            actualizarCarga(40, "CARGANDO CASA…");
+            await crearCasaJeanPierre(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(47, "CARGANDO TRACTOR…");
+            await crearTractor(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(49, "COLOCANDO APEROS…");
+            await crearAdornosCasa(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(50, "CARGANDO ESTABLO…");
+            await crearEstablo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(52, "CARGANDO MANZANOS…");
+            await crearManzanos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
+            actualizarCarga(64, "CARGANDO OLMO…");
+            await crearOlmo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(68, "CARGANDO MANDARINOS…");
+            await crearMandarinos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
+            actualizarCarga(72, "CARGANDO FLORES…");
+            await crearAgapantos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
+            actualizarCarga(76, "GENERANDO PRADERA…");
+            await crearPraderaMundoAbierto(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
+            actualizarCarga(96, "PREPARANDO VISITA…");
 
             if (window.innerWidth >= 1100 && BABYLON.SSAO2RenderingPipeline) {
                 const oclusion = new BABYLON.SSAO2RenderingPipeline("oclusion-ambiental", scene, {
@@ -760,14 +2223,19 @@
 
             camera.position.copyFrom(inicio);
 
+            actualizarCarga(100, "LISTO");
             entrar.disabled = false;
-            entrar.textContent = "ENTRAR EN GRANJA";
+            cargaTexto.textContent = "ENTRAR EN GRANJA";
+            entrar.removeAttribute("role");
+            entrar.removeAttribute("aria-valuemin");
+            entrar.removeAttribute("aria-valuemax");
+            entrar.removeAttribute("aria-valuenow");
         })
         .catch(fallo => {
             console.error(fallo);
             error.hidden = false;
             error.textContent = `No se ha podido cargar la maqueta: ${fallo.message || fallo}`;
-            entrar.textContent = "ERROR DE CARGA";
+            cargaTexto.textContent = "ERROR DE CARGA";
         });
 
     entrar.addEventListener("click", () => {
@@ -775,11 +2243,65 @@
         hud.hidden = false;
         visitaActiva = true;
         camera.attachControl(canvas, true);
-        canvas.requestPointerLock?.();
+        if (esTactil) controlesTactiles?.classList.add("granja-controles-tactiles--activos");
+        else canvas.requestPointerLock?.();
     });
 
     canvas.addEventListener("click", () => {
-        if (visitaActiva && document.pointerLockElement !== canvas) canvas.requestPointerLock?.();
+        if (!esTactil && visitaActiva && document.pointerLockElement !== canvas) canvas.requestPointerLock?.();
+    });
+
+    function configurarJoystick(elemento, alMover) {
+        if (!elemento) return;
+        const mando = elemento.querySelector("span");
+        let puntero = null;
+        const actualizar = evento => {
+            const caja = elemento.getBoundingClientRect();
+            const radio = Math.min(caja.width, caja.height) * 0.34;
+            let x = evento.clientX - (caja.left + caja.width / 2);
+            let y = evento.clientY - (caja.top + caja.height / 2);
+            const distancia = Math.hypot(x, y);
+            if (distancia > radio) {
+                x = x / distancia * radio;
+                y = y / distancia * radio;
+            }
+            mando.style.transform = `translate(${x}px,${y}px)`;
+            alMover(x / radio, y / radio, evento);
+        };
+        elemento.addEventListener("pointerdown", evento => {
+            evento.preventDefault();
+            puntero = evento.pointerId;
+            elemento.setPointerCapture(puntero);
+            actualizar(evento);
+        });
+        elemento.addEventListener("pointermove", evento => {
+            if (evento.pointerId !== puntero) return;
+            evento.preventDefault();
+            actualizar(evento);
+        });
+        const finalizar = evento => {
+            if (evento.pointerId !== puntero) return;
+            puntero = null;
+            mando.style.transform = "translate(0,0)";
+            alMover(0, 0, evento);
+        };
+        elemento.addEventListener("pointerup", finalizar);
+        elemento.addEventListener("pointercancel", finalizar);
+    }
+
+    configurarJoystick(joystickMover, (x, y) => {
+        movimientoTactil.x = x;
+        movimientoTactil.y = y;
+    });
+    configurarJoystick(joystickMirar, (x, y) => {
+        miradaTactil.x = x;
+        miradaTactil.y = y;
+    });
+    botonRapido?.addEventListener("pointerdown", evento => {
+        evento.preventDefault();
+        multiplicadorTactil = multiplicadorTactil === 1 ? 1.8 : 1;
+        botonRapido.classList.toggle("activo", multiplicadorTactil > 1);
+        botonRapido.textContent = multiplicadorTactil > 1 ? "RÁPIDO ×1,8" : "RÁPIDO";
     });
 
     window.addEventListener("keydown", evento => {
@@ -801,6 +2323,11 @@
         cubierta.textContent = camera.position.y > 18 ? "CUBIERTA C4" : "CUBIERTA C2";
 
         if (visitaActiva) {
+            const deltaControl = Math.min(engine.getDeltaTime() / 1000, 0.05);
+            if (esTactil) {
+                camera.rotation.y += miradaTactil.x * 2.15 * deltaControl;
+                camera.rotation.x = Math.max(-1.25, Math.min(1.15, camera.rotation.x + miradaTactil.y * 1.55 * deltaControl));
+            }
             const avance = camera.getDirection(BABYLON.Axis.Z);
             const lateral = camera.getDirection(BABYLON.Axis.X);
             avance.y = 0;
@@ -813,9 +2340,13 @@
             if (teclas.has("KeyS") || teclas.has("ArrowDown")) movimiento.subtractInPlace(avance);
             if (teclas.has("KeyD") || teclas.has("ArrowRight")) movimiento.addInPlace(lateral);
             if (teclas.has("KeyA") || teclas.has("ArrowLeft")) movimiento.subtractInPlace(lateral);
+            if (esTactil) {
+                movimiento.addInPlace(avance.scale(-movimientoTactil.y));
+                movimiento.addInPlace(lateral.scale(movimientoTactil.x));
+            }
 
             if (movimiento.lengthSquared() > 0) {
-                const paso = 3.2 * engine.getDeltaTime() / 1000;
+                const paso = 6.4 * (esTactil ? multiplicadorTactil : 1) * engine.getDeltaTime() / 1000;
                 movimiento.normalize().scaleInPlace(paso);
             }
 
@@ -834,13 +2365,26 @@
                     murosHueco.some(segmento =>
                         distanciaASegmento(destino.x, destino.z, segmento) < 0.75
                     );
-                if (!bloqueadoPorPared && !bloqueadoPorBarandilla && !bloqueadoPorMuroHueco) {
+                const tramoMovimiento = destino.subtract(camera.position);
+                const choqueFrontal = tramoMovimiento.lengthSquared() > 0 && scene.pickWithRay(
+                    new BABYLON.Ray(camera.position, tramoMovimiento.normalize(), tramoMovimiento.length() + 0.55),
+                    mesh => obstaculosSolidos.has(mesh)
+                ).hit;
+                const sobreTalud = scene.pickWithRay(
+                    new BABYLON.Ray(destino.add(new BABYLON.Vector3(0, 4, 0)), BABYLON.Vector3.Down(), 8),
+                    mesh => /talud_rampa/i.test(mesh.name)
+                ).hit;
+                if (!bloqueadoPorPared && !bloqueadoPorBarandilla && !bloqueadoPorMuroHueco && !choqueFrontal && !sobreTalud) {
                     camera.position.x = destino.x;
                     camera.position.z = destino.z;
                 }
             }
 
-            actualizarHierbaProxima?.();
+            actualizarPraderaBromus?.();
+            actualizarManzanos?.();
+            actualizarMandarinos?.();
+            actualizarAgapantos?.();
+            actualizarOlmo?.();
 
             const delta = Math.min(engine.getDeltaTime() / 1000, 0.05);
             const origenRayo = new BABYLON.Vector3(camera.position.x, camera.position.y + 0.6, camera.position.z);

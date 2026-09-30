@@ -1,0 +1,32 @@
+.granja-portada button {
+  position: relative;
+  min-width: 290px;
+  overflow: hidden;
+}
+
+.granja-portada button:disabled {
+  opacity: .9;
+}
+
+.granja-portada button > span {
+  position: relative;
+  z-index: 1;
+}
+
+.granja-portada #granjaCargaBar {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  width: var(--progreso-carga, 0%);
+  background: linear-gradient(90deg, #315d20, #78ad3f, #315d20);
+  background-size: 200% 100%;
+  transition: width .35s ease;
+  animation: granja-carga-activa 1.4s linear infinite;
+}
+
+@keyframes granja-carga-activa {
+  to {
+    background-position: -200% 0;
+  }
+}
+

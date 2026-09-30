@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="assets/css/zeus.css">
     <link rel="stylesheet" href="assets/css/flota.css">
     <link rel="stylesheet" href="assets/css/granja-3d.css">
+    <link rel="stylesheet" href="assets/css/granja-carga.css">
     <link rel="stylesheet" href="assets/css/hangar.css">
     <link rel="stylesheet" href="assets/css/hospital.css">
     <link rel="stylesheet" href="assets/css/jardines.css">
@@ -53,9 +54,13 @@
         <section id="granjaPortada" class="granja-portada">
             <p class="granja-kicker">PROTOTIPO NAVEGABLE</p>
             <h2>Dos praderas. Un único paisaje.</h2>
-            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled" id="granjaEntrar" type="button" disabled="">CARGANDO MAQUETA…</button><small>Ratón para mirar · WASD para caminar · R para regresar · ESC para liberar el cursor</small>
+            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled" id="granjaEntrar" type="button" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" disabled=""><span id="granjaCargaBar" aria-hidden="true"></span><span id="granjaCargaTexto">INICIANDO… 0 %</span></button><small>Ratón para mirar · WASD para caminar · R para regresar · ESC para liberar el cursor</small>
         </section>
         <div id="granjaHud" class="granja-hud" hidden=""><span id="granjaCubierta">CUBIERTA C2</span><span id="granjaFps">-- FPS</span><button type="button" id="granjaCalidad">MODO LOW</button></div>
+        <div id="granjaControlesTactiles" class="granja-controles-tactiles" aria-label="Controles táctiles">
+            <div id="granjaMover" class="granja-joystick granja-joystick--mover" aria-label="Mover"><span></span><small>MOVER</small></div><button type="button" class="granja-rapido" id="granjaRapido">RÁPIDO</button>
+            <div id="granjaMirar" class="granja-joystick granja-joystick--mirar" aria-label="Mirar"><span></span><small>MIRAR</small></div>
+        </div>
         <div class="granja-punto" aria-hidden="true"></div>
         <p id="granjaError" class="granja-error" hidden=""></p>
     </main>

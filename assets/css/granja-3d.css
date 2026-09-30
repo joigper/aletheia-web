@@ -198,3 +198,100 @@
   }
 }
 
+.granja-controles-tactiles {
+  display: none;
+  position: absolute;
+  z-index: 25;
+  inset: auto 14px 14px;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.granja-controles-tactiles--activos {
+  display: flex;
+}
+
+.granja-joystick {
+  position: relative;
+  width: 126px;
+  height: 126px;
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 50%;
+  background: rgba(5,10,11,.34);
+  box-shadow: inset 0 0 28px rgba(0,0,0,.28);
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.granja-joystick span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin: -26px;
+  border: 2px solid rgba(243,196,79,.9);
+  border-radius: 50%;
+  background: rgba(28,38,31,.78);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  will-change: transform;
+}
+
+.granja-joystick small {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -19px;
+  color: rgba(255,255,255,.72);
+  font: 10px Tektur,sans-serif;
+  letter-spacing: .12em;
+  text-align: center;
+}
+
+.granja-rapido {
+  align-self: flex-end;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(243,196,79,.7);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(10,16,18,.72);
+  font: 700 11px Tektur,sans-serif;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.granja-rapido.activo {
+  color: #18160f;
+  background: #f3c44f;
+}
+
+@media (pointer:fine) {
+  .granja-controles-tactiles {
+    display: none!important;
+  }
+}
+
+@media (max-width:700px) {
+  .granja-joystick {
+    width: 108px;
+    height: 108px;
+  }
+}
+
+@media (max-width:700px) {
+  .granja-joystick span {
+    width: 46px;
+    height: 46px;
+    margin: -23px;
+  }
+}
+
+@media (max-width:700px) {
+  .granja-rapido {
+    font-size: 10px;
+    padding: 9px 11px;
+  }
+}
+
