@@ -440,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const capa = document.createElement("img");
       capa.className = "hospital-alzado__grafico hospital-alzado__capa";
       capa.dataset.modulo = modulo;
-      capa.src = imagenBase.src.replace(/hospital-alzado\.png(?:\?.*)?$/i, `hospital-modulo-${modulo}.png`);
+      capa.src = imagenBase.src.replace(/hospital-alzado\.webp(?:\?.*)?$/i, `hospital-modulo-${modulo}.webp`);
       capa.alt = "";
       capa.setAttribute("aria-hidden", "true");
       capa.draggable = false;

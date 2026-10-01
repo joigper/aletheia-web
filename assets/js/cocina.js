@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Aquí se distribuyen alimentos listos para consumir con rotación rápida: ensaladas, fruta preparada, gazpachos, postres refrigerados, lácteos y raciones envasadas. Solo llegan productos que permanecieron sin servir y han superado el control de tiempo, temperatura y trazabilidad; nunca sobras de platos individuales.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac1p02.jpg",
+        src: "assets/img/cocina/cocinac1p02.webp",
         alt: "Tienda de frescos de corta duración de ALÉTHEIA"
       }
     },
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Las bandejas, cubetas y tapas reutilizables regresan por un circuito separado. Se clasifican, pasan por lavado industrial, secado e inspección, y vuelven a los carros limpios para un nuevo servicio. El sistema reduce el uso de plásticos de un solo uso y mantiene separados los flujos sucio y limpio.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac1p03.jpg",
+        src: "assets/img/cocina/cocinac1p03.webp",
         alt: "Retorno y lavado industrial de envases reutilizables de ALÉTHEIA"
       }
     }
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   texto: "Las cámaras frigoríficas de trabajo mantienen únicamente las reservas necesarias para la producción inmediata, evitando almacenar en COCINA grandes cantidades de alimentos durante largos periodos. Los productos procedentes de ALMACÉN 2 se conservan a la temperatura adecuada y, cuando es necesario, pasan por procesos de descongelación controlada antes de incorporarse a las áreas de preparación. Estas operaciones se realizan en espacios separados para mantener la cadena de frío y las condiciones higiénicas.",
   medio: {
     tipo: "imagen",
-    src: "assets/img/cocina/cocinac2p02.jpg",
+    src: "assets/img/cocina/cocinac2p02.webp",
     alt: "Zona de conservación y descongelación controlada del módulo Cocina"
     }
   },
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   texto: "Área destinada a la selección, lavado, desinfección, pelado y corte de verduras, frutas y otros productos vegetales. Los procesos se realizan en líneas diferenciadas y parcialmente automatizadas, bajo supervisión del personal de COCINA, antes de que los ingredientes preparados pasen a las áreas de elaboración.",
   medio: {
     tipo: "imagen",
-    src: "assets/img/cocina/cocinac2p03.jpg",
+    src: "assets/img/cocina/cocinac2p03.webp",
     alt: "Zona de preparación y procesado de productos vegetales del módulo Cocina"
   }
     },
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Los productos cárnicos y el pescado se procesan en sectores diferenciados para mantener unas condiciones higiénicas independientes y evitar contaminaciones cruzadas.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac2p04.jpg",
+        src: "assets/img/cocina/cocinac2p04.webp",
         alt: "Área separada de procesamiento de carnes y pescado del módulo Cocina"
       }
     },
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         src: "assets/img/cocina/cocinac3p01.mp4"
       },
       receta: {
-        imagen: "assets/img/cocina/cocinac3p01-receta.jpg",
+        imagen: "assets/img/cocina/cocinac3p01-receta.webp",
         alt: "Costillas de cerdo caramelizadas con salsa de cola",
         ingredientes: [
           "1,5 kg de costillas de cerdo",
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "En esta línea se elaboran y mantienen las salsas, se preparan las guarniciones y se realizan los últimos ajustes de cada plato. Las cubetas térmicas y recipientes de servicio conservan cada componente en condiciones adecuadas hasta su paso a emplatado.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac3p04.jpg",
+        src: "assets/img/cocina/cocinac3p04.webp",
         alt: "Zona de salsas, guarniciones y preparación final del módulo Cocina"
       }
     },
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Esta área produce ensaladas, platos fríos, fruta preparada y salsas para el servicio diario. Sus superficies refrigeradas y cámaras de día mantienen la cadena de frío hasta el momento en que cada elaboración pasa a montaje y expedición.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac4p01.jpg",
+        src: "assets/img/cocina/cocinac4p01.webp",
         alt: "Área de preparación fría de ALÉTHEIA"
       }
     },
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "La producción dulce se organiza por lotes: postres de cuchara, fruta, repostería y raciones refrigeradas. Esta separación permite mantener ritmos y controles específicos sin interferir con la cocina caliente ni con la panadería.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac4p03.jpg",
+        src: "assets/img/cocina/cocinac4p03.webp",
         alt: "Área de repostería y postres de ALÉTHEIA"
       }
     },
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Aquí se completa el montaje de preparaciones frías, se agrupan las bandejas por destino y se cargan los carros de servicio. La salida conecta directamente con la cubierta 5, donde se coordinan los últimos tiempos de entrega hacia los comedores.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac4p05.jpg",
+        src: "assets/img/cocina/cocinac4p05.webp",
         alt: "Acabado frío y expedición de la cubierta 4"
       }
     }
@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Las elaboraciones procedentes de las cubiertas 2, 3 y 4 llegan en cubetas y carros identificados por lote, destino y ventana de servicio. Antes de pasar al montaje se comprueba su temperatura, integridad y secuencia de entrega para que cada preparación continúe por el circuito correcto.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac5p01.jpg",
+        src: "assets/img/cocina/cocinac5p01.webp",
         alt: "Recepción de elaboraciones procedentes de producción en ALÉTHEIA"
       }
     },
@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Carros y armarios térmicos mantienen cada preparación caliente o fría durante la breve espera previa a la salida. No es un almacén: su función es amortiguar los ritmos entre cocina y comedor sin comprometer calidad, temperatura ni trazabilidad.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac5p03.jpg",
+        src: "assets/img/cocina/cocinac5p03.webp",
         alt: "Carros térmicos de conservación temporal en ALÉTHEIA"
       }
     },
@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Los mostradores abiertos de la corona de servicio permiten entregar los platos, reponer bandejas y coordinar la salida de carros térmicos sin invadir la sala principal. El personal trabaja desde el interior de esta franja técnica, siempre cerca de cada comedor.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac6p02.jpg",
+        src: "assets/img/cocina/cocinac6p02.webp",
         alt: "Mostrador de servicio asistido de los comedores del módulo Cocina"
       }
     },
@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Además del paso desde el núcleo central, cada comedor dispone de dos accesos por módulos contiguos. Esta red de entradas reparte las llegadas y salidas de los comensales, evita concentraciones en un único punto y facilita el tránsito hacia HOME, SPORT y las escaleras.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac6p04.jpg",
+        src: "assets/img/cocina/cocinac6p04.webp",
         alt: "Comensales saliendo del comedor por una de sus conexiones laterales"
       }
     }
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
       texto: "Esta cubierta funciona como comedor de contingencia para misiones de evacuación o transporte masivo. Mesas corridas, recorridos directos y líneas de reparto autónomas permiten atender a miles de personas por turnos, con un servicio simplificado, seguro y de alta rotación.",
       medio: {
         tipo: "imagen",
-        src: "assets/img/cocina/cocinac9p01.jpg",
+        src: "assets/img/cocina/cocinac9p01.webp",
         alt: "Comedor de alta densidad de ALÉTHEIA"
       }
     }
@@ -530,7 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
   detalleCerrar.addEventListener("click", cerrarDetalle);
   const modelosCubierta = Array.from(
     { length: 10 },
-    (_, nivel) => `assets/img/cocina/cocina-modelo-${nivel}.png`
+    (_, nivel) => `assets/img/cocina/cocina-modelo-${nivel}.webp`
   );
 
   const cubiertas = [
@@ -694,7 +694,7 @@ bajarCubierta.addEventListener("click", () => {
     intro.classList.remove("vista-planta", "plano-visible", "modelo-resaltado");
     plano.removeAttribute("src");
     if (planosDisponibles.has(nivel)) {
-      plano.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
+      plano.src = `assets/img/cocina/cocinac${nivel}-plano.webp`;
       plano.alt = `Plano funcional de la cubierta ${nivel}`;
     }
     intro.classList.add("transicion-cubierta");
@@ -745,7 +745,7 @@ bajarCubierta.addEventListener("click", () => {
 
     plano.removeAttribute("src");
     if (planosDisponibles.has(nivel)) {
-      plano.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
+      plano.src = `assets/img/cocina/cocinac${nivel}-plano.webp`;
       plano.alt = `Plano funcional de la cubierta ${nivel}`;
     }
 
@@ -824,7 +824,7 @@ bajarCubierta.addEventListener("click", () => {
     });
     planosDisponibles.forEach((nivel) => {
       const imagen = new Image();
-      imagen.src = `assets/img/cocina/cocinac${nivel}-plano.png`;
+      imagen.src = `assets/img/cocina/cocinac${nivel}-plano.webp`;
     });
 
     if (cubiertaFijada === null && cubiertaEnPlanta === null) {

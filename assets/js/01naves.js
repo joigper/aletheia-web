@@ -222,7 +222,7 @@ window.naves = [
 
         imagenes: [
             {
-                src: "assets/img/PRAETORIAE01.jpg",
+                src: "assets/img/PRAETORIAE01.webp",
                 alt: "Nave PRAETORIAE"
             },
         ],
