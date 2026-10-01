@@ -615,12 +615,15 @@
         registrarTramos(carreteraPerimetral, 5.0, true, "c2");
         registrarTramos(carreteraPerimetral, 5.0, true, "c4");
         registrarTramos(enlaceRampaC2, 5.4, false, "c2");
-        registrarTramos(enlaceRampaC4, 5.4, false, "c4");
+        // En C4 la reserva anterior dejaba una calva visible alrededor de la
+        // desembocadura. 4,25 m cubren el firme (3,7 m por lado) y conservan
+        // medio metro de seguridad sin vaciar la pradera contigua.
+        registrarTramos(enlaceRampaC4, 4.25, false, "c4");
         // Corredor preciso para rampa y taludes: impide árboles, ganado y hierba
         // sobre la subida o bajo ella, sin afectar al resto del módulo.
         zonasExcluidas.push(
             { segmento: [[48.85, -38.09], [109.70, -124.35]], radio: 6.2, cubierta: "c2" },
-            { segmento: [[92.0, -99.2], [110.11, -124.98]], radio: 6.2, cubierta: "c4" }
+            { segmento: [[92.0, -99.2], [110.11, -124.98]], radio: 5.1, cubierta: "c4" }
         );
         return { sueloC2, sueloC4, zonasExcluidas };
     }
@@ -1921,8 +1924,14 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                 // [OPT] Comprobaciones baratas primero; el raycast solo si hacen falta.
                 const bloqueoBarato = bloqueadoPorPared || bloqueadoPorBarandilla ||
                     bloqueadoPorMuroHueco || bloqueadoPorAnimal;
-                // [OPT] Rampa: consulta de altura sobre los taludes, sin raycast.
-                const sobreTalud = !bloqueoBarato &&
+                // En la boca de C4 los taludes continúan parcialmente bajo el
+                // enlace y el suelo. No deben bloquear al visitante cuando hay
+                // una superficie transitable válida por encima de ellos.
+                const sueloDestino = !bloqueoBarato ? alturaEnMallas(
+                    superficiesTransitables, destino.x, destino.z,
+                    destino.y + 0.6, destino.y - 2.5
+                ) : null;
+                const sobreTalud = !bloqueoBarato && sueloDestino === null &&
                     alturaEnMallas(taludes, destino.x, destino.z, destino.y + 4, destino.y - 4) !== null;
                 let choqueFrontal = false;
                 if (!bloqueoBarato && !sobreTalud) {
