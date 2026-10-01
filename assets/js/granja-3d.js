@@ -87,6 +87,7 @@
 
     const superficiesTransitables = new Set();
     const obstaculosSolidos = new Set();
+    const obstaculosDinamicos = [];
     // Inicio junto al pie de la rampa para comprobarla inmediatamente.
     let inicio = new BABYLON.Vector3(43.5, 1.72, 49.5);
     let visitaActiva = false;
@@ -119,6 +120,11 @@
         [[92.437, 71.897], [66.880, 89.442]],
         [[66.880, 89.442], [97.677, 133.372]]
     ];
+    // Reserva amplia en planta: impide poblar tanto la propia rampa como el hueco inferior.
+    const zonaSinArbolesRampa = { minX: 45, maxX: 135, minZ: 45, maxZ: 145 };
+    const estaEnZonaRampa = (x, z) => x >= zonaSinArbolesRampa.minX &&
+        x <= zonaSinArbolesRampa.maxX && z >= zonaSinArbolesRampa.minZ &&
+        z <= zonaSinArbolesRampa.maxZ;
     const teclas = new Set();
     const teclasMovimiento = new Set([
         "KeyW", "KeyA", "KeyS", "KeyD",
@@ -148,6 +154,7 @@
         const dx = bx - ax;
         const dz = bz - az;
         const longitud2 = dx * dx + dz * dz;
+        if (longitud2 === 0) return Math.hypot(x - ax, z - az);
         const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / longitud2));
         return Math.hypot(x - (ax + t * dx), z - (az + t * dz));
     }
@@ -273,20 +280,12 @@
         pared.roughness = 0.76;
         pared.metallic = 0.02;
 
-        const rampa = new BABYLON.StandardMaterial("material-rampa", scene);
-        rampa.bumpTexture = textura("rampa-antideslizante-v1.webp", 5, 14);
-        rampa.diffuseColor = new BABYLON.Color3(0.43, 0.44, 0.43);
-        rampa.emissiveColor = new BABYLON.Color3(0.38, 0.39, 0.38);
-        rampa.specularColor = BABYLON.Color3.Black();
-        rampa.disableLighting = true;
-
-        const tierraRampa = new BABYLON.StandardMaterial("material-tierra-rampa", scene);
-        tierraRampa.diffuseTexture = textura("camino-albedo-v1.webp", 7, 16);
-        tierraRampa.diffuseColor = new BABYLON.Color3(0.62, 0.46, 0.30);
-        tierraRampa.emissiveColor = new BABYLON.Color3(0.31, 0.19, 0.09);
-        tierraRampa.specularColor = BABYLON.Color3.Black();
-        tierraRampa.backFaceCulling = false;
-        tierraRampa.disableLighting = true;
+        const rampa = new BABYLON.PBRMaterial("material-carretera-rampa", scene);
+        rampa.albedoTexture = textura("carretera-superficie-v1.png");
+        rampa.albedoColor = new BABYLON.Color3(0.92, 0.92, 0.90);
+        rampa.roughness = 0.92;
+        rampa.metallic = 0;
+        rampa.backFaceCulling = false;
 
         const laterales = new BABYLON.PBRMaterial("material-laterales-rampa", scene);
         laterales.albedoTexture = textura("pared-v2-albedo-v1.webp", 1, 1);
@@ -333,6 +332,42 @@
             mesh.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true);
         };
 
+        const uvCarretera = mesh => {
+            const posiciones = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+            if (!posiciones?.length) return;
+            let centroX = 0, centroZ = 0;
+            for (let i = 0; i < posiciones.length; i += 3) {
+                centroX += posiciones[i]; centroZ += posiciones[i + 2];
+            }
+            centroX /= posiciones.length / 3; centroZ /= posiciones.length / 3;
+            let xx = 0, zz = 0, xz = 0;
+            for (let i = 0; i < posiciones.length; i += 3) {
+                const x = posiciones[i] - centroX;
+                const z = posiciones[i + 2] - centroZ;
+                xx += x * x; zz += z * z; xz += x * z;
+            }
+            const angulo = 0.5 * Math.atan2(2 * xz, xx - zz);
+            const ejeX = Math.cos(angulo), ejeZ = Math.sin(angulo);
+            const lateralX = -ejeZ, lateralZ = ejeX;
+            const proyectados = [];
+            let minLateral = Infinity, maxLateral = -Infinity;
+            for (let i = 0; i < posiciones.length; i += 3) {
+                const x = posiciones[i] - centroX;
+                const z = posiciones[i + 2] - centroZ;
+                const longitudinal = x * ejeX + z * ejeZ;
+                const lateral = x * lateralX + z * lateralZ;
+                proyectados.push([longitudinal, lateral]);
+                minLateral = Math.min(minLateral, lateral);
+                maxLateral = Math.max(maxLateral, lateral);
+            }
+            const ancho = Math.max(0.001, maxLateral - minLateral);
+            const uvs = [];
+            proyectados.forEach(([longitudinal, lateral]) => {
+                uvs.push((lateral - minLateral) / ancho, longitudinal / 31);
+            });
+            mesh.setVerticesData(BABYLON.VertexBuffer.UVKind, uvs, true);
+        };
+
         superficies.forEach(mesh => {
             const nombre = mesh.name;
             mesh.receiveShadows = true;
@@ -349,18 +384,19 @@
                 mesh.material = pared;
             }
             else if (/GRANJA_Rampa$|Cubo\.025/i.test(nombre)) {
-                uvHorizontal(mesh, false, 4);
-                mesh.material = tierraRampa;
+                uvCarretera(mesh);
+                mesh.material = rampa;
             }
             else if (/GRANJA_Rampa_Calzada_Central/i.test(nombre)) {
-                uvHorizontal(mesh, false, 4);
+                uvCarretera(mesh);
                 mesh.material = rampa;
             }
             else if (/GRANJA_(?:Lateral_Rampa|Fondo_Hueco_Rampa)/i.test(nombre)) {
                 uvVertical(mesh, 4);
                 mesh.material = laterales;
             }
-            if (/GRANJA_(?:Paredes|Rampa|Lateral_Rampa|Fondo_Hueco_Rampa)/i.test(nombre)) {
+            if (/GRANJA_(?:Paredes|Rampa|Lateral_Rampa|Fondo_Hueco_Rampa)/i.test(nombre)
+                && !/Rampa_(?:Calzada_Central|Estrecha)/i.test(nombre)) {
                 sombras.addShadowCaster(mesh, false);
             }
         });
@@ -402,8 +438,44 @@
         return resultado;
     }
 
-    function crearCamino(nombre, puntos2d, anchura, superficie, alturaOrigen, material, cerrado = false) {
-        const centros = densificarLineal(puntos2d, cerrado, 6)
+    function suavizarTrazado(puntos, cerrado, radio = 7, pasos = 7) {
+        if (puntos.length < 3) return puntos.slice();
+        const resultado = [];
+        const inicio = cerrado ? 0 : 1;
+        const fin = cerrado ? puntos.length : puntos.length - 1;
+        if (!cerrado) resultado.push(puntos[0]);
+        for (let i = inicio; i < fin; i++) {
+            const anterior = puntos[(i - 1 + puntos.length) % puntos.length];
+            const centro = puntos[i];
+            const siguiente = puntos[(i + 1) % puntos.length];
+            const longitudA = Math.hypot(anterior[0] - centro[0], anterior[1] - centro[1]) || 1;
+            const longitudB = Math.hypot(siguiente[0] - centro[0], siguiente[1] - centro[1]) || 1;
+            const distancia = Math.min(radio, longitudA * 0.28, longitudB * 0.28);
+            const entrada = [
+                centro[0] + (anterior[0] - centro[0]) / longitudA * distancia,
+                centro[1] + (anterior[1] - centro[1]) / longitudA * distancia
+            ];
+            const salida = [
+                centro[0] + (siguiente[0] - centro[0]) / longitudB * distancia,
+                centro[1] + (siguiente[1] - centro[1]) / longitudB * distancia
+            ];
+            resultado.push(entrada);
+            for (let paso = 1; paso <= pasos; paso++) {
+                const t = paso / pasos;
+                const unoMenos = 1 - t;
+                resultado.push([
+                    unoMenos * unoMenos * entrada[0] + 2 * unoMenos * t * centro[0] + t * t * salida[0],
+                    unoMenos * unoMenos * entrada[1] + 2 * unoMenos * t * centro[1] + t * t * salida[1]
+                ]);
+            }
+        }
+        if (!cerrado) resultado.push(puntos[puntos.length - 1]);
+        return resultado;
+    }
+
+    function crearCamino(nombre, puntos2d, anchura, superficie, alturaOrigen, material, cerrado = false, suavizado = 7) {
+        const trazado = suavizarTrazado(puntos2d, cerrado, suavizado, 7);
+        const centros = densificarLineal(trazado, cerrado, 2)
             .map(([x, z]) => {
                 const y = alturaSobre(superficie, x, z, alturaOrigen);
                 return y === null ? null : new BABYLON.Vector3(x, y + 0.045, z);
@@ -411,30 +483,47 @@
             .filter(Boolean);
         if (centros.length < 2) return;
 
-        const izquierda = [];
-        const derecha = [];
+        const posiciones = [];
+        const uvs = [];
+        const indices = [];
+        const normales = [];
+        let recorrido = 0;
         for (let i = 0; i < centros.length; i++) {
-            const anterior = centros[(i - 1 + centros.length) % centros.length];
-            const siguiente = centros[(i + 1) % centros.length];
-            const a = !cerrado && i === 0 ? centros[i] : anterior;
-            const b = !cerrado && i === centros.length - 1 ? centros[i] : siguiente;
+            const anterior = centros[Math.max(0, i - 1)];
+            const siguiente = centros[Math.min(centros.length - 1, i + 1)];
+            const a = cerrado && i === 0 ? centros[centros.length - 1] : anterior;
+            const b = cerrado && i === centros.length - 1 ? centros[0] : siguiente;
             const dx = b.x - a.x;
             const dz = b.z - a.z;
             const longitud = Math.hypot(dx, dz) || 1;
             const nx = -dz / longitud * anchura / 2;
             const nz = dx / longitud * anchura / 2;
-            izquierda.push(new BABYLON.Vector3(centros[i].x + nx, centros[i].y, centros[i].z + nz));
-            derecha.push(new BABYLON.Vector3(centros[i].x - nx, centros[i].y, centros[i].z - nz));
+            if (i > 0) recorrido += BABYLON.Vector3.Distance(centros[i - 1], centros[i]);
+            posiciones.push(
+                centros[i].x + nx, centros[i].y, centros[i].z + nz,
+                centros[i].x - nx, centros[i].y, centros[i].z - nz
+            );
+            uvs.push(0, recorrido / 31, 1, recorrido / 31);
         }
-        const camino = BABYLON.MeshBuilder.CreateRibbon(nombre, {
-            pathArray: [izquierda, derecha],
-            closePath: cerrado,
-            sideOrientation: BABYLON.Mesh.DOUBLESIDE,
-            updatable: false
-        }, scene);
+        const segmentos = cerrado ? centros.length : centros.length - 1;
+        for (let i = 0; i < segmentos; i++) {
+            const siguiente = (i + 1) % centros.length;
+            const a = i * 2, b = a + 1, c = siguiente * 2, d = c + 1;
+            indices.push(a, c, b, b, c, d, b, c, a, d, c, b);
+        }
+        BABYLON.VertexData.ComputeNormals(posiciones, indices, normales);
+        const datos = new BABYLON.VertexData();
+        datos.positions = posiciones;
+        datos.indices = indices;
+        datos.normals = normales;
+        datos.uvs = uvs;
+        const camino = new BABYLON.Mesh(nombre, scene);
+        datos.applyToMesh(camino);
         camino.material = material;
         camino.isPickable = true;
+        camino.receiveShadows = true;
         superficiesTransitables.add(camino);
+        return camino;
     }
 
     function crearHierbaProxima(superficies, zonasExcluidas) {
@@ -593,6 +682,7 @@
 
     function construirPaisaje(superficies) {
         const sueloC2 = superficies.find(mesh => /suelo_cubierta_2/i.test(mesh.name));
+        const sueloBaseC2 = superficies.find(mesh => /suelo_base_c2/i.test(mesh.name));
         const sueloC4 = superficies.find(mesh => /suelo_cubierta_3/i.test(mesh.name));
         if (!sueloC2 || !sueloC4) return;
 
@@ -617,6 +707,7 @@
         };
         const pradera = new BABYLON.PBRMaterial("pradera-pbr-final", scene);
         aplicarUvMetrico(sueloC2);
+        if (sueloBaseC2) aplicarUvMetrico(sueloBaseC2);
         aplicarUvMetrico(sueloC4);
         pradera.albedoTexture = crearMapa("pradera-albedo-v1.webp", 1);
         pradera.albedoTexture.anisotropicFilteringLevel = 16;
@@ -626,6 +717,7 @@
         pradera.roughness = 0.98;
         pradera.metallic = 0;
         sueloC2.material = pradera;
+        if (sueloBaseC2) sueloBaseC2.material = pradera;
         sueloC4.material = pradera.clone("pradera-pbr-final-c4");
 
         const crearTaludRampa = () => {
@@ -783,51 +875,42 @@
         };
         // Los taludes, la prolongación y la pared posterior ya forman parte del GLB v5.
 
-        const tierra = new BABYLON.PBRMaterial("tierra-caminos-pbr", scene);
-        tierra.albedoTexture = crearMapa("camino-albedo-v1.webp", 4.5);
-        tierra.bumpTexture = crearMapa("camino-normal-v1.webp", 4.5);
-        tierra.albedoColor = new BABYLON.Color3(0.76, 0.69, 0.59);
-        tierra.roughness = 1;
-        tierra.metallic = 0;
+        const desplazarPoligono = (puntos, distancia) => {
+            const area = puntos.reduce((suma, punto, i) => {
+                const siguiente = puntos[(i + 1) % puntos.length];
+                return suma + punto[0] * siguiente[1] - siguiente[0] * punto[1];
+            }, 0);
+            const signo = area > 0 ? 1 : -1;
+            const lineas = puntos.map((punto, i) => {
+                const siguiente = puntos[(i + 1) % puntos.length];
+                const dx = siguiente[0] - punto[0];
+                const dz = siguiente[1] - punto[1];
+                const longitud = Math.hypot(dx, dz) || 1;
+                const nx = signo * -dz / longitud;
+                const nz = signo * dx / longitud;
+                return { punto: [punto[0] + nx * distancia, punto[1] + nz * distancia], direccion: [dx / longitud, dz / longitud] };
+            });
+            return puntos.map((_, i) => {
+                const a = lineas[(i - 1 + lineas.length) % lineas.length];
+                const b = lineas[i];
+                const cruz = a.direccion[0] * b.direccion[1] - a.direccion[1] * b.direccion[0];
+                if (Math.abs(cruz) < 1e-8) return a.punto.slice();
+                const t = ((b.punto[0] - a.punto[0]) * b.direccion[1] - (b.punto[1] - a.punto[1]) * b.direccion[0]) / cruz;
+                return [a.punto[0] + a.direccion[0] * t, a.punto[1] + a.direccion[1] * t];
+            });
+        };
+        const anilloBase = desplazarPoligono(contorno, 4.8);
 
-        const centro = contorno.reduce((acumulado, punto) => [
-            acumulado[0] + punto[0] / contorno.length,
-            acumulado[1] + punto[1] / contorno.length
-        ], [0, 0]);
-        const anillo = contorno.map(([x, z]) => {
-            const dx = centro[0] - x;
-            const dz = centro[1] - z;
-            const longitud = Math.hypot(dx, dz) || 1;
-            return [x + dx / longitud * 8.5, z + dz / longitud * 8.5];
-        });
-
-        crearCamino("camino-perimetral-c2", anillo, 4.8, sueloC2, 10, tierra, true);
-        const accesosC2 = [];
-        for (let i = 0; i < contorno.length; i++) {
-            const siguiente = (i + 1) % contorno.length;
-            const puerta = [
-                (contorno[i][0] + contorno[siguiente][0]) / 2,
-                (contorno[i][1] + contorno[siguiente][1]) / 2
-            ];
-            const acceso = [
-                (anillo[i][0] + anillo[siguiente][0]) / 2,
-                (anillo[i][1] + anillo[siguiente][1]) / 2
-            ];
-            const tramoAcceso = [puerta, acceso];
-            accesosC2.push(tramoAcceso);
-            crearCamino(`acceso-c2-${i + 1}`, tramoAcceso, 3.8, sueloC2, 10, tierra);
-        }
-
-        const caminoC2 = [
-            [70, -40], [48, -20], [20, -5], [-5, 15], [-32, 28], [-59, 34]
-        ];
-        crearCamino("camino-central-c2", caminoC2, 5.4, sueloC2, 10, tierra);
-
-        const caminoC4 = [
-            [-58, -205], [-45, -145], [-30, -70], [-8, 5], [14, 78], [48, 155]
-        ];
-        crearCamino("camino-central-c4", caminoC4, 5.0, sueloC4, 36, tierra);
-
+        // La carretera vuelve a seguir íntegramente el perímetro. La rampa se
+        // conecta mediante un único tramo recto, sin desvíos ni curvas añadidas.
+        const carreteraPerimetral = suavizarTrazado(anilloBase, true, 8, 10);
+        // Boca real de la rampa en coordenadas Babylon. La antigua Z positiva
+        // desplazaba la exclusión a otra zona y producía una gran calva.
+        const bocaRampa = [48.8504, -38.0921];
+        const unionRampa = carreteraPerimetral.reduce((mejor, punto) =>
+            Math.hypot(punto[0] - bocaRampa[0], punto[1] - bocaRampa[1]) < Math.hypot(mejor[0] - bocaRampa[0], mejor[1] - bocaRampa[1]) ? punto : mejor
+        );
+        const enlaceRampa = [unionRampa, bocaRampa];
         const zonasExcluidas = [];
         const registrarTramos = (puntos, radio, cerrado = false, cubierta = "c2") => {
             const limite = cerrado ? puntos.length : puntos.length - 1;
@@ -835,10 +918,16 @@
                 zonasExcluidas.push({ segmento: [puntos[i], puntos[(i + 1) % puntos.length]], radio, cubierta });
             }
         };
-        registrarTramos(anillo, 4.2, true);
-        accesosC2.forEach(acceso => registrarTramos(acceso, 3.6));
-        registrarTramos(caminoC2, 4.4);
-        registrarTramos(caminoC4, 4.2, false, "c4");
+        // El firme mide 7,4 m y la franja allanada 9,4 m. Este margen cubre la
+        // calzada y el arcén sin vaciar grandes bandas de pradera.
+        registrarTramos(carreteraPerimetral, 5.0, true);
+        registrarTramos(enlaceRampa, 5.0);
+        // Corredor preciso para rampa y taludes: impide árboles, ganado y hierba
+        // sobre la subida o bajo ella, sin afectar al resto del módulo.
+        zonasExcluidas.push(
+            { segmento: [[48.85, -38.09], [109.70, -124.35]], radio: 6.2, cubierta: "c2" },
+            { segmento: [[92.0, -99.2], [109.70, -124.35]], radio: 6.2, cubierta: "c4" }
+        );
         return { sueloC2, sueloC4, zonasExcluidas };
     }
 
@@ -948,9 +1037,25 @@
             BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "bale.glb", scene),
             BABYLON.SceneLoader.LoadAssetContainerAsync("assets/img/granja/", "bag.glb", scene)
         ]);
+        contenedorBala.materials.forEach(material => {
+            material.alpha = 1;
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.38;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            if (material.diffuseTexture) material.diffuseTexture.hasAlpha = true;
+        });
+        contenedorSaco.materials.forEach(material => {
+            material.alpha = 1;
+            material.backFaceCulling = false;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_OPAQUE;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = false;
+            if (material.diffuseTexture) material.diffuseTexture.hasAlpha = false;
+        });
 
         const crearAdorno = (contenedor, prefijo, datos, indice) => {
-            const y = alturaSobre(sueloC2, datos.x, datos.z, 10);
+            const y = datos.alturaBase ?? alturaSobre(sueloC2, datos.x, datos.z, 10);
             if (y === null) return;
             const instancia = contenedor.instantiateModelsToScene(
                 nombre => `${prefijo}-${indice}-${nombre}`, false
@@ -961,6 +1066,8 @@
                 raiz.scaling.scaleInPlace(datos.escala || 1);
                 raiz.rotationQuaternion = null;
                 raiz.rotation.y = datos.rotacion;
+                raiz.rotation.x = datos.inclinacionX || 0;
+                raiz.rotation.z = datos.inclinacionZ || 0;
                 raiz.getChildMeshes().forEach(malla => {
                     mallas.push(malla);
                     malla.isPickable = true;
@@ -972,28 +1079,41 @@
             crearColisionEnvolvente(`colision-${prefijo}-${indice}`, mallas);
         };
 
-        const balas = [
-            { x: -16.2, z: -33.8, rotacion: 0.08 },
-            { x: -15.0, z: -33.7, rotacion: -0.05 },
-            { x: -13.8, z: -33.9, rotacion: 0.11 },
-            { x: -15.6, z: -34.0, rotacion: 0.03, elevacion: 0.59 },
-            { x: -14.4, z: -34.0, rotacion: -0.04, elevacion: 0.59 },
-            { x: -18.0, z: -35.2, rotacion: 0.32 }
+        const alturaPila = alturaSobre(sueloC2, -53.9, -158.3, 10);
+        const balas = alturaPila === null ? [] : [
+            // Cinco abajo, cuatro en el centro y tres arriba: una pila compacta.
+            ...[-160.14, -159.22, -158.3, -157.38, -156.46].map((z, i) => ({
+                x: -53.9, z, alturaBase: alturaPila,
+                rotacion: Math.PI * 0.5 + (i % 2 ? 0.01 : -0.008)
+            })),
+            ...[-159.68, -158.76, -157.84, -156.92].map((z, i) => ({
+                x: -53.9, z, alturaBase: alturaPila,
+                rotacion: Math.PI * 0.5 + (i % 2 ? -0.008 : 0.01), elevacion: 0.50
+            })),
+            ...[-159.22, -158.3, -157.38].map((z, i) => ({
+                x: -53.9, z, alturaBase: alturaPila,
+                rotacion: Math.PI * 0.5 + (i % 2 ? 0.006 : -0.006), elevacion: 1.0
+            }))
         ];
         const sacos = [
-            { x: -12.8, z: -27.7, rotacion: 0.18 },
-            { x: -12.4, z: -28.2, rotacion: -0.22 },
-            { x: -12.9, z: -28.6, rotacion: 0.05 },
-            { x: -12.6, z: -28.0, rotacion: 0.28, elevacion: 0.32 },
-            { x: -13.3, z: -28.1, rotacion: -0.35 },
-            { x: -13.0, z: -28.4, rotacion: 0.14, elevacion: 0.33 }
+            // Cuatro apoyados en la pared lateral de la casa.
+            { x: -12.1, z: -26.6, rotacion: 0.12, inclinacionZ: 0.10 },
+            { x: -12.15, z: -27.25, rotacion: 0.05, inclinacionZ: 0.08 },
+            { x: -12.2, z: -27.9, rotacion: 0.16, inclinacionZ: 0.11 },
+            { x: -12.25, z: -28.55, rotacion: 0.08, inclinacionZ: 0.09 },
+            // Otros cuatro contra la pared exterior del establo.
+            { x: -53.95, z: -151.2, rotacion: Math.PI * 0.94, inclinacionZ: -0.09 },
+            { x: -53.9, z: -151.85, rotacion: Math.PI * 0.96, inclinacionZ: -0.11 },
+            { x: -53.85, z: -152.5, rotacion: Math.PI * 0.93, inclinacionZ: -0.08 },
+            { x: -53.8, z: -153.15, rotacion: Math.PI * 0.95, inclinacionZ: -0.10 }
         ];
         balas.forEach((datos, indice) => crearAdorno(contenedorBala, "bala", datos, indice));
         sacos.forEach((datos, indice) => crearAdorno(contenedorSaco, "saco", datos, indice));
 
         zonasExcluidas.push(
-            { segmento: [[-18.5, -34], [-13, -34]], radio: 2.2, cubierta: "c2" },
-            { segmento: [[-13.4, -28], [-12.2, -28]], radio: 1.5, cubierta: "c2" }
+            { segmento: [[-53.9, -160.8], [-53.9, -155.8]], radio: 1.6, cubierta: "c2" },
+            { segmento: [[-12.2, -26.3], [-12.2, -28.9]], radio: 1.0, cubierta: "c2" },
+            { segmento: [[-53.9, -150.9], [-53.8, -153.5]], radio: 1.0, cubierta: "c2" }
         );
     }
 
@@ -1103,7 +1223,25 @@
 
         for (let indice = 0; indice < zonas.length; indice++) {
             const zona = zonas[indice];
-            const y = alturaSobre(sueloC2, zona.x, zona.z, 10);
+            let xInicial = zona.x;
+            let zInicial = zona.z;
+            if (!puntoPermitido(xInicial, zInicial)) {
+                // Algunas zonas históricas quedaron demasiado próximas al nuevo
+                // corredor. Se busca una posición segura antes de instanciar.
+                for (let intento = 1; intento <= 48; intento++) {
+                    const angulo = intento * 2.399963229728653;
+                    const distancia = 4 + Math.ceil(intento / 8) * 3.5;
+                    const candidatoX = zona.x + Math.cos(angulo) * distancia;
+                    const candidatoZ = zona.z + Math.sin(angulo) * distancia;
+                    if (puntoPermitido(candidatoX, candidatoZ)) {
+                        xInicial = candidatoX;
+                        zInicial = candidatoZ;
+                        break;
+                    }
+                }
+            }
+            if (!puntoPermitido(xInicial, zInicial)) continue;
+            const y = alturaSobre(sueloC2, xInicial, zInicial, 10);
             if (y === null) continue;
             const instancia = contenedor.instantiateModelsToScene(
                 nombre => `vaca-${indice + 1}-${nombre}`, false
@@ -1122,7 +1260,7 @@
                     malla.alwaysSelectAsActiveMesh = true;
                 });
             });
-            pivote.position.set(zona.x, 0, zona.z);
+            pivote.position.set(xInicial, 0, zInicial);
             pivote.scaling.setAll(1.5);
             pivote.rotation.y = indice * 0.73;
             pivote.computeWorldMatrix(true);
@@ -1157,6 +1295,7 @@
             vaca.objetivo = buscarObjetivo(vaca);
             reproducir(vaca, indice % 3 === 0 ? "comer" : (indice % 3 === 1 ? "reposo" : "variacion"));
             vacas.push(vaca);
+            obstaculosDinamicos.push({ nodo: pivote, radio: 1.45 });
         }
 
         actualizarVacas = () => {
@@ -1172,8 +1311,16 @@
                             (vaca.aleatorio() < 0.5 ? "reposo" : "variacion"));
                     } else {
                         const paso = Math.min(distancia, 0.52 * delta);
-                        vaca.pivote.position.x += dx / distancia * paso;
-                        vaca.pivote.position.z += dz / distancia * paso;
+                        const siguienteX = vaca.pivote.position.x + dx / distancia * paso;
+                        const siguienteZ = vaca.pivote.position.z + dz / distancia * paso;
+                        if (!puntoPermitido(siguienteX, siguienteZ)) {
+                            vaca.objetivo = buscarObjetivo(vaca);
+                            vaca.restante = 2 + vaca.aleatorio() * 3;
+                            reproducir(vaca, "reposo");
+                            return;
+                        }
+                        vaca.pivote.position.x = siguienteX;
+                        vaca.pivote.position.z = siguienteZ;
                         const deseado = Math.atan2(dx, dz);
                         let diferencia = deseado - vaca.pivote.rotation.y;
                         diferencia = Math.atan2(Math.sin(diferencia), Math.cos(diferencia));
@@ -1233,6 +1380,7 @@
                 ? [[25, 48], [43, 28], [58, 45], [30, 68], [61, 67]]
                 : [[25, 48], [43, 28], [58, 45], [30, 68], [61, 67]];
             posicionesVisibles.forEach(([x, z]) => {
+                if (estaEnZonaRampa(x, z)) return;
                 const y = alturaSobre(superficie, x, z, alturaOrigen);
                 if (y !== null && !zonasExcluidas.some(zona => zona.cubierta === cubierta &&
                     distanciaASegmento(x, z, zona.segmento) < zona.radio + 6
@@ -1242,6 +1390,7 @@
             while (posiciones.length < 100 && intentos++ < 50000) {
                 const x = -135 + aleatorio() * 280;
                 const z = -200 + aleatorio() * 370;
+                if (estaEnZonaRampa(x, z)) continue;
                 if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 12) continue;
                 if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
                     distanciaASegmento(x, z, zona.segmento) < zona.radio + 6)) continue;
@@ -1329,7 +1478,7 @@
         crearNivel(mid, "mid");
         zonasExcluidas.push({
             segmento: [[posicion.x, posicion.z], [posicion.x, posicion.z]],
-            radio: 3.2,
+            radio: 10,
             cubierta: "c2"
         });
         actualizarOlmo = () => {};
@@ -1363,6 +1512,7 @@
             while (posiciones.length < 12 && intentos++ < 20000) {
                 const x = -125 + aleatorio() * 260;
                 const z = -185 + aleatorio() * 340;
+                if (estaEnZonaRampa(x, z)) continue;
                 if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 14) continue;
                 if (zonasExcluidas.some(zona => zona.cubierta === cubierta &&
                     distanciaASegmento(x, z, zona.segmento) < zona.radio + 7)) continue;
@@ -2253,9 +2403,9 @@
             return t * t * (3 - 2 * t);
         };
         const factorLOD = (nivel, distancia) => {
-            if (nivel === 0) return 1 - pasoSuave(12, 18, distancia);
-            if (nivel === 1) return pasoSuave(10, 16, distancia) * (1 - pasoSuave(30, 38, distancia));
-            return pasoSuave(28, 36, distancia) * (1 - pasoSuave(52, 65, distancia));
+            if (nivel === 0) return 1 - pasoSuave(18, 27, distancia);
+            if (nivel === 1) return pasoSuave(15, 24, distancia) * (1 - pasoSuave(45, 57, distancia));
+            return pasoSuave(42, 54, distancia) * (1 - pasoSuave(78, 97.5, distancia));
         };
         const actualizarBuffer = (malla, estado, fragmentos, nivel) => {
             const capacidadNecesaria = fragmentos.reduce((total, datos) => total + datos.length, 0);
@@ -2314,9 +2464,9 @@
                 const distancia = Math.hypot(centroX - camera.position.x, centroZ - camera.position.z);
                 const margenCelda = tamanoCelda * Math.SQRT1_2;
                 const niveles = [];
-                if (distancia <= 18 + margenCelda) niveles.push(0);
-                if (distancia >= 10 - margenCelda && distancia <= 38 + margenCelda) niveles.push(1);
-                if (distancia >= 28 - margenCelda && distancia <= 65 + margenCelda) niveles.push(2);
+                if (distancia <= 27 + margenCelda) niveles.push(0);
+                if (distancia >= 15 - margenCelda && distancia <= 57 + margenCelda) niveles.push(1);
+                if (distancia >= 42 - margenCelda && distancia <= 97.5 + margenCelda) niveles.push(2);
                 niveles.forEach(nivel => celda.matrices.forEach((datos, tipo) => {
                     if (datos.length) fragmentos[nivel][tipo].push(datos);
                 }));
@@ -2337,7 +2487,7 @@
     }
 
     BABYLON.SceneLoader.ImportMeshAsync(
-        "", "assets/img/granja/", "granja-pradera-pbr-v20.glb", scene,
+        "", "assets/img/granja/", "granja-pradera-pbr-v40-puertas-centradas-farolas-completas.glb", scene,
         evento => {
             const fraccion = evento.lengthComputable && evento.total ? evento.loaded / evento.total : 0;
             actualizarCarga(4 + fraccion * 26, "CARGANDO TERRENO…");
@@ -2349,11 +2499,22 @@
 
             visibles.forEach(mesh => {
                 mesh.checkCollisions = false;
-                if (/suelo|granja_rampa|cubo\.025/i.test(mesh.name)) {
+                if (/SUPERFICIE_HAIR_/i.test(mesh.name)) {
+                    mesh.isVisible = false;
+                    mesh.visibility = 0;
+                    mesh.isPickable = false;
+                    return;
+                }
+                if (/carretera_/i.test(mesh.name)) {
+                    mesh.alwaysSelectAsActiveMesh = true;
+                    mesh.receiveShadows = false;
+                    mesh.refreshBoundingInfo();
+                }
+                if (/suelo|granja_rampa|cubo\.025|carretera_/i.test(mesh.name)) {
                     mesh.isPickable = true;
                     superficiesTransitables.add(mesh);
                 }
-                if (/talud_rampa|pared_trasera_rampa/i.test(mesh.name)) {
+                if (/talud_rampa|pared_trasera_rampa|murete_|muro_/i.test(mesh.name)) {
                     mesh.isPickable = true;
                     obstaculosSolidos.add(mesh);
                 }
@@ -2373,10 +2534,10 @@
             await crearEstablo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
             actualizarCarga(51, "SOLTANDO VACAS…");
             await crearVacas(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
-            actualizarCarga(52, "CARGANDO MANZANOS…");
-            await crearManzanos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
-            actualizarCarga(64, "CARGANDO OLMO…");
+            actualizarCarga(52, "CARGANDO OLMO…");
             await crearOlmo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            actualizarCarga(56, "CARGANDO MANZANOS…");
+            await crearManzanos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(68, "CARGANDO MANDARINOS…");
             await crearMandarinos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(72, "CARGANDO FLORES…");
@@ -2541,6 +2702,13 @@
                     murosHueco.some(segmento =>
                         distanciaASegmento(destino.x, destino.z, segmento) < 0.75
                     );
+                const bloqueadoPorAnimal = obstaculosDinamicos.some(obstaculo =>
+                    Math.abs(camera.position.y - obstaculo.nodo.position.y) < 3 &&
+                    Math.hypot(
+                        destino.x - obstaculo.nodo.position.x,
+                        destino.z - obstaculo.nodo.position.z
+                    ) < obstaculo.radio + 0.45
+                );
                 const tramoMovimiento = destino.subtract(camera.position);
                 const choqueFrontal = tramoMovimiento.lengthSquared() > 0 && scene.pickWithRay(
                     new BABYLON.Ray(camera.position, tramoMovimiento.normalize(), tramoMovimiento.length() + 0.55),
@@ -2550,7 +2718,8 @@
                     new BABYLON.Ray(destino.add(new BABYLON.Vector3(0, 4, 0)), BABYLON.Vector3.Down(), 8),
                     mesh => /talud_rampa/i.test(mesh.name)
                 ).hit;
-                if (!bloqueadoPorPared && !bloqueadoPorBarandilla && !bloqueadoPorMuroHueco && !choqueFrontal && !sobreTalud) {
+                if (!bloqueadoPorPared && !bloqueadoPorBarandilla && !bloqueadoPorMuroHueco &&
+                    !bloqueadoPorAnimal && !choqueFrontal && !sobreTalud) {
                     camera.position.x = destino.x;
                     camera.position.z = destino.z;
                 }
