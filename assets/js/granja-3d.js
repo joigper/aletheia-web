@@ -54,7 +54,7 @@
         "mandarino_near_mid.glb", "mandarino_far.glb", "agapanthus_01.glb", "agapanthus_02.glb",
         "fern.glb", "fern_grass_02.glb", "cliff_shrub.glb", "shrub_flowers.glb"
     ].forEach(cargarContenedor);
-    const promesaMapaHierba = fetch(`${rutaModelos}granja-hierba-celdas-v1.bin`).then(respuesta => {
+    const promesaMapaHierba = fetch(`${rutaModelos}granja-hierba-celdas-v3.bin`).then(respuesta => {
         if (!respuesta.ok) throw new Error(`No se ha podido cargar el mapa de hierba (${respuesta.status}).`);
         return respuesta.arrayBuffer();
     });
@@ -68,8 +68,8 @@
     scene.imageProcessingConfiguration.contrast = 1.14;
     // Bruma atmosférica: integra el LOD lejano con el horizonte sin ocultar edificios.
     scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
-    scene.fogStart = 45;
-    scene.fogEnd = 145;
+    scene.fogStart = 67.5;
+    scene.fogEnd = 217.5;
     scene.fogColor = new BABYLON.Color3(0.44, 0.60, 0.73);
 
     const camera = new BABYLON.UniversalCamera("visitante", new BABYLON.Vector3(0, 1.72, 0), scene);
@@ -219,12 +219,27 @@
         if (indice && indice.longitud === zonas.length) return indice;
         indice = { longitud: zonas.length, casillas: new Map() };
         zonas.forEach(zona => {
-            const [[ax, az], [bx, bz]] = zona.segmento;
-            const alcance = zona.radio + MARGEN_MAXIMO_ZONAS;
-            const minX = Math.floor((Math.min(ax, bx) - alcance) / TAMANO_CASILLA_ZONAS);
-            const maxX = Math.floor((Math.max(ax, bx) + alcance) / TAMANO_CASILLA_ZONAS);
-            const minZ = Math.floor((Math.min(az, bz) - alcance) / TAMANO_CASILLA_ZONAS);
-            const maxZ = Math.floor((Math.max(az, bz) + alcance) / TAMANO_CASILLA_ZONAS);
+            let limiteMinX, limiteMaxX, limiteMinZ, limiteMaxZ;
+            if (zona.elipse) {
+                const [cx, cz] = zona.elipse.centro;
+                const [ru, rv] = zona.elipse.radios;
+                const alcance = Math.max(ru, rv) + MARGEN_MAXIMO_ZONAS;
+                limiteMinX = cx - alcance;
+                limiteMaxX = cx + alcance;
+                limiteMinZ = cz - alcance;
+                limiteMaxZ = cz + alcance;
+            } else {
+                const [[ax, az], [bx, bz]] = zona.segmento;
+                const alcance = zona.radio + MARGEN_MAXIMO_ZONAS;
+                limiteMinX = Math.min(ax, bx) - alcance;
+                limiteMaxX = Math.max(ax, bx) + alcance;
+                limiteMinZ = Math.min(az, bz) - alcance;
+                limiteMaxZ = Math.max(az, bz) + alcance;
+            }
+            const minX = Math.floor(limiteMinX / TAMANO_CASILLA_ZONAS);
+            const maxX = Math.floor(limiteMaxX / TAMANO_CASILLA_ZONAS);
+            const minZ = Math.floor(limiteMinZ / TAMANO_CASILLA_ZONAS);
+            const maxZ = Math.floor(limiteMaxZ / TAMANO_CASILLA_ZONAS);
             for (let cx = minX; cx <= maxX; cx++) {
                 for (let cz = minZ; cz <= maxZ; cz++) {
                     const clave = claveCasilla(cx, cz);
@@ -237,11 +252,29 @@
         indicesZonas.set(zonas, indice);
         return indice;
     }
-    // Equivale a: zonas.some(z => z.cubierta === cubierta && dist(x,z,z.segmento) < z.radio + margen)
-    function enZonaExcluida(zonas, x, z, cubierta, margen = 0) {
+    const dentroDeZona = (zona, x, z, margen) => {
+        if (zona.elipse) {
+            const [cx, cz] = zona.elipse.centro;
+            const [ru, rv] = zona.elipse.radios;
+            const angulo = zona.elipse.angulo;
+            const dx = x - cx;
+            const dz = z - cz;
+            const coseno = Math.cos(angulo);
+            const seno = Math.sin(angulo);
+            const u = dx * coseno + dz * seno;
+            const v = -dx * seno + dz * coseno;
+            return (u * u) / ((ru + margen) ** 2) + (v * v) / ((rv + margen) ** 2) < 1;
+        }
+        return distanciaASegmento(x, z, zona.segmento) < zona.radio + margen;
+    };
+    // Admite corredores por segmentos y exclusiones elípticas precisas.
+    // esHierba: la hierba ignora las zonas marcadas con afectaHierba: false
+    // (su reparto ya viene recortado desde SUPERFICIE_HAIR en el .bin).
+    function enZonaExcluida(zonas, x, z, cubierta, margen = 0, esHierba = false) {
         if (margen > MARGEN_MAXIMO_ZONAS) {
             return zonas.some(zona => zona.cubierta === cubierta &&
-                distanciaASegmento(x, z, zona.segmento) < zona.radio + margen);
+                !(esHierba && zona.afectaHierba === false) &&
+                dentroDeZona(zona, x, z, margen));
         }
         const lista = indiceZonas(zonas).casillas.get(claveCasilla(
             Math.floor(x / TAMANO_CASILLA_ZONAS), Math.floor(z / TAMANO_CASILLA_ZONAS)
@@ -250,7 +283,8 @@
         for (let i = 0; i < lista.length; i++) {
             const zona = lista[i];
             if (zona.cubierta === cubierta &&
-                distanciaASegmento(x, z, zona.segmento) < zona.radio + margen) return true;
+                !(esHierba && zona.afectaHierba === false) &&
+                dentroDeZona(zona, x, z, margen)) return true;
         }
         return false;
     }
@@ -1145,7 +1179,7 @@
         actualizarManzanos = () => {
             arboles.forEach(arbol => {
                 const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
-                const usarNear = distancia2 < 900;
+                const usarNear = distancia2 < 2025;
                 arbol.near.forEach(raiz => raiz.setEnabled(usarNear));
                 arbol.mid.forEach(raiz => raiz.setEnabled(!usarNear));
             });
@@ -1194,7 +1228,7 @@
         const nivelMid = crearNivel(mid, "mid");
         actualizarOlmo = () => {
             const distancia2 = (posicion.x - camera.position.x) ** 2 + (posicion.z - camera.position.z) ** 2;
-            const usarNear = distancia2 < 1600;
+            const usarNear = distancia2 < 3600;
             nivelNear.setEnabled(usarNear);
             nivelMid.setEnabled(!usarNear);
         };
@@ -1268,7 +1302,7 @@
 
         actualizarJacarandas = () => arboles.forEach(arbol => {
             const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
-            const usarNear = distancia2 < 1225;
+            const usarNear = distancia2 < 2756.25;
             arbol.near.forEach(raiz => raiz.setEnabled(usarNear));
             arbol.mid.forEach(raiz => raiz.setEnabled(!usarNear));
         });
@@ -1342,7 +1376,7 @@
         distribuir(sueloC4, 36, "c4", 0x6d4a01);
         actualizarMandarinos = () => arboles.forEach(arbol => {
             const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
-            const usarNearMid = distancia2 < 1156;
+            const usarNearMid = distancia2 < 2601;
             arbol.nearMid.forEach(raiz => raiz.setEnabled(usarNearMid));
             arbol.far.forEach(raiz => raiz.setEnabled(!usarNearMid));
         });
@@ -1411,7 +1445,7 @@
         distribuir(sueloC4, 36, "c4", 32, 0xa6a4001);
         actualizarAgapantos = () => plantas.forEach(planta => {
             const distancia2 = (planta.x - camera.position.x) ** 2 + (planta.z - camera.position.z) ** 2;
-            const visible = distancia2 < 3025;
+            const visible = distancia2 < 6806.25;
             planta.raices.forEach(raiz => raiz.setEnabled(visible));
         });
         actualizarAgapantos();
@@ -1420,10 +1454,10 @@
     async function crearArbustos(sueloC2, sueloC4, zonasExcluidas) {
         if (!sueloC2 || !sueloC4) return;
         const definiciones = [
-            { archivo: "cliff_shrub.glb", c2: 70, c4: 55, separacion: 5.2, escalaMin: 0.72, escalaMax: 1.28, distancia: 82, margen: 1.4 },
-            { archivo: "fern_grass_02.glb", c2: 40, c4: 18, separacion: 4.0, escalaMin: 0.72, escalaMax: 1.18, distancia: 68, margen: 1.1, agrupado: true },
-            { archivo: "fern.glb", c2: 24, c4: 10, separacion: 5.5, escalaMin: 0.68, escalaMax: 1.12, distancia: 60, margen: 1.2, agrupado: true },
-            { archivo: "shrub_flowers.glb", c2: 6, c4: 4, separacion: 22, escalaMin: 0.76, escalaMax: 1.04, distancia: 48, margen: 2.2 }
+            { archivo: "cliff_shrub.glb", c2: 70, c4: 55, separacion: 5.2, escalaMin: 0.72, escalaMax: 1.28, distancia: 123, margen: 1.4 },
+            { archivo: "fern_grass_02.glb", c2: 40, c4: 18, separacion: 4.0, escalaMin: 0.72, escalaMax: 1.18, distancia: 102, margen: 1.1, agrupado: true },
+            { archivo: "fern.glb", c2: 24, c4: 10, separacion: 5.5, escalaMin: 0.68, escalaMax: 1.12, distancia: 90, margen: 1.2, agrupado: true },
+            { archivo: "shrub_flowers.glb", c2: 6, c4: 4, separacion: 22, escalaMin: 0.76, escalaMax: 1.04, distancia: 72, margen: 2.2 }
         ];
         const contenedores = await Promise.all(definiciones.map(d => cargarContenedor(d.archivo)));
         contenedores.forEach(contenedor => contenedor.materials.forEach(material => {
@@ -1518,9 +1552,9 @@
         // [OPT] Rangos de fundido (entraInicio, entraFin, saleInicio, saleFin) en metros.
         // Son exactamente los de la antigua factorLOD, pero ahora se evalúan en la GPU.
         const rangosLOD = [
-            [0, 0, 18, 27],
-            [15, 24, 45, 57],
-            [42, 54, 78, 97.5]
+            [0, 0, 27, 40.5],
+            [22.5, 36, 67.5, 85.5],
+            [63, 81, 117, 146.25]
         ];
         const tipos = [
             { archivo: "hierba-fina-alpha-v1.webp", color: new BABYLON.Color3(0.72, 0.78, 0.40) },
@@ -1654,7 +1688,7 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
         const celdas = new Map();
         const permitida = (x, z, cubierta) =>
             dentroDelContorno(x, z) && distanciaAlContorno(x, z) >= 3.5 &&
-            !enZonaExcluida(zonasExcluidas, x, z, cubierta);
+            !enZonaExcluida(zonasExcluidas, x, z, cubierta, 0, true);
         const matriz = new BABYLON.Matrix();
         const escalaVector = new BABYLON.Vector3();
         const posicion = new BABYLON.Vector3();
@@ -1775,7 +1809,7 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                 const dx = celda.centroX - camaraX;
                 const dz = celda.centroZ - camaraZ;
                 const distancia = Math.hypot(dx, dz);
-                if (distancia > 97.5 + holgura) continue;
+                if (distancia > 146.25 + holgura) continue;
                 if (usarCono && distancia > RADIO_SIEMPRE_VISIBLE) {
                     const coseno = Math.max(-1, Math.min(1, (dx * frenteX + dz * frenteZ) / distancia));
                     const radioAngular = Math.asin(Math.min(1, radioCelda / distancia));
@@ -1787,9 +1821,9 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                         if (matrices[tipo].length) fragmentos[nivel][tipo].push(matrices[tipo]);
                     }
                 };
-                if (distancia <= 27 + holgura) anadir(0);
-                if (distancia >= 15 - holgura && distancia <= 57 + holgura) anadir(1);
-                if (distancia >= 42 - holgura) anadir(2);
+                if (distancia <= 40.5 + holgura) anadir(0);
+                if (distancia >= 22.5 - holgura && distancia <= 85.5 + holgura) anadir(1);
+                if (distancia >= 63 - holgura) anadir(2);
             }
             maestros.forEach((nivel, indiceLOD) => nivel.forEach((malla, indiceTipo) =>
                 actualizarBuffer(malla, estadosBuffer[indiceLOD][indiceTipo], fragmentos[indiceLOD][indiceTipo])
@@ -1854,7 +1888,7 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
     }
 
     BABYLON.SceneLoader.ImportMeshAsync(
-        "", "assets/img/granja/", "granja-pradera-pbr-v46-hueco-fondo-enlaces-limpios.glb", scene,
+        "", "assets/img/granja/", "granja-pradera-pbr-v70-canas-fuera-del-agua.glb", scene,
         evento => {
             const fraccion = evento.lengthComputable && evento.total ? evento.loaded / evento.total : 0;
             actualizarCarga(4 + fraccion * 26, "CARGANDO TERRENO…");
@@ -1874,7 +1908,7 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                     mesh.receiveShadows = false;
                     mesh.refreshBoundingInfo();
                 }
-                if (/suelo|granja_rampa|cubo\.025|carretera_/i.test(mesh.name)) {
+                if (/suelo|lago_terreno|granja_rampa|cubo\.025|carretera_/i.test(mesh.name)) {
                     mesh.isPickable = true;
                     superficiesTransitables.add(mesh);
                 }
@@ -1891,6 +1925,23 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
 
             vestirArquitectura(visibles);
             const paisaje = construirPaisaje(visibles);
+            // La reserva se limita a la lámina de agua. La orilla mantiene la
+            // vegetación general y evita una calva rectangular alrededor.
+            paisaje?.zonasExcluidas?.push({
+                elipse: {
+                    // Coordenadas Babylon. En Blender el lago está en (89.90, 84.77), pero el
+                    // importador glTF de Babylon invierte X y Z: aquí es (-89.90, -84.77).
+                    // El ángulo no cambia (invertir ambos ejes equivale a girar 180°).
+                    centro: [-89.904985, -84.773363],
+                    radios: [25.0, 15.5],
+                    angulo: 39.663841 * Math.PI / 180
+                },
+                cubierta: "c2",
+                // La hierba no la necesita: el hueco de SUPERFICIE_HAIR_C2 ya define
+                // el lago en el .bin v3 y así la orilla conserva su vegetación.
+                // Árboles, flores y vacas sí la respetan.
+                afectaHierba: false
+            });
             // La precarga de vegetación debe centrarse en el punto real de aparición.
             camera.position.copyFrom(inicio);
             actualizarCarga(40, "CARGANDO CASA…");
@@ -2089,6 +2140,16 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                 // registradas en obstaculosSolidos y se comprueban con su geometría.
                 const bloqueadoPorBarandilla = false;
                 const bloqueadoPorMuroHueco = false;
+                // El terreno sí es transitable; únicamente se bloquea la lámina
+                // de agua, transformando el punto al eje local del nuevo lago.
+                // Mismo centro que la zona excluida del lago, en coordenadas Babylon.
+                const deltaCharcaX = destino.x + 89.905;
+                const deltaCharcaZ = destino.z + 84.773;
+                const charcaLocalX = deltaCharcaX * 0.769703 + deltaCharcaZ * 0.638402;
+                const charcaLocalZ = deltaCharcaX * -0.638402 + deltaCharcaZ * 0.769703;
+                const bloqueadoPorCharca = camera.position.y < 18 &&
+                    (charcaLocalX * charcaLocalX) / (20.8 * 20.8) +
+                    (charcaLocalZ * charcaLocalZ) / (10.4 * 10.4) < 1;
                 const bloqueadoPorAnimal = obstaculosDinamicos.some(obstaculo =>
                     Math.abs(camera.position.y - obstaculo.nodo.position.y) < 3 &&
                     Math.hypot(
@@ -2098,7 +2159,7 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                 );
                 // [OPT] Comprobaciones baratas primero; el raycast solo si hacen falta.
                 const bloqueoBarato = bloqueadoPorPared || bloqueadoPorBarandilla ||
-                    bloqueadoPorMuroHueco || bloqueadoPorAnimal;
+                    bloqueadoPorMuroHueco || bloqueadoPorCharca || bloqueadoPorAnimal;
                 // En la boca de C4 los taludes continúan parcialmente bajo el
                 // enlace y el suelo. No deben bloquear al visitante cuando hay
                 // una superficie transitable válida por encima de ellos.
@@ -2166,3 +2227,4 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
     engine.runRenderLoop(() => scene.render());
     window.addEventListener("resize", () => engine.resize());
 })();
+

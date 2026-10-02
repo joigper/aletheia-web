@@ -23,13 +23,13 @@
     <link rel="stylesheet" href="assets/css/tripulacion.css">
     <link rel="stylesheet" href="assets/css/zeus.css">
     <link rel="stylesheet" href="assets/css/flota.css">
-    <link rel="stylesheet" href="assets/css/granja-3d.css">
     <link rel="stylesheet" href="assets/css/granja-carga.css">
     <link rel="stylesheet" href="assets/css/hangar.css">
     <link rel="stylesheet" href="assets/css/hospital.css">
     <link rel="stylesheet" href="assets/css/jardines.css">
     <link rel="stylesheet" href="assets/css/observatorio.css">
     <link rel="stylesheet" href="assets/css/planetas.css">
+    <link rel="stylesheet" href="assets/css/granja-3d.css">
 </head>
 
 <body>
@@ -54,7 +54,7 @@
         <section id="granjaPortada" class="granja-portada">
             <p class="granja-kicker">PROTOTIPO NAVEGABLE</p>
             <h2>Dos praderas. Un único paisaje.</h2>
-            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled" id="granjaEntrar" type="button" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" disabled=""><span id="granjaCargaBar" aria-hidden="true"></span><span id="granjaCargaTexto">INICIANDO… 0 %</span></button><small>Ratón para mirar · WASD para caminar · R para regresar · ESC para liberar el cursor</small>
+            <p>Primera comprobación de escala, movimiento y comunicación entre C2 y C4.</p><button class="disabled disabled" id="granjaEntrar" type="button" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" disabled=""><span id="granjaCargaBar" aria-hidden="true"></span><span id="granjaCargaTexto">INICIANDO… 0 %</span></button><small>Ratón para mirar · WASD para caminar · R para regresar · ESC para liberar el cursor</small>
         </section>
         <div id="granjaHud" class="granja-hud" hidden=""><span id="granjaCubierta">CUBIERTA C2</span><span id="granjaFps">-- FPS</span><button type="button" id="granjaCalidad">MODO LOW</button></div>
         <div id="granjaControlesTactiles" class="granja-controles-tactiles" aria-label="Controles táctiles">
@@ -62,7 +62,26 @@
             <div id="granjaMirar" class="granja-joystick granja-joystick--mirar" aria-label="Mirar"><span></span><small>MIRAR</small></div>
         </div>
         <div class="granja-punto" aria-hidden="true"></div>
-        <p id="granjaError" class="granja-error" hidden=""></p>
+        <p id="granjaError" class="granja-error" hidden=""></p><button type="button" id="granjaCreditosAbrir" class="granja-creditos-abrir" aria-haspopup="dialog">CRÉDITOS</button>
+        <section id="granjaCreditosModal" class="granja-creditos-modal" role="dialog" aria-modal="true" aria-labelledby="granjaCreditosTitulo" hidden="">
+            <div class="granja-creditos-panel"><button type="button" id="granjaCreditosCerrar" class="granja-creditos-cerrar" aria-label="Cerrar créditos">×</button>
+                <p class="granja-creditos-kicker">ALÉTHEIA · MÓDULO GRANJA</p>
+                <h2 id="granjaCreditosTitulo">Créditos de modelos 3D</h2>
+                <p>Modelos adaptados, optimizados y convertidos para esta experiencia web.</p>
+                <div class="granja-creditos-lista">
+                    <h3>Creative Commons Attribution 4.0</h3>
+                    <p><a href="https://sketchfab.com/3d-models/cliff-shrub-for-terrain-7a0f2bf2982c4ff8bacc67856fdbfae2" target="_blank" rel="noopener">Cliff Shrub For Terrain</a> · Natural_Disbuster / lemedesign</p>
+                    <p><a href="https://sketchfab.com/3d-models/fern-0773992894ef4747b94f03e6eb69d620" target="_blank" rel="noopener">Fern</a> · zvanstone</p>
+                    <p><a href="https://sketchfab.com/3d-models/fern-grass-02-93d1f6a261e24b8394d0ea41cf985ef9" target="_blank" rel="noopener">fern grass 02</a> · POLYSCAN / POLYSCAN3D</p>
+                    <p><a href="https://sketchfab.com/3d-models/dwarf-snowflake-mock-orange-flowers-spring-4e30f856ab5f45049a27885ec344304c" target="_blank" rel="noopener">Dwarf Snowflake Mock Orange</a> · hkhalif</p>
+                    <p><a href="https://sketchfab.com/3d-models/tramain-house-1-france-ba987b3d4a1e4b96822048f5cc32c4ec" target="_blank" rel="noopener">Tramain House 1 [France]</a> · Lost Gecko</p>
+                    <h3>Dominio público · CC0</h3>
+                    <p><a href="https://polyhaven.com/a/island_tree_01" target="_blank" rel="noopener">Island Tree 01</a> · Poly Haven · Rico Cilliers y Rob Tuytel</p>
+                    <p><a href="https://polyhaven.com/a/jacaranda_tree" target="_blank" rel="noopener">Jacaranda Tree</a> · Poly Haven · Rico Cilliers y Rob Tuytel</p>
+                </div>
+                <p class="granja-creditos-nota">Otros elementos originales o con licencia propia del proyecto quedan documentados en el registro interno de recursos.</p>
+            </div>
+        </section>
     </main>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bs-init.js"></script>
@@ -84,8 +103,9 @@
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <script src="assets/js/home.js"></script>
     <script src="assets/js/navegador-estelar.js"></script>
-    <script src="assets/js/granja-3d.js"></script>
     <script src="assets/js/observatorio.js"></script>
+    <script src="assets/js/granja-creditos.js"></script>
+    <script src="assets/js/granja-3d.js"></script>
 </body>
 
 </html>
