@@ -7,7 +7,13 @@
 
   if (!canvas || !visor || !Array.isArray(estrellas) || !estrellas.length) return;
 
-  const contexto = canvas.getContext('2d');
+  const contextoVisible = canvas.getContext('2d');
+  // [OPT] Capa fija fuera de pantalla: guarda todo el mapa (retícula, ruta,
+  // estrellas y etiquetas). Solo se vuelve a pintar cuando algo cambia.
+  // En cada fotograma basta con copiarla y dibujar encima el anillo que late
+  // alrededor de la estrella seleccionada.
+  const capaFija = document.createElement('canvas');
+  let contexto = capaFija.getContext('2d');
   const interfaz = {
     radio: document.getElementById('navegador-radio'),
     seleccion: document.getElementById('navegador-seleccion'),
@@ -42,6 +48,17 @@
   let movimiento = 0;
   let ultimoPunto = null;
   let distanciaPinza = 0;
+  let escenaSucia = true;
+  let anilloSeleccion = null;
+  let fotograma = null;
+  let enPantalla = true;
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Cualquier cambio de vista o de selección marca la capa fija para repintarla.
+  function marcarSucia() {
+    escenaSucia = true;
+    arrancar();
+  }
 
   function limitar(valor, minimo, maximo) {
     return Math.max(minimo, Math.min(maximo, valor));
@@ -88,7 +105,11 @@
     canvas.height = Math.round(altura * densidad);
     canvas.style.width = `${anchura}px`;
     canvas.style.height = `${altura}px`;
+    capaFija.width = canvas.width;
+    capaFija.height = canvas.height;
     contexto.setTransform(densidad, 0, 0, densidad, 0, 0);
+    contextoVisible.setTransform(densidad, 0, 0, densidad, 0, 0);
+    marcarSucia();
   }
 
   function rotar(x, y, z) {
@@ -192,8 +213,11 @@
     contexto.fill();
     contexto.restore();
 
-    if (esOrigen || esDestino || esSeleccionada) {
-      const pulso = esSeleccionada ? Math.sin(tiempo / 280) * 1.5 : 0;
+    if (esSeleccionada) {
+      // El anillo de la seleccionada late: se dibuja aparte en cada fotograma.
+      anilloSeleccion = { x: punto.x, y: punto.y, radio: radioEstrella, esOrigen, esDestino };
+    } else if (esOrigen || esDestino) {
+      const pulso = 0;
       contexto.save();
       contexto.strokeStyle = esDestino ? '#f4d675' : '#59d7ff';
       contexto.lineWidth = esSeleccionada ? 1.3 : 1;
@@ -222,11 +246,12 @@
     }
   }
 
-  function dibujar(tiempo) {
+  function dibujarEscenaFija() {
     contexto.clearRect(0, 0, anchura, altura);
     dibujarReticula();
     dibujarRuta();
     proyectadas.length = 0;
+    anilloSeleccion = null;
 
     estrellas.forEach((estrella) => {
       if (distanciaEntre(estrella, centro) > radio) return;
@@ -236,8 +261,64 @@
     });
 
     proyectadas.sort((a, b) => a.z - b.z);
-    proyectadas.forEach((punto) => dibujarMarcador(punto, punto.estrella, tiempo));
-    window.requestAnimationFrame(dibujar);
+    proyectadas.forEach((punto) => dibujarMarcador(punto, punto.estrella, 0));
+    escenaSucia = false;
+  }
+
+  function dibujarAnilloSeleccion(tiempo) {
+    if (!anilloSeleccion) return;
+    const { x, y, radio: radioEstrella, esOrigen, esDestino } = anilloSeleccion;
+    const pulso = sinMovimiento.matches ? 0 : Math.sin(tiempo / 280) * 1.5;
+    contextoVisible.save();
+    contextoVisible.strokeStyle = esDestino ? '#f4d675' : '#59d7ff';
+    contextoVisible.lineWidth = 1.3;
+    contextoVisible.globalAlpha = .82;
+    contextoVisible.beginPath();
+    contextoVisible.arc(x, y, radioEstrella + 5 + pulso, 0, Math.PI * 2);
+    contextoVisible.stroke();
+    if (esOrigen) {
+      contextoVisible.beginPath();
+      contextoVisible.arc(x, y, radioEstrella + 8 + pulso, 0, Math.PI * 2);
+      contextoVisible.stroke();
+    }
+    contextoVisible.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // [OPT] Antes se recalculaban y redibujaban todas las estrellas (con
+  // sombras difuminadas, lo más caro de un canvas 2D) en cada fotograma,
+  // aunque nada se moviera y aunque el mapa estuviera fuera de pantalla.
+  // Ahora:
+  //  - la escena completa solo se repinta cuando cambia (arrastre, zoom,
+  //    selección, ruta, redimensión);
+  //  - cada fotograma solo copia esa capa y dibuja el anillo que late;
+  //  - el bucle se detiene fuera de pantalla y con la pestaña oculta;
+  //  - con «reducir movimiento» activado, no hay animación continua.
+  // ------------------------------------------------------------------
+  function dibujar(tiempo) {
+    fotograma = null;
+    const habiaCambios = escenaSucia;
+    if (escenaSucia) dibujarEscenaFija();
+    contextoVisible.save();
+    contextoVisible.setTransform(1, 0, 0, 1, 0, 0);
+    contextoVisible.clearRect(0, 0, canvas.width, canvas.height);
+    contextoVisible.drawImage(capaFija, 0, 0);
+    contextoVisible.restore();
+    dibujarAnilloSeleccion(tiempo);
+    // Solo el latido necesita animación continua.
+    const latido = anilloSeleccion && !sinMovimiento.matches;
+    if (latido || (habiaCambios && escenaSucia)) arrancar();
+  }
+
+  function arrancar() {
+    if (fotograma !== null || !enPantalla || document.hidden) return;
+    fotograma = window.requestAnimationFrame(dibujar);
+  }
+
+  function detener() {
+    if (fotograma === null) return;
+    window.cancelAnimationFrame(fotograma);
+    fotograma = null;
   }
 
   function actualizarSeleccion() {
@@ -294,6 +375,7 @@
       const nuevaDistancia = Math.hypot(a.x - b.x, a.y - b.y);
       if (distanciaPinza > 0) zoom = limitar(zoom * nuevaDistancia / distanciaPinza, .55, 4.5);
       distanciaPinza = nuevaDistancia;
+      marcarSucia();
       movimiento += 5;
       return;
     }
@@ -305,6 +387,7 @@
     giroVertical = limitar(giroVertical + dy * .007, -1.45, 1.45);
     movimiento += Math.abs(dx) + Math.abs(dy);
     ultimoPunto = punto;
+    marcarSucia();
   });
 
   function finalizarPuntero(evento) {
@@ -314,6 +397,7 @@
       if (estrella) {
         seleccionada = estrella;
         actualizarSeleccion();
+        marcarSucia();
       }
     }
     punteros.delete(evento.pointerId);
@@ -327,28 +411,33 @@
   canvas.addEventListener('wheel', (evento) => {
     evento.preventDefault();
     zoom = limitar(zoom * Math.exp(-evento.deltaY * .0012), .55, 4.5);
+    marcarSucia();
   }, { passive: false });
 
   interfaz.radio?.addEventListener('change', () => {
     radio = Number(interfaz.radio.value) || 30;
     zoom = 1;
+    marcarSucia();
   });
 
   interfaz.origen?.addEventListener('click', () => {
     origen = seleccionada;
     if (destino === origen) destino = null;
     actualizarRuta();
+    marcarSucia();
   });
 
   interfaz.destino?.addEventListener('click', () => {
     if (seleccionada === origen) return;
     destino = seleccionada;
     actualizarRuta();
+    marcarSucia();
   });
 
   interfaz.centrar?.addEventListener('click', () => {
     centro = seleccionada;
     zoom = 1;
+    marcarSucia();
   });
 
   interfaz.reiniciar?.addEventListener('click', () => {
@@ -358,12 +447,28 @@
     giroVertical = .36;
     zoom = 1;
     actualizarSeleccion();
+    marcarSucia();
   });
 
   const observador = new ResizeObserver(redimensionar);
   observador.observe(visor);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entradas) => {
+      enPantalla = entradas[entradas.length - 1].isIntersecting;
+      if (enPantalla) arrancar();
+      else detener();
+    }).observe(visor);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) detener();
+    else arrancar();
+  });
+  sinMovimiento.addEventListener?.('change', arrancar);
+  // Las etiquetas usan Tektur: se repinta cuando la fuente termina de cargar.
+  document.fonts?.ready.then(marcarSucia);
+
   redimensionar();
   actualizarSeleccion();
   actualizarRuta();
-  window.requestAnimationFrame(dibujar);
+  arrancar();
 })();

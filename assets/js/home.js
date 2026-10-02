@@ -93,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
   showPlan(plans.residential, "is-residential-selected", "3");
 });
 /* Puntos de interés de los planos del módulo HOME. */
-/* Puntos de interés de los planos del módulo HOME. */
 document.addEventListener("DOMContentLoaded", () => {
   const planStage = document.querySelector(".home-plan-stage");
   const map = document.querySelector(".home-map-image");
@@ -287,37 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
   showCard("summary");
   updatePointsVisibility();
 });
-/* Visor inmersivo de la estructura del módulo HOME. */
-document.addEventListener("DOMContentLoaded", () => {
-  const openButton = document.getElementById("home-open-structure");
-  const viewer = document.getElementById("home-structure-viewer");
-  const closeButton = document.getElementById("home-close-structure");
-
-  if (!openButton || !viewer || !closeButton) return;
-
-  const closeViewer = () => {
-    viewer.hidden = true;
-    document.body.classList.remove("home-structure-open");
-    openButton.focus();
-  };
-
-  openButton.addEventListener("click", () => {
-    viewer.hidden = false;
-    document.body.classList.add("home-structure-open");
-    closeButton.focus();
-  });
-
-  closeButton.addEventListener("click", closeViewer);
-
-  viewer.addEventListener("click", (event) => {
-    if (event.target === viewer) closeViewer();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !viewer.hidden) closeViewer();
-  });
-});
-/* Visor inmersivo de la estructura del módulo HOME. */
+/* Visor inmersivo de la estructura del módulo HOME.
+   Antes este bloque estaba duplicado: el primero ataba ABRIR, CERRAR y Escape
+   y este volvía a atarlos, de modo que cada acción se ejecutaba dos veces. */
 document.addEventListener("DOMContentLoaded", () => {
   const openButton = document.getElementById("home-open-structure");
   if (!openButton) return;
@@ -369,8 +340,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!document.querySelector('script[src*="@google/model-viewer"]')) {
     const script = document.createElement("script");
     script.type = "module";
+    // Misma versión fija que HANGAR y FLOTA: sin versión, unpkg sirve siempre
+    // la última, que puede cambiar de comportamiento y no se cachea igual.
     script.src =
-      "https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js";
+      "https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js";
     document.head.append(script);
   }
 
@@ -378,6 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
   openButton.type = "button";
 
   const closeButton = viewer.querySelector("#home-close-structure");
+  if (!closeButton) return;
 
   const closeViewer = () => {
     viewer.hidden = true;

@@ -49,8 +49,10 @@
     };
     [
         "tramain_house_1_france.glb", "tractor.glb", "bale.glb", "bag.glb", "establo.glb",
-        "vaca.glb", "elmtree_mid.glb", "manzano_near.glb", "manzano_mid.glb",
-        "mandarino_near_mid.glb", "mandarino_far.glb", "agapanthus_01.glb", "agapanthus_02.glb"
+        "vaca.glb", "island_tree_near.glb", "island_tree_mid.glb", "jacaranda_near.glb", "jacaranda_mid.glb",
+        "manzano_near.glb", "manzano_mid.glb",
+        "mandarino_near_mid.glb", "mandarino_far.glb", "agapanthus_01.glb", "agapanthus_02.glb",
+        "fern.glb", "fern_grass_02.glb", "cliff_shrub.glb", "shrub_flowers.glb"
     ].forEach(cargarContenedor);
     const promesaMapaHierba = fetch(`${rutaModelos}granja-hierba-celdas-v1.bin`).then(respuesta => {
         if (!respuesta.ok) throw new Error(`No se ha podido cargar el mapa de hierba (${respuesta.status}).`);
@@ -123,8 +125,11 @@
     let velocidadVertical = 0;
     let actualizarPraderaBromus = null;
     let actualizarManzanos = null;
+    let actualizarOlmo = null;
+    let actualizarJacarandas = null;
     let actualizarMandarinos = null;
     let actualizarAgapantos = null;
+    let actualizarArbustos = null;
     let actualizarVacas = null;
     const movimientoTactil = { x: 0, y: 0 };
     const miradaTactil = { x: 0, y: 0 };
@@ -1153,21 +1158,25 @@
         const posicion = { x: -25, z: -25 };
         const y = alturaSobre(sueloC2, posicion.x, posicion.z, 10);
         if (y === null) return;
-        const ruta = "assets/img/granja/";
-        const mid = await cargarContenedor("elmtree_mid.glb");
-        mid.materials.forEach(material => {
+        const [near, mid] = await Promise.all([
+            cargarContenedor("island_tree_near.glb"),
+            cargarContenedor("island_tree_mid.glb")
+        ]);
+        [near, mid].forEach(contenedor => contenedor.materials.forEach(material => {
             material.backFaceCulling = false;
             material.useAlphaFromAlbedoTexture = true;
             if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
             material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
-            material.alphaCutOff = 0.18;
-        });
+            material.alphaCutOff = 0.38;
+        }));
 
         const crearNivel = (contenedor, nivel) => {
             const instancia = contenedor.instantiateModelsToScene(nombre => `olmo-${nivel}-${nombre}`, false);
             const ancla = new BABYLON.TransformNode(`olmo-${nivel}`, scene);
             ancla.position.set(posicion.x, y, posicion.z);
-            ancla.scaling.setAll(0.75);
+            // El modelo original mide unos 5 m. Esta escala lo convierte en el
+            // árbol grande y veterano que actúa como referencia del paisaje.
+            ancla.scaling.setAll(1.65);
             instancia.rootNodes.forEach(raiz => {
                 raiz.parent = ancla;
                 const mallas = [raiz, ...raiz.getChildMeshes()].filter(malla =>
@@ -1181,12 +1190,89 @@
             });
             return ancla;
         };
-        crearNivel(mid, "mid");
+        const nivelNear = crearNivel(near, "near");
+        const nivelMid = crearNivel(mid, "mid");
+        actualizarOlmo = () => {
+            const distancia2 = (posicion.x - camera.position.x) ** 2 + (posicion.z - camera.position.z) ** 2;
+            const usarNear = distancia2 < 1600;
+            nivelNear.setEnabled(usarNear);
+            nivelMid.setEnabled(!usarNear);
+        };
+        actualizarOlmo();
         zonasExcluidas.push({
             segmento: [[posicion.x, posicion.z], [posicion.x, posicion.z]],
             radio: 10,
             cubierta: "c2"
         });
+    }
+
+    async function crearJacarandas(sueloC2, zonasExcluidas) {
+        if (!sueloC2) return;
+        const [near, mid] = await Promise.all([
+            cargarContenedor("jacaranda_near.glb"),
+            cargarContenedor("jacaranda_mid.glb")
+        ]);
+        [near, mid].forEach(contenedor => contenedor.materials.forEach(material => {
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            material.alphaCutOff = 0.38;
+        }));
+
+        // Tres hitos separados en C2. Se registran antes del arbolado aleatorio
+        // para que manzanos y mandarinos respeten su espacio libre.
+        const candidatos = [
+            { x: -85, z: -70, giro: 0.22, escala: 0.52 },
+            { x: 5, z: -110, giro: 2.18, escala: 0.48 },
+            { x: 85, z: 20, giro: 4.31, escala: 0.56 }
+        ];
+        const arboles = [];
+
+        candidatos.forEach((datos, indice) => {
+            if (estaEnZonaRampa(datos.x, datos.z)) return;
+            if (enZonaExcluida(zonasExcluidas, datos.x, datos.z, "c2", 12)) return;
+            const y = alturaSobre(sueloC2, datos.x, datos.z, 10);
+            if (y === null) return;
+
+            const crearNivel = (contenedor, nivel) => {
+                const instancia = contenedor.instantiateModelsToScene(
+                    nombre => `jacaranda-${nivel}-${indice + 1}-${nombre}`, false
+                );
+                instancia.rootNodes.forEach(raiz => {
+                    raiz.position.set(datos.x, y, datos.z);
+                    raiz.scaling.setAll(datos.escala);
+                    raiz.rotationQuaternion = null;
+                    raiz.rotation.y = datos.giro;
+                    raiz.getChildMeshes().forEach(malla => {
+                        malla.isPickable = true;
+                        malla.receiveShadows = true;
+                        obstaculosSolidos.add(malla);
+                    });
+                });
+                return instancia.rootNodes;
+            };
+
+            arboles.push({
+                x: datos.x,
+                z: datos.z,
+                near: crearNivel(near, "near"),
+                mid: crearNivel(mid, "mid")
+            });
+            zonasExcluidas.push({
+                segmento: [[datos.x, datos.z], [datos.x, datos.z]],
+                radio: 12,
+                cubierta: "c2"
+            });
+        });
+
+        actualizarJacarandas = () => arboles.forEach(arbol => {
+            const distancia2 = (arbol.x - camera.position.x) ** 2 + (arbol.z - camera.position.z) ** 2;
+            const usarNear = distancia2 < 1225;
+            arbol.near.forEach(raiz => raiz.setEnabled(usarNear));
+            arbol.mid.forEach(raiz => raiz.setEnabled(!usarNear));
+        });
+        actualizarJacarandas();
     }
 
     async function crearMandarinos(sueloC2, sueloC4, zonasExcluidas) {
@@ -1329,6 +1415,95 @@
             planta.raices.forEach(raiz => raiz.setEnabled(visible));
         });
         actualizarAgapantos();
+    }
+
+    async function crearArbustos(sueloC2, sueloC4, zonasExcluidas) {
+        if (!sueloC2 || !sueloC4) return;
+        const definiciones = [
+            { archivo: "cliff_shrub.glb", c2: 70, c4: 55, separacion: 5.2, escalaMin: 0.72, escalaMax: 1.28, distancia: 82, margen: 1.4 },
+            { archivo: "fern_grass_02.glb", c2: 40, c4: 18, separacion: 4.0, escalaMin: 0.72, escalaMax: 1.18, distancia: 68, margen: 1.1, agrupado: true },
+            { archivo: "fern.glb", c2: 24, c4: 10, separacion: 5.5, escalaMin: 0.68, escalaMax: 1.12, distancia: 60, margen: 1.2, agrupado: true },
+            { archivo: "shrub_flowers.glb", c2: 6, c4: 4, separacion: 22, escalaMin: 0.76, escalaMax: 1.04, distancia: 48, margen: 2.2 }
+        ];
+        const contenedores = await Promise.all(definiciones.map(d => cargarContenedor(d.archivo)));
+        contenedores.forEach(contenedor => contenedor.materials.forEach(material => {
+            material.backFaceCulling = false;
+            material.useAlphaFromAlbedoTexture = true;
+            if (material.albedoTexture) material.albedoTexture.hasAlpha = true;
+            material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHATEST;
+            if (!Number.isFinite(material.alphaCutOff)) material.alphaCutOff = 0.35;
+        }));
+
+        const plantas = [];
+        const ocupadas = { c2: [], c4: [] };
+        const distribuir = (definicion, contenedor, superficie, alturaOrigen, cubierta, cantidad, semillaInicial) => {
+            let semilla = semillaInicial >>> 0;
+            const aleatorio = () => {
+                semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+                return semilla / 4294967296;
+            };
+            const centros = [];
+            if (definicion.agrupado) {
+                const numeroCentros = Math.max(3, Math.ceil(cantidad / 7));
+                let intentosCentro = 0;
+                while (centros.length < numeroCentros && intentosCentro++ < 5000) {
+                    const x = -132 + aleatorio() * 274;
+                    const z = -192 + aleatorio() * 354;
+                    if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 8) continue;
+                    if (estaEnZonaRampa(x, z) || enZonaExcluida(zonasExcluidas, x, z, cubierta, 3)) continue;
+                    centros.push([x, z]);
+                }
+            }
+            let creadas = 0;
+            let intentos = 0;
+            while (creadas < cantidad && intentos++ < cantidad * 180) {
+                let x, z;
+                if (centros.length) {
+                    const centro = centros[Math.floor(aleatorio() * centros.length)];
+                    const angulo = aleatorio() * Math.PI * 2;
+                    const radio = Math.sqrt(aleatorio()) * 7;
+                    x = centro[0] + Math.cos(angulo) * radio;
+                    z = centro[1] + Math.sin(angulo) * radio;
+                } else {
+                    x = -132 + aleatorio() * 274;
+                    z = -192 + aleatorio() * 354;
+                }
+                if (!dentroDelContorno(x, z) || distanciaAlContorno(x, z) < 7) continue;
+                if (estaEnZonaRampa(x, z)) continue;
+                if (enZonaExcluida(zonasExcluidas, x, z, cubierta, definicion.margen)) continue;
+                if (ocupadas[cubierta].some(p => Math.hypot(p[0] - x, p[1] - z) < definicion.separacion)) continue;
+                const y = alturaSobre(superficie, x, z, alturaOrigen);
+                if (y === null) continue;
+                const instancia = contenedor.instantiateModelsToScene(
+                    nombre => `arbusto-${definicion.archivo}-${cubierta}-${creadas}-${nombre}`, false
+                );
+                const escala = definicion.escalaMin + aleatorio() * (definicion.escalaMax - definicion.escalaMin);
+                instancia.rootNodes.forEach(raiz => {
+                    raiz.position.set(x, y, z);
+                    raiz.scaling.scaleInPlace(escala);
+                    raiz.rotationQuaternion = null;
+                    raiz.rotation.y = aleatorio() * Math.PI * 2;
+                    raiz.getChildMeshes().forEach(malla => {
+                        malla.isPickable = false;
+                        malla.receiveShadows = false;
+                    });
+                });
+                ocupadas[cubierta].push([x, z]);
+                plantas.push({ x, z, distancia2: definicion.distancia ** 2, raices: instancia.rootNodes });
+                creadas++;
+            }
+        };
+
+        definiciones.forEach((definicion, indice) => {
+            distribuir(definicion, contenedores[indice], sueloC2, 10, "c2", definicion.c2, 0x51a200 + indice * 0x10101);
+            distribuir(definicion, contenedores[indice], sueloC4, 36, "c4", definicion.c4, 0x51a400 + indice * 0x10101);
+        });
+        actualizarArbustos = () => plantas.forEach(planta => {
+            const distancia2 = (planta.x - camera.position.x) ** 2 + (planta.z - camera.position.z) ** 2;
+            const visible = distancia2 < planta.distancia2;
+            planta.raices.forEach(raiz => raiz.setEnabled(visible));
+        });
+        actualizarArbustos();
     }
 
     async function crearPraderaMundoAbierto(sueloC2, sueloC4, zonasExcluidas) {
@@ -1703,7 +1878,9 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                     mesh.isPickable = true;
                     superficiesTransitables.add(mesh);
                 }
-                if (/talud_rampa|pared_trasera_rampa|murete_|muro_/i.test(mesh.name)) {
+                // Las colisiones siguen la geometría real. Los taludes son suelo
+                // transitable; los laterales y el fondo de la rampa sí son paredes.
+                if (/pared_trasera_rampa|lateral_rampa|fondo_hueco_rampa|murete_|muro_|^bar_/i.test(mesh.name)) {
                     mesh.isPickable = true;
                     obstaculosSolidos.add(mesh);
                 }
@@ -1728,13 +1905,16 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
             await crearVacas(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
             actualizarCarga(52, "CARGANDO OLMO…");
             await crearOlmo(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
+            await crearJacarandas(paisaje?.sueloC2, paisaje?.zonasExcluidas || []);
             actualizarCarga(56, "CARGANDO MANZANOS…");
             await crearManzanos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(68, "CARGANDO MANDARINOS…");
             await crearMandarinos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(72, "CARGANDO FLORES…");
             await crearAgapantos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
-            actualizarCarga(76, "GENERANDO PRADERA…");
+            actualizarCarga(74, "COLOCANDO ARBUSTOS…");
+            await crearArbustos(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
+            actualizarCarga(78, "GENERANDO PRADERA…");
             await crearPraderaMundoAbierto(paisaje?.sueloC2, paisaje?.sueloC4, paisaje?.zonasExcluidas || []);
             actualizarCarga(96, "PREPARANDO VISITA…");
 
@@ -1904,16 +2084,11 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
                 const bloqueadoPorPared =
                     !dentroDelContorno(destino.x, destino.z) ||
                     distanciaAlContorno(destino.x, destino.z) < 0.9;
-                const bloqueadoPorBarandilla =
-                    camera.position.y > 23.3 &&
-                    barandillaC4.some(segmento =>
-                        distanciaASegmento(destino.x, destino.z, segmento) < 0.65
-                    );
-                const bloqueadoPorMuroHueco =
-                    camera.position.y > 14.8 && camera.position.y < 23.4 &&
-                    murosHueco.some(segmento =>
-                        distanciaASegmento(destino.x, destino.z, segmento) < 0.75
-                    );
+                // Ya no se usan segmentos aproximados: bloqueaban puntos libres
+                // alrededor de la boca C4. Las barandillas y paredes reales están
+                // registradas en obstaculosSolidos y se comprueban con su geometría.
+                const bloqueadoPorBarandilla = false;
+                const bloqueadoPorMuroHueco = false;
                 const bloqueadoPorAnimal = obstaculosDinamicos.some(obstaculo =>
                     Math.abs(camera.position.y - obstaculo.nodo.position.y) < 3 &&
                     Math.hypot(
@@ -1955,8 +2130,11 @@ worldPos.xyz = baseMata + (worldPos.xyz - baseMata) * factorMata;
             if (BABYLON.Vector3.DistanceSquared(camera.position, posicionVegetacion) > 1) {
                 posicionVegetacion.copyFrom(camera.position);
                 actualizarManzanos?.();
+                actualizarOlmo?.();
+                actualizarJacarandas?.();
                 actualizarMandarinos?.();
                 actualizarAgapantos?.();
+                actualizarArbustos?.();
             }
             actualizarVacas?.();
 
