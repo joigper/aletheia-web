@@ -43,6 +43,27 @@ document.addEventListener("DOMContentLoaded", () => {
 const botonCerrarFicha = document.getElementById(
     "cerrar-ficha-modulo"
 );
+const botonSimuladorGravedad = document.getElementById(
+    "modulo-simulador-gravedad"
+);
+const simuladorGravedad = document.getElementById(
+    "nexus-gravity-sim"
+);
+const botonVolverFicha = document.getElementById(
+    "nexus-gravity-back"
+);
+const controlGravedad = document.getElementById(
+    "nexus-gravity-range"
+);
+const dialGravedad = document.getElementById(
+    "nexus-gravity-dial"
+);
+const valorGravedad = document.getElementById(
+    "nexus-gravity-value"
+);
+const referenciaGravedad = document.getElementById(
+    "nexus-gravity-reference"
+);
 
     if (!svg) {
         console.error("No se encontró el mapa SVG.");
@@ -236,6 +257,7 @@ L2_007: {
         L1_001: {
             nombre: "NEXUS",
             area: "Propulsión y navegación",
+            curiosidad: "simulador-gravedad",
             imagen: "assets/img/NEXUS.jpg",
             video: "assets/video/NEXUS.mp4",
             imagenAlt:
@@ -1159,7 +1181,89 @@ L1_033: {
     let indiceImagenActual = 0;
     let videoActual = null;
 
+    function cerrarSimuladorGravedad() {
+        fichaModulo.classList.remove(
+            "ficha-modulo--simulador"
+        );
+
+        if (simuladorGravedad) {
+            simuladorGravedad.hidden = true;
+        }
+    }
+
+    function actualizarGravedad(valor) {
+        if (
+            !controlGravedad ||
+            !dialGravedad ||
+            !valorGravedad ||
+            !simuladorGravedad
+        ) {
+            return;
+        }
+
+        const gravedad = Math.min(
+            19.6,
+            Math.max(0.1, Number(valor))
+        );
+        const progreso = (gravedad - 0.1) / 19.5;
+        const angulo = -135 + progreso * 270;
+        const altura = 42 + (1 - progreso) * 154;
+        const duracion = 1.45 - progreso * 0.78;
+
+        controlGravedad.value = gravedad.toFixed(1);
+        valorGravedad.textContent = gravedad
+            .toFixed(1)
+            .padStart(4, "0");
+        dialGravedad.setAttribute(
+            "aria-valuenow",
+            gravedad.toFixed(1)
+        );
+        simuladorGravedad.style.setProperty(
+            "--nexus-progress",
+            `${(progreso * 100).toFixed(1)}%`
+        );
+        simuladorGravedad.style.setProperty(
+            "--nexus-angle",
+            `${angulo.toFixed(1)}deg`
+        );
+        simuladorGravedad.style.setProperty(
+            "--nexus-bounce",
+            `${altura.toFixed(0)}px`
+        );
+        simuladorGravedad.style.setProperty(
+            "--nexus-duration",
+            `${duracion.toFixed(2)}s`
+        );
+
+        if (referenciaGravedad) {
+            referenciaGravedad.textContent =
+                `${(gravedad / 9.8).toFixed(2).replace(".", ",")} G` +
+                (Math.abs(gravedad - 9.8) < 0.05
+                    ? " · GRAVEDAD TERRESTRE"
+                    : " · GRAVEDAD RELATIVA");
+        }
+    }
+
+    function actualizarDesdePuntero(evento) {
+        if (!dialGravedad) {
+            return;
+        }
+
+        const limites = dialGravedad.getBoundingClientRect();
+        const x = evento.clientX - (limites.left + limites.width / 2);
+        const y = evento.clientY - (limites.top + limites.height / 2);
+        let angulo = Math.atan2(y, x) * 180 / Math.PI + 90;
+
+        if (angulo > 180) angulo -= 360;
+        angulo = Math.min(135, Math.max(-135, angulo));
+
+        actualizarGravedad(
+            0.1 + ((angulo + 135) / 270) * 19.5
+        );
+    }
+
     function mostrarDatos(datos, estado) {
+    cerrarSimuladorGravedad();
     estadoFicha.textContent = estado;
     nombreModulo.textContent = datos.nombre;
     areaModulo.textContent = datos.area;
@@ -1181,6 +1285,11 @@ L1_033: {
     if (botonMasImagenes) {
         botonMasImagenes.hidden =
             imagenesActuales.length <= 1;
+    }
+
+    if (botonSimuladorGravedad) {
+        botonSimuladorGravedad.hidden =
+            datos.curiosidad !== "simulador-gravedad";
     }
 
     if (videoModulo) {
@@ -1352,6 +1461,72 @@ if (botonMasImagenes) {
             imagenesActuales[indiceImagenActual].alt;
     });
 }
+    if (botonSimuladorGravedad && simuladorGravedad) {
+        botonSimuladorGravedad.addEventListener("click", () => {
+            fichaModulo.classList.add(
+                "ficha-modulo--simulador"
+            );
+            simuladorGravedad.hidden = false;
+            actualizarGravedad(controlGravedad?.value || 9.8);
+            botonVolverFicha?.focus();
+        });
+    }
+
+    botonVolverFicha?.addEventListener("click", () => {
+        cerrarSimuladorGravedad();
+        botonSimuladorGravedad?.focus();
+    });
+
+    controlGravedad?.addEventListener("input", (evento) => {
+        actualizarGravedad(evento.currentTarget.value);
+    });
+
+    if (dialGravedad) {
+        let arrastrandoDial = false;
+
+        dialGravedad.addEventListener("pointerdown", (evento) => {
+            arrastrandoDial = true;
+            dialGravedad.setPointerCapture(evento.pointerId);
+            actualizarDesdePuntero(evento);
+        });
+
+        dialGravedad.addEventListener("pointermove", (evento) => {
+            if (arrastrandoDial) {
+                actualizarDesdePuntero(evento);
+            }
+        });
+
+        dialGravedad.addEventListener("pointerup", () => {
+            arrastrandoDial = false;
+        });
+
+        dialGravedad.addEventListener("keydown", (evento) => {
+            const pasos = {
+                ArrowLeft: -0.1,
+                ArrowDown: -0.1,
+                ArrowRight: 0.1,
+                ArrowUp: 0.1,
+                PageDown: -1,
+                PageUp: 1
+            };
+
+            if (evento.key === "Home") {
+                evento.preventDefault();
+                actualizarGravedad(0.1);
+            } else if (evento.key === "End") {
+                evento.preventDefault();
+                actualizarGravedad(19.6);
+            } else if (pasos[evento.key]) {
+                evento.preventDefault();
+                actualizarGravedad(
+                    Number(controlGravedad.value) +
+                    pasos[evento.key]
+                );
+            }
+        });
+    }
+
+    actualizarGravedad(9.8);
     if (botonVerVideo && videoModulo) {
         botonVerVideo.addEventListener("click", () => {
             if (!videoActual) {
