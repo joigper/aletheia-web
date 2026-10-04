@@ -259,7 +259,7 @@ L2_007: {
             area: "Propulsión y navegación",
             curiosidad: "simulador-gravedad",
             imagen: "assets/img/NEXUS.jpg",
-            video: "assets/video/NEXUS.mp4",
+            video: "assets/video/nexus.webm",
             imagenAlt:
                 "Interpretación visual del módulo NEXUS",
             descripcion:
