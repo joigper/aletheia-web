@@ -679,6 +679,54 @@
   }
 }
 
+/* =========================================   EXPLORAR - CABECERA MÓVIL   Mismo reparto utilizado en FLOTA:   título completo y cuatro accesos en 2 × 2.   ========================================= */
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor > section:first-child > .row:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    margin: 0 !important;
+    padding: 10px 8px 20px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor > section:first-child > .row:first-child > .col:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-bottom: 4px;
+    padding: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor > section:first-child > .row:first-child > .col {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor > section:first-child > .row:first-child .aletheia-galaxy-button {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .explorar-contenedor > section:first-child > .row:first-child .galaxy-trigger {
+    width: 100%;
+    justify-content: center;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 0.78rem;
+  }
+}
+
 @media (max-width: 575.98px) {
   .ficha-modulo__cerrar:hover {
     color: #ffffff;
