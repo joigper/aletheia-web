@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="48" height="56" role="img" aria-label="ALÉTHEIA-TV">
+  <defs>
+    <mask id="playHueco">
+      <rect x="33" y="53" width="54" height="37" rx="6" fill="#fff"/>
+      <polygon points="54,62 54,81 70,71.5" fill="#000" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <!-- Hexágono -->
+  <polygon points="60,6 112,36 112,104 60,134 8,104 8,36" fill="none" stroke="#fff" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Antenas -->
+  <path d="M49 43 L60 53 L71 43" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Pantalla con play hueco -->
+  <rect x="33" y="53" width="54" height="37" rx="6" fill="#fff" mask="url(#playHueco)"/>
+  <!-- Peana -->
+  <rect x="48" y="94" width="24" height="4" rx="2" fill="#fff"/>
+</svg>

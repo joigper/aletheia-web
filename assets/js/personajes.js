@@ -787,3 +787,60 @@ window.personajes = [
 },
 
 ];
+
+/*
+ * Perfil interno provisional para ALÉTHEIA TV.
+ * Escala 0-100. No altera la información visible de las fichas.
+ */
+(function aplicarPerfilesDeJuego(personajes) {
+  const perfiles = {
+    "capitan":              { conocimiento: 78, precision: 80, rapidez: 62, impulsividad: 22, riesgo: 42, variabilidad: 12, fortalezas: ["ALÉTHEIA", "HISTORIA", "GEOGRAFÍA"] },
+    "marcus-lowe":          { conocimiento: 55, precision: 66, rapidez: 72, impulsividad: 32, riesgo: 58, variabilidad: 18, fortalezas: ["ALÉTHEIA", "HISTORIA"] },
+    "rose-whitmore":        { conocimiento: 76, precision: 84, rapidez: 68, impulsividad: 18, riesgo: 35, variabilidad: 10, fortalezas: ["ALÉTHEIA", "HISTORIA", "GEOGRAFÍA"] },
+    "leo-sanchez":          { conocimiento: 66, precision: 65, rapidez: 78, impulsividad: 58, riesgo: 64, variabilidad: 34, fortalezas: ["TECNOLOGÍA", "CIENCIA", "ALÉTHEIA"] },
+    "alya-dmaggio":         { conocimiento: 70, precision: 73, rapidez: 61, impulsividad: 32, riesgo: 40, variabilidad: 20, fortalezas: ["NATURALEZA", "CIENCIA"] },
+    "haru-akiyama":         { conocimiento: 72, precision: 86, rapidez: 48, impulsividad: 14, riesgo: 28, variabilidad: 8, fortalezas: ["TECNOLOGÍA", "CIENCIA", "ALÉTHEIA"] },
+    "olga-petrov":          { conocimiento: 62, precision: 69, rapidez: 86, impulsividad: 52, riesgo: 74, variabilidad: 25, fortalezas: ["GEOGRAFÍA", "ALÉTHEIA"] },
+    "alan-smith":           { conocimiento: 75, precision: 76, rapidez: 57, impulsividad: 28, riesgo: 43, variabilidad: 17, fortalezas: ["CIENCIA", "NATURALEZA", "GEOGRAFÍA"] },
+    "sabine-vanwijngaarden":{ conocimiento: 72, precision: 82, rapidez: 56, impulsividad: 20, riesgo: 34, variabilidad: 12, fortalezas: ["CIENCIA", "TECNOLOGÍA"] },
+    "sirena-duarte":        { conocimiento: 71, precision: 74, rapidez: 59, impulsividad: 30, riesgo: 45, variabilidad: 18, fortalezas: ["NATURALEZA", "CIENCIA", "GEOGRAFÍA"] },
+    "biruk-juma":           { conocimiento: 52, precision: 68, rapidez: 73, impulsividad: 29, riesgo: 56, variabilidad: 16, fortalezas: ["ALÉTHEIA", "GEOGRAFÍA"] },
+    "patrick-corban":       { conocimiento: 86, precision: 88, rapidez: 40, impulsividad: 12, riesgo: 24, variabilidad: 7, fortalezas: ["ASTRONOMÍA", "CIENCIA", "TECNOLOGÍA"] },
+    "lars-clarsson":        { conocimiento: 79, precision: 78, rapidez: 54, impulsividad: 20, riesgo: 31, variabilidad: 13, fortalezas: ["CIENCIA", "NATURALEZA"] },
+    "anna-kovalenco":       { conocimiento: 73, precision: 75, rapidez: 65, impulsividad: 27, riesgo: 39, variabilidad: 15, fortalezas: ["HISTORIA", "GEOGRAFÍA", "ALÉTHEIA"] },
+    "audrey-johnson":       { conocimiento: 60, precision: 67, rapidez: 88, impulsividad: 61, riesgo: 77, variabilidad: 29, fortalezas: ["GEOGRAFÍA", "ALÉTHEIA"] },
+    "jean-pierre":          { conocimiento: 67, precision: 64, rapidez: 58, impulsividad: 55, riesgo: 52, variabilidad: 31, fortalezas: ["NATURALEZA", "CIENCIA"] },
+    "giulia-bellini":       { conocimiento: 54, precision: 70, rapidez: 69, impulsividad: 26, riesgo: 51, variabilidad: 17, fortalezas: ["ALÉTHEIA", "HISTORIA"] },
+    "kamal-nair":           { conocimiento: 84, precision: 83, rapidez: 64, impulsividad: 30, riesgo: 46, variabilidad: 16, fortalezas: ["TECNOLOGÍA", "CIENCIA", "ALÉTHEIA"] },
+    "edgar-sanchez":        { conocimiento: 88, precision: 91, rapidez: 36, impulsividad: 10, riesgo: 21, variabilidad: 5, fortalezas: ["TECNOLOGÍA", "CIENCIA"] },
+    "raha-nair":            { conocimiento: 85, precision: 84, rapidez: 58, impulsividad: 24, riesgo: 38, variabilidad: 13, fortalezas: ["CIENCIA", "TECNOLOGÍA", "HISTORIA"] },
+    "agatha-kovalenko":     { conocimiento: 76, precision: 68, rapidez: 57, impulsividad: 39, riesgo: 47, variabilidad: 29, fortalezas: ["CIENCIA", "NATURALEZA", "GEOGRAFÍA"] },
+    "francis-kovalenko":    { conocimiento: 48, precision: 46, rapidez: 83, impulsividad: 75, riesgo: 69, variabilidad: 62, fortalezas: ["NATURALEZA", "ALÉTHEIA"] },
+    "elliot-phillips":      { conocimiento: 74, precision: 62, rapidez: 50, impulsividad: 48, riesgo: 49, variabilidad: 36, fortalezas: ["NATURALEZA", "CIENCIA"] },
+    "lidia-serrano":        { conocimiento: 82, precision: 87, rapidez: 44, impulsividad: 13, riesgo: 25, variabilidad: 9, fortalezas: ["EXPRESIONES", "HISTORIA", "ARTE"] },
+    "oscar":                { seleccionable: false, conocimiento: 82, precision: 71, rapidez: 79, impulsividad: 68, riesgo: 72, variabilidad: 48, fortalezas: ["ALÉTHEIA", "CIENCIA"] },
+    "andre-leblanc":        { conocimiento: 83, precision: 77, rapidez: 62, impulsividad: 43, riesgo: 48, variabilidad: 25, fortalezas: ["CIENCIA", "NATURALEZA"] },
+    "thomas-muller":        { conocimiento: 64, precision: 84, rapidez: 55, impulsividad: 16, riesgo: 27, variabilidad: 10, fortalezas: ["EXPRESIONES", "ALÉTHEIA"] },
+    "angelo-dmaggio":       { conocimiento: 57, precision: 58, rapidez: 66, impulsividad: 64, riesgo: 61, variabilidad: 38, fortalezas: ["EXPRESIONES", "HISTORIA"] },
+    "mae-kim":              { conocimiento: 76, precision: 79, rapidez: 60, impulsividad: 18, riesgo: 32, variabilidad: 12, fortalezas: ["CIENCIA", "NATURALEZA"] },
+    "mikael-korhonen":      { conocimiento: 81, precision: 82, rapidez: 52, impulsividad: 17, riesgo: 29, variabilidad: 11, fortalezas: ["ASTRONOMÍA", "CIENCIA"] },
+    "akama":                { conocimiento: 58, precision: 72, rapidez: 80, impulsividad: 35, riesgo: 63, variabilidad: 19, fortalezas: ["GEOGRAFÍA", "NATURALEZA"] },
+    "adele-durand":         { conocimiento: 60, precision: 71, rapidez: 52, impulsividad: 24, riesgo: 33, variabilidad: 18, fortalezas: ["EXPRESIONES", "ARTE"] },
+    "alexey-petrov":        { conocimiento: 69, precision: 81, rapidez: 71, impulsividad: 19, riesgo: 44, variabilidad: 11, fortalezas: ["GEOGRAFÍA", "HISTORIA", "ALÉTHEIA"] },
+    "dawit-tesfaye":        { conocimiento: 63, precision: 83, rapidez: 63, impulsividad: 14, riesgo: 30, variabilidad: 9, fortalezas: ["CIENCIA", "TECNOLOGÍA"] },
+    "adelina-dmaggio":      { conocimiento: 66, precision: 72, rapidez: 64, impulsividad: 29, riesgo: 38, variabilidad: 17, fortalezas: ["CIENCIA", "EXPRESIONES"] },
+    "ji-eun-yoon":          { conocimiento: 77, precision: 80, rapidez: 76, impulsividad: 22, riesgo: 41, variabilidad: 12, fortalezas: ["CIENCIA", "NATURALEZA"] },
+    "jonas":                { conocimiento: 78, precision: 69, rapidez: 73, impulsividad: 52, riesgo: 55, variabilidad: 27, fortalezas: ["HISTORIA", "EXPRESIONES", "CINE"] },
+    "emma-solberg":         { conocimiento: 73, precision: 76, rapidez: 65, impulsividad: 34, riesgo: 48, variabilidad: 20, fortalezas: ["NATURALEZA", "CIENCIA", "GEOGRAFÍA"] },
+    "ramon":                { conocimiento: 65, precision: 62, rapidez: 60, impulsividad: 57, riesgo: 58, variabilidad: 33, fortalezas: ["EXPRESIONES", "HISTORIA"] }
+  };
+
+  personajes.forEach((personaje) => {
+    const perfil = perfiles[personaje.id];
+    if (perfil) Object.defineProperty(personaje, "juego", {
+      value: Object.freeze({ seleccionable: true, ...perfil }),
+      enumerable: false,
+      configurable: true
+    });
+  });
+})(window.personajes);

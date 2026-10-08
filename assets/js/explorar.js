@@ -589,6 +589,8 @@ L1_017: {
         L1_088: {
     nombre: "OCIO",
     area: "Comercio, restauración y servicios",
+    enlace: "ALETHEIA-TV.html",
+    textoEnlace: "JUGAR A ALÉTHEIA-TV",
             imagenes: [
     {
         src: "assets/img/OCIO.jpg",
@@ -1320,9 +1322,9 @@ botonSaberMas.hidden = !enlaceSaberMas;
 if (enlaceSaberMas) {
     botonSaberMas.href = enlaceSaberMas;
 
-    botonSaberMas.textContent = esZeus
+    botonSaberMas.textContent = datos.textoEnlace || (esZeus
         ? "SABINE EXPLICA"
-        : "SABER MÁS";
+        : "SABER MÁS");
 } else {
     botonSaberMas.removeAttribute("href");
 }

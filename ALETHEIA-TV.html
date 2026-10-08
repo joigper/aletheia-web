@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>ALÉTHEIA TV | Módulo OCIO</title>
+    <meta name="description" content="Concurso ALÉTHEIA TV del módulo OCIO.">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;700&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/bss-overrides.css">
+    <link rel="stylesheet" href="assets/css/adelanto.css">
+    <link rel="stylesheet" href="assets/css/aletheia-books.css">
+    <link rel="stylesheet" href="assets/css/aletheia-earth.css">
+    <link rel="stylesheet" href="assets/css/cocina.css">
+    <link rel="stylesheet" href="assets/css/galaxy-button.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/tripulacion.css">
+    <link rel="stylesheet" href="assets/css/zeus.css">
+    <link rel="stylesheet" href="assets/css/flota.css">
+    <link rel="stylesheet" href="assets/css/granja-carga.css">
+    <link rel="stylesheet" href="assets/css/hangar.css">
+    <link rel="stylesheet" href="assets/css/hospital.css">
+    <link rel="stylesheet" href="assets/css/jardines.css">
+    <link rel="stylesheet" href="assets/css/observatorio.css">
+    <link rel="stylesheet" href="assets/css/planetas.css">
+    <link rel="stylesheet" href="assets/css/granja-3d.css">
+    <link rel="stylesheet" href="assets/css/aletheia-tv.css">
+    <link rel="stylesheet" href="assets/css/explorar.css">
+</head>
+
+<body>
+    <div class="container aletheia-tv-page">
+        <div class="row aletheia-tv-header">
+            <div class="col"><img src="assets/img/ocio/aletheia-tv-icon-transparente.svg" style="color:var(--bs-border-color-translucent);text-align:center;" width="131" height="131" alt="ALÉTHEIA TV"></div>
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+                <h1 style="font-family:Tektur, serif;font-weight:bold;font-size:28px;color:rgb(255,255,255);">ALÉTHEIA-TV</h1>
+            </div>
+            <div class="col d-flex flex-column justify-content-center align-items-center">
+                <p style="font-family:Tektur, serif;color:var(--bs-light);font-size:30px;margin-bottom:0;">MÓDULO OCIO</p>
+                <p style="color:var(--bs-light);font-size:16px;">ENTRETENIMIENTO</p>
+            </div>
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="aletheia-galaxy-button galaxy-button--small" style="--button-hue:265;"><a href="explorar.html" class="galaxy-trigger"><span class="spark"></span><span class="backdrop"></span><span class="galaxy__container"><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span><span class="star star--static"></span></span><span class="galaxy"><span class="galaxy__ring"><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span><span class="star"></span></span></span><span class="text">VOLVER</span></a></div>
+            </div>
+        </div>
+        <div class="aletheia-tv-divider"></div>
+        <main id="aletheia-tv-app" class="tv-app">
+            <section id="setup-panel" class="tv-setup">
+                <header class="tv-section-title"><span>FASE 1</span>
+                    <h2>CONFIGURAR PARTIDA</h2>
+                </header>
+                <div class="tv-participants-grid">
+                    <aside class="tv-prometheus tv-panel" aria-label="Espacio reservado para PROMETEO">
+                        <div class="tv-prometheus-image"><img src="assets/img/PROMETEOALFA.jpg" alt="Imagen provisional de PROMETEO"><span>REFERENCIA TEMPORAL</span></div>
+                        <div class="tv-prometheus-copy"><small>PRESENTADOR</small><strong>PROMETEO</strong></div>
+                    </aside>
+                    <section class="tv-human-card tv-contestant-card tv-panel" data-slot="slot-1" data-controller="human">
+                        <div id="human-avatar-slot-1" class="tv-human-avatar"><span>TÚ</span></div>
+                        <div class="tv-card-copy"><small>PLAZA 1 · JUGADOR HUMANO</small><strong>Tu alias</strong><label class="visually-hidden" for="alias">Alias del jugador humano</label><input id="alias" maxlength="18" value="Invitado" autocomplete="nickname"></div>
+                    </section>
+                    <div id="rival-preview" class="tv-rivals" aria-live="polite">
+                        <article class="rival-card tv-contestant-card tv-panel" data-slot="slot-2" data-controller="cpu">
+                            <div class="tv-file-placeholder"><span>ARCHIVO 02</span></div>
+                            <div class="tv-card-copy"><small>PLAZA 2 · CPU</small><strong>Seleccionando…</strong></div>
+                        </article>
+                        <article class="rival-card tv-contestant-card tv-panel" data-slot="slot-3" data-controller="cpu">
+                            <div class="tv-file-placeholder"><span>ARCHIVO 03</span></div>
+                            <div class="tv-card-copy"><small>PLAZA 3 · CPU</small><strong>En espera</strong></div>
+                        </article>
+                    </div>
+                </div>
+                <div class="tv-status-row tv-panel" role="status" aria-live="polite" aria-atomic="true">
+                    <div class="tv-status-orb" aria-hidden="true"></div>
+                    <div class="tv-status-copy"><small>INFORMACIÓN DE PARTIDA</small>
+                        <p id="setup-message">He seleccionado dos miembros de la tripulación. Escribe tu alias cuando estés preparado.</p>
+                    </div>
+                    <div class="tv-status-actions"><label class="tv-timed-option" for="timed-game"><span>JUGAR CON TIEMPO</span><input type="checkbox" id="timed-game" role="switch"><i aria-hidden="true"></i></label><button class="tv-button tv-button-secondary" id="reroll-rivals" type="button">CAMBIAR RIVALES</button><button class="tv-button tv-button-primary" id="start-game" type="button">COMENZAR PARTIDA</button></div>
+                </div>
+            </section>
+            <section id="game-panel" class="tv-game" hidden="" aria-live="polite">
+                <div class="tv-message tv-panel"><span class="tv-orb" aria-hidden="true"></span>
+                    <p id="message">Todo preparado.</p>
+                    <div class="tv-game-tools"><span id="game-clock" class="tv-clock" hidden="" aria-live="off">00:30</span><button class="tv-button tv-pause-button" id="pause-game" type="button" aria-pressed="false">PAUSA</button><button class="tv-button tv-restart-button" id="new-game" type="button">REINICIAR PARTIDA</button></div>
+                </div>
+                <section id="puzzle-panel" class="tv-puzzle tv-panel">
+                    <div class="tv-puzzle-meta"><span id="round-label">RONDA 1 DE 5</span><strong id="category"></strong></div>
+                    <p id="clue"></p>
+                    <div id="letter-board" class="letter-board" aria-label="Panel de letras"></div>
+                </section>
+                <section id="winner-panel" class="tv-winner tv-panel" hidden=""><small>PARTIDA FINALIZADA</small>
+                    <h2 id="winner-name"></h2>
+                    <p id="winner-score"></p>
+                </section>
+                <div id="play-area" class="tv-play-area">
+                    <section class="tv-wheel-panel tv-panel">
+                        <div class="pointer" aria-hidden="true"></div><button class="wheel" id="spin" type="button" aria-label="Girar la ruleta"><span id="wheel-rotor" class="wheel-rotor"><span id="wheel-labels" class="wheel-labels" aria-hidden="true"></span></span><span id="wheel-hub" class="wheel-hub"><strong id="wheel-result">PULSA</strong><small id="wheel-action">PARA GIRAR</small></span></button>
+                    </section>
+                    <section class="tv-controls tv-panel">
+                        <div class="tv-control-heading">
+                            <div><small>CONTROL DE PARTIDA</small>
+                                <div class="tv-turn-title">
+                                    <h2 id="turn-label">Turno</h2><button class="tv-button tv-button-primary" id="next-round" type="button" hidden="">SIGUIENTE RONDA</button>
+                                </div>
+                            </div>
+                            <div class="tv-active-money"><small>SALDO DE RONDA</small><strong id="active-round-score">0</strong><span>TOTAL <b id="active-total-score">0</b></span></div>
+                        </div>
+                        <p class="tv-keyboard-help">CONSONANTES DESPUÉS DE GIRAR · VOCALES 50</p>
+                        <div id="keyboard" class="keyboard"></div>
+                        <form id="solve-form"><label>Resolver panel<input autocomplete="off" id="solution" placeholder="Escribe la solución"></label><button class="tv-button tv-button-secondary" type="submit">RESOLVER</button></form><button class="tv-button tv-pass-button" id="pass-turn" type="button" hidden="">PASAR TURNO</button>
+                    </section>
+                </div>
+                <section class="tv-contestants">
+                    <div id="scoreboard" class="scoreboard"></div>
+                </section>
+                <ol id="event-log" hidden=""></ol>
+                <div id="pause-overlay" class="tv-pause-overlay" hidden="">
+                    <div><small>ALÉTHEIA-TV</small><strong>PARTIDA EN PAUSA</strong>
+                        <p>El tiempo y los jugadores están detenidos.</p><button class="tv-button tv-button-primary" id="resume-game" type="button">REANUDAR</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bs-init-1.js"></script>
+    <script src="assets/js/01naves.js"></script>
+    <script src="assets/js/02flota.js"></script>
+    <script src="assets/js/cocina.js"></script>
+    <script src="assets/js/contacto.js"></script>
+    <script src="assets/js/galaxy-button.js"></script>
+    <script src="assets/js/hospital.js"></script>
+    <script src="assets/js/tripulacion.js"></script>
+    <script src="assets/js/zeus.js"></script>
+    <script src="assets/js/hangar.js"></script>
+    <script src="assets/js/jardines.js"></script>
+    <script src="assets/js/navegador-estelar-datos.js"></script>
+    <script src="assets/js/planetas.js"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/navegador-estelar.js"></script>
+    <script src="assets/js/observatorio.js"></script>
+    <script src="assets/js/granja-creditos.js"></script>
+    <script src="assets/js/granja-3d.js"></script>
+    <script src="assets/js/bs-init.js"></script>
+    <script src="assets/js/aletheia-engine.js"></script>
+    <script src="assets/js/aletheia-paneles.js"></script>
+    <script src="assets/js/aletheia-tv.js"></script>
+    <script src="assets/js/explorar.js"></script>
+    <script src="assets/js/personajes.js"></script>
+</body>
+
+</html>
