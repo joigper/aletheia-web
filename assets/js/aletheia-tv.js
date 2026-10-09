@@ -734,6 +734,7 @@
   const pause = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
   function portraitPath(person, useThumbnail) {
+    if (person.remoteImage) return person.remoteImage;
     const filename = String(person.imagen || "");
     const stem = filename.replace(/^.*[\\/]/, "").replace(/\.[^.]+$/, "");
     if (useThumbnail && !missingThumbnails.has(stem.toUpperCase())) {
@@ -905,6 +906,23 @@
     voice?.play(["comienza-partida", "panel-preparado"]);
     $("game-clock").hidden = !timedGame;
     resetActionClock();
+  });
+  window.addEventListener("aletheia:remote-player", event => {
+    const slot = Number(event.detail?.slot);
+    const player = event.detail?.player;
+    if (![1, 2, 3].includes(slot) || !player) return;
+    if (slot !== 1 && slotModes[slot] !== "human") return;
+    if (slot !== 1) slotAliases[slot] = String(player.alias || `Invitado ${slot}`).slice(0, 18);
+    humanAvatars[slot] = {
+      id: `remote-${slot}-${player.avatarId || "avatar"}`,
+      nombre: player.avatarName || "Avatar",
+      apellidos: "",
+      cargo: "Jugador conectado",
+      imagen: "",
+      remoteImage: player.avatarImage || ""
+    };
+    const avatar = $("human-avatar-slot-" + slot);
+    if (avatar) avatar.outerHTML = humanAvatarMarkup(slot);
   });
   $("reroll-rivals").addEventListener("click", () => void chooseRivals());
   $("rival-preview").addEventListener("input", event => {
