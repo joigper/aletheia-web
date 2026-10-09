@@ -3796,3 +3796,164 @@ html, body {
   }
 }
 
+/* Entrada voluntaria: el primer gesto desbloquea el audio en navegador, móvil y Smart TV. */
+
+.tv-entry {
+  position: fixed;
+  z-index: 9000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #eef7ff;
+  background: radial-gradient(circle at 50% 35%,#1b3152 0,#080d18 48%,#020407 100%);
+  text-align: center;
+}
+
+.tv-entry[hidden] {
+  display: none;
+}
+
+.tv-entry-card {
+  width: min(620px,94vw);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: clamp(24px,4vw,46px);
+  border: 1px solid #526b91;
+  border-radius: 18px;
+  background: linear-gradient(145deg,#111b30ee,#080c16f5);
+  box-shadow: 0 24px 80px #000b,inset 0 0 45px #57e6ff0c;
+}
+
+.tv-entry-card img {
+  width: clamp(90px,12vw,140px);
+  height: auto;
+}
+
+.tv-entry-card small {
+  color: #91a8d2;
+  font: 600 10px "Tektur",sans-serif;
+  letter-spacing: .16em;
+}
+
+.tv-entry-card h1 {
+  margin: 0;
+  color: var(--tv-cyan);
+  font: 700 clamp(30px,5vw,54px) "Tektur",sans-serif;
+  text-shadow: 0 0 24px #57e6ff55;
+}
+
+.tv-entry-card p {
+  max-width: 480px;
+  margin: 0 0 10px;
+  color: #ced9eb;
+  font-size: clamp(14px,1.4vw,18px);
+}
+
+.tv-entry-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tv-entry-actions .tv-button {
+  min-height: 52px;
+  font-size: 12px;
+}
+
+.tv-sound-button {
+  min-width: 94px;
+  padding: 7px 10px!important;
+  border: 1px solid #3c7788;
+  color: #bdf8ff;
+  background: #102d38;
+  font-size: 8px!important;
+  letter-spacing: .05em;
+}
+
+.tv-sound-button.is-muted {
+  border-color: #5e6576;
+  color: #aab2c3;
+  background: #171b25;
+}
+
+@media (max-width:620px) {
+  .tv-entry-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width:620px) {
+  .tv-entry-card {
+    gap: 8px;
+    padding: 20px;
+  }
+}
+
+@media (max-width:620px) {
+  .tv-entry-actions .tv-button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-sound-button {
+    min-width: 58px;
+    min-height: 26px;
+    padding: 3px 5px!important;
+    font-size: 6px!important;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-card {
+    width: min(540px,90vw);
+    grid-template-columns: 90px 1fr;
+    column-gap: 18px;
+    padding: 16px 22px;
+    text-align: left;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-card img {
+    grid-row: 1/5;
+    width: 90px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-card h1, .tv-entry-card p, .tv-entry-card small {
+    justify-self: start;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-card h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-card p {
+    font-size: 11px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-actions {
+    grid-column: 2;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-actions .tv-button {
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: 8px;
+  }
+}
+

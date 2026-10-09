@@ -14,6 +14,7 @@
   let cpuNotBefore = 0;
   let timedGame = false;
   let gamePaused = false;
+  let experienceStarted = false;
   let actionTimeRemaining = 30000;
   let actionDeadline = 0;
   let clockTimer = null;
@@ -55,6 +56,17 @@
 
   function stopPrometeo() {
     prometeoActive?.pause();
+  }
+
+  function startPrometeoWelcome() {
+    if (!prometeoActive) return;
+    prometeoActive.pause();
+    prometeoActive.src = prometeoBasePath + "Prometeo05B.mp4";
+    prometeoActive.currentTime = 0;
+    prometeoActive.muted = true;
+    prometeoActive.load();
+    const playback = prometeoActive.play();
+    if (playback !== undefined) playback.catch(() => {});
   }
 
   prometeoActive.addEventListener("ended", playNextPrometeo);
@@ -786,10 +798,50 @@
   $("pause-game").addEventListener("click", () => setGamePaused(!gamePaused));
   $("resume-game").addEventListener("click", () => setGamePaused(false));
   $("new-game").addEventListener("click", () => location.reload());
+  function updateSoundButtons() {
+    const enabled = voice?.isEnabled() !== false;
+    [$("setup-sound"), $("game-sound")].forEach(button => {
+      if (!button) return;
+      button.textContent = enabled ? "SONIDO: SÍ" : "SONIDO: NO";
+      button.setAttribute("aria-pressed", String(!enabled));
+      button.classList.toggle("is-muted", !enabled);
+    });
+  }
+
+  function setSoundEnabled(enabled) {
+    voice?.setEnabled(enabled);
+    if (enabled) {
+      if (state && !$("game-panel").hidden && !gamePaused) voice?.resumeMusic();
+      voice?.playEffect("interfaz-confirmar", { volume: 0.24 });
+    }
+    updateSoundButtons();
+  }
+
+  function toggleSound() {
+    setSoundEnabled(!(voice?.isEnabled() !== false));
+  }
+
+  function enterExperience(withSound) {
+    if (experienceStarted) return;
+    experienceStarted = true;
+    setSoundEnabled(withSound);
+    $("tv-entry").hidden = true;
+    startPrometeoWelcome();
+    if (withSound) voice?.play("saludo-prometeo");
+    setTimeout(() => void chooseRivals(), 550);
+  }
+
+  $("enter-with-sound").addEventListener("click", () => enterExperience(true));
+  $("enter-without-sound").addEventListener("click", () => enterExperience(false));
+  $("setup-sound").addEventListener("click", toggleSound);
+  $("game-sound").addEventListener("click", toggleSound);
+
   function initializeSetup() {
     chooseHumanAvatar(1);
     $("human-avatar-slot-1").outerHTML = humanAvatarMarkup(1);
-    void chooseRivals();
+    $("reroll-rivals").disabled = true;
+    $("start-game").disabled = true;
+    updateSoundButtons();
   }
 
   if (document.readyState === "loading") {

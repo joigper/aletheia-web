@@ -5,6 +5,7 @@
   const effectsPath = basePath;
   const musicFile = "maksymmalko-roblox-minecraft-fortnite-video-game-music-564544.mp3";
   const library = Object.freeze({
+    "saludo-prometeo": ["saludo.mp3"],
     bienvenida: ["bienvenida.mp3", "bienvenida-01.mp3", "bienvenida-02.mp3"],
     "comienza-partida": ["comienza-partida.mp3", "comienza-partida-01.mp3", "comienza-partida-02.mp3", "comienza-partida-03.mp3"],
     "comienza-ronda": ["comienza-ronda.mp3", "comienza-ronda-01.mp3", "comienza-ronda-02.mp3", "comienza-ronda-03.mp3"],
@@ -111,6 +112,7 @@
   function startMusic() {
     musicRequested = true;
     musicSuspended = false;
+    if (!enabled) return;
     const begin = () => {
       if (!musicRequested) return;
       if (music.currentTime === 0 && Number.isFinite(music.duration) && music.duration > 40) {
@@ -133,13 +135,14 @@
   }
 
   function resumeMusic() {
-    if (!musicRequested) return;
+    if (!musicRequested || !enabled) return;
     musicSuspended = false;
     const playback = music.play();
     if (playback !== undefined) playback.then(() => fadeMusic(speaking ? duckedMusicVolume : musicVolume, 500)).catch(() => {});
   }
 
   function playEffect(name, options = {}) {
+    if (!enabled) return null;
     const definition = effectLibrary[name];
     if (!definition) return null;
     const effect = new Audio(effectsPath + encodeURIComponent(definition.file));
@@ -267,7 +270,11 @@
     isSpeaking: () => speaking || queue.length > 0 || delayedStart !== null,
     setEnabled(value) {
       enabled = Boolean(value);
-      if (!enabled) stop();
+      if (!enabled) {
+        stop();
+        stopEffects();
+        pauseMusic();
+      }
     },
     isEnabled: () => enabled,
     setVolume(value) {

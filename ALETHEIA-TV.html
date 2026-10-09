@@ -34,6 +34,13 @@
 </head>
 
 <body>
+    <div id="tv-entry" class="tv-entry" role="dialog" aria-modal="true" aria-labelledby="tv-entry-title">
+        <div class="tv-entry-card"><img src="assets/img/ocio/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true"><small>ALÉTHEIA-TV · EMISIÓN INTERACTIVA</small>
+            <h1 id="tv-entry-title">BIENVENIDOS</h1>
+            <p>Elige cómo quieres entrar. Podrás activar o silenciar el sonido más adelante.</p>
+            <div class="tv-entry-actions"><button class="tv-button tv-button-primary" id="enter-with-sound" type="button">ENTRAR CON SONIDO</button><button class="tv-button tv-button-secondary" id="enter-without-sound" type="button">ENTRAR SIN SONIDO</button></div>
+        </div>
+    </div>
     <div class="container aletheia-tv-page">
         <div class="row aletheia-tv-header">
             <div class="col"><img src="assets/img/ocio/aletheia-tv-icon-transparente.svg" style="color:var(--bs-border-color-translucent);text-align:center;" width="131" height="131" alt="ALÉTHEIA TV"></div>
@@ -56,7 +63,7 @@
                 </header>
                 <div class="tv-participants-grid">
                     <aside class="tv-prometheus tv-panel" aria-label="Espacio reservado para PROMETEO">
-                        <div class="tv-prometheus-image tv-prometheus-stage" aria-label="PROMETEO, presentador de ALÉTHEIA-TV"><video class="true tv-prometheus-video is-active" id="prometeo-video-a" autoplay="" muted="" preload="auto">
+                        <div class="tv-prometheus-image tv-prometheus-stage" aria-label="PROMETEO, presentador de ALÉTHEIA-TV"><video class="true tv-prometheus-video is-active" id="prometeo-video-a" muted="" preload="auto">
                                 <source src="assets/img/ocio/Prometeo05B.mp4" type="video/mp4">
                             </video><span>PRESENTADOR IA</span></div>
                         <div class="tv-prometheus-copy"><small>PRESENTADOR</small><strong>PROMETEO</strong></div>
@@ -81,13 +88,13 @@
                     <div class="tv-status-copy"><small>INFORMACIÓN DE PARTIDA</small>
                         <p id="setup-message">He seleccionado dos miembros de la tripulación. Escribe tu alias cuando estés preparado.</p>
                     </div>
-                    <div class="tv-status-actions"><label class="tv-timed-option" for="timed-game"><span>JUGAR CON TIEMPO</span><input type="checkbox" id="timed-game" role="switch"><i aria-hidden="true"></i></label><button class="tv-button tv-button-secondary" id="reroll-rivals" type="button">CAMBIAR RIVALES</button><button class="tv-button tv-button-primary" id="start-game" type="button">COMENZAR PARTIDA</button></div>
+                    <div class="tv-status-actions"><button class="tv-button tv-sound-button" id="setup-sound" type="button" aria-pressed="false">SONIDO: SÍ</button><label class="tv-timed-option" for="timed-game"><span>JUGAR CON TIEMPO</span><input type="checkbox" id="timed-game" role="switch"><i aria-hidden="true"></i></label><button class="tv-button tv-button-secondary" id="reroll-rivals" type="button">CAMBIAR RIVALES</button><button class="tv-button tv-button-primary" id="start-game" type="button">COMENZAR PARTIDA</button></div>
                 </div>
             </section>
             <section id="game-panel" class="tv-game" hidden="" aria-live="polite">
                 <div class="tv-message tv-panel"><span class="tv-orb" aria-hidden="true"></span>
                     <p id="message">Todo preparado.</p>
-                    <div class="tv-game-tools"><span id="game-clock" class="tv-clock" hidden="" aria-live="off">00:30</span><button class="tv-button tv-pause-button" id="pause-game" type="button" aria-pressed="false">PAUSA</button><button class="tv-button tv-restart-button" id="new-game" type="button">REINICIAR PARTIDA</button></div>
+                    <div class="tv-game-tools"><button class="tv-button tv-sound-button" id="game-sound" type="button" aria-pressed="false">SONIDO: SÍ</button><span id="game-clock" class="tv-clock" hidden="" aria-live="off">00:30</span><button class="tv-button tv-pause-button" id="pause-game" type="button" aria-pressed="false">PAUSA</button><button class="tv-button tv-restart-button" id="new-game" type="button">REINICIAR PARTIDA</button></div>
                 </div>
                 <section id="puzzle-panel" class="tv-puzzle tv-panel">
                     <div class="tv-puzzle-meta">
