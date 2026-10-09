@@ -14,10 +14,17 @@
   let cpuNotBefore = 0;
   let timedGame = false;
   let gamePaused = false;
+  let pauseStartedAt = 0;
   let experienceStarted = false;
-  let actionTimeRemaining = 30000;
+  let actionTimeRemaining = 25000;
   let actionDeadline = 0;
   let clockTimer = null;
+  let speedTimer = null;
+  let renderedPhase = null;
+  let challengeKey = "";
+  let challengeReadyAt = 0;
+  let challengeUnlockTimer = null;
+  let questionResultTimer = null;
   const missingThumbnails = new Set(["OSCAR2"]);
 
   const alphabet = [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"];
@@ -28,8 +35,10 @@
   const prometeoBasePath = "assets/img/ocio/";
   const prometeoIdlePrincipal = "Prometeo04B.mp4";
   const prometeoGestures = ["Prometeo01B.mp4", "Prometeo02B.mp4", "Prometeo03B.mp4", "Prometeo06B.mp4", "Prometeo07B.mp4", "Prometeo08B.mp4", "Prometeo09B.mp4"];
-  const prometeoActive = $("prometeo-video-a");
-  prometeoActive?.removeAttribute("poster");
+  let prometeoActive = $("prometeo-video-a");
+  let prometeoStandby = $("prometeo-video-b");
+  let prometeoSwitching = false;
+  [prometeoActive, prometeoStandby].forEach(video => video?.removeAttribute("poster"));
   let lastPrometeoGesture = null;
 
   function choosePrometeoGesture() {
@@ -40,22 +49,45 @@
     return clip;
   }
 
+  function preloadNextPrometeo() {
+    if (!prometeoStandby || prometeoStandby.dataset.prepared === "true") return;
+    prometeoStandby.src = prometeoBasePath + choosePrometeoGesture();
+    prometeoStandby.muted = true;
+    prometeoStandby.preload = "auto";
+    prometeoStandby.dataset.prepared = "true";
+    prometeoStandby.load();
+  }
+
   function playNextPrometeo() {
-    const nextSource = prometeoBasePath + choosePrometeoGesture();
-    prometeoActive.pause();
-    prometeoActive.src = nextSource;
-    prometeoActive.muted = true;
-    prometeoActive.load();
-    const startPlayback = () => {
-      const playback = prometeoActive.play();
-      if (playback !== undefined) playback.catch(() => {});
+    if (!prometeoActive || !prometeoStandby || prometeoSwitching) return;
+    prometeoSwitching = true;
+    preloadNextPrometeo();
+    const revealStandby = () => {
+      const playback = prometeoStandby.play();
+      if (playback === undefined) return;
+      playback.then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+        const previous = prometeoActive;
+        prometeoStandby.classList.add("is-active");
+        previous.classList.remove("is-active");
+        prometeoActive = prometeoStandby;
+        prometeoStandby = previous;
+        prometeoStandby.dataset.prepared = "false";
+        setTimeout(() => {
+          prometeoStandby.pause();
+          prometeoStandby.removeAttribute("src");
+          prometeoStandby.load();
+          prometeoSwitching = false;
+          preloadNextPrometeo();
+        }, 220);
+      }))).catch(() => { prometeoSwitching = false; });
     };
-    if (prometeoActive.readyState >= 3) startPlayback();
-    else prometeoActive.addEventListener("canplay", startPlayback, { once: true });
+    if (prometeoStandby.readyState >= 3) revealStandby();
+    else prometeoStandby.addEventListener("canplay", revealStandby, { once: true });
   }
 
   function stopPrometeo() {
     prometeoActive?.pause();
+    prometeoStandby?.pause();
   }
 
   function startPrometeoWelcome() {
@@ -66,10 +98,12 @@
     prometeoActive.muted = true;
     prometeoActive.load();
     const playback = prometeoActive.play();
-    if (playback !== undefined) playback.catch(() => {});
+    if (playback !== undefined) playback.then(preloadNextPrometeo).catch(() => {});
   }
 
-  prometeoActive.addEventListener("ended", playNextPrometeo);
+  [prometeoActive, prometeoStandby].forEach(video => video?.addEventListener("ended", event => {
+    if (event.currentTarget === prometeoActive) playNextPrometeo();
+  }));
 
   AletheiaGame.wheel.forEach((value, index) => {
     const label = document.createElement("span");
@@ -85,7 +119,11 @@
     button.type = "button"; button.textContent = letter; button.dataset.letter = letter;
     button.classList.toggle("is-vowel", vowels.has(letter));
     button.setAttribute("aria-label", vowels.has(letter) ? `Comprar vocal ${letter} por ${AletheiaGame.vowelPrice}` : `Elegir consonante ${letter}`);
-    button.addEventListener("click", () => act(() => vowels.has(letter) ? engine.buyVowel(state, letter) : engine.letter(state, letter)));
+    button.addEventListener("click", () => act(() => {
+      if (state.phase === "SPECIAL_LETTER") return engine.specialLetter(state, letter);
+      if (state.phase === "FINAL_PICK") return engine.finalLetter(state, letter);
+      return vowels.has(letter) ? engine.buyVowel(state, letter) : engine.letter(state, letter);
+    }));
     keyboard.append(button);
   });
 
@@ -136,7 +174,7 @@
     const panelKey = `${state.round}:${normalized}`;
     const samePanel = panelKey === previousPanelKey;
     panelJustChanged = !samePanel;
-    const completed = state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE";
+    const completed = ["ROUND_COMPLETE", "QUESTION_BONUS", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase);
     const visibleLetters = new Set(completed ? [...normalized].filter(char => char !== " ") : state.puzzle.revealed);
     const rows = splitPanelText(normalized);
 
@@ -216,19 +254,27 @@
   function render(message) {
     const gameComplete = state.phase === "GAME_COMPLETE";
     const roundComplete = state.phase === "ROUND_COMPLETE";
+    const finalReady = state.phase === "FINAL_READY";
+    const finalRound = state.phase === "FINAL_PICK" || state.phase === "FINAL_SOLVE";
+    const specialRound = state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
+    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "FINAL_SOLVE";
     const consonantsRemain = engine.hasAvailableConsonants(state);
     const humanTurn = !state.players[state.active].cpu;
-    if (roundComplete || gameComplete) {
+    if (roundComplete || finalReady || gameComplete) {
       clearTimeout(clockTimer);
       voice?.stopLoop("reloj");
     }
-    $("game-clock").hidden = !timedGame || gameComplete;
+    if (renderedPhase !== state.phase && forcedClock) resetActionClock();
+    renderedPhase = state.phase;
+    $("game-clock").hidden = (!timedGame && !forcedClock) || gameComplete;
     $("pause-game").disabled = gameComplete;
     $("puzzle-panel").hidden = gameComplete;
     $("play-area").hidden = gameComplete;
     $("winner-panel").hidden = !gameComplete;
-    $("next-round").hidden = !roundComplete;
-    $("round-label").textContent = `RONDA ${state.round} DE ${state.maxRounds}`;
+    $("contestants-panel").hidden = gameComplete;
+    $("next-round").hidden = !roundComplete && !finalReady;
+    $("next-round").textContent = finalReady ? "JUGAR RULETA FINAL" : "SIGUIENTE RONDA";
+    $("round-label").textContent = finalRound ? "RULETA FINAL" : `RONDA ${state.round} DE ${state.maxRounds}${state.roundMode === "CHOOSE" ? " · TÚ ELIGES" : state.roundMode === "QUESTION" ? " · PREGUNTA" : state.roundMode === "SPECIAL" ? ` · ${state.special?.type === "SPEED" ? "VELOCIDAD" : "CRONO"}` : ""}`;
     $("category").textContent = state.puzzle.category;
     $("clue").textContent = state.puzzle.clue;
     $("letter-board").innerHTML = maskedPuzzle();
@@ -239,24 +285,39 @@
     } else if (!roundComplete) {
       animateNewPanelLetters();
     }
-    $("turn-label").textContent = roundComplete ? `Ronda ${state.round} terminada` : `Turno de ${state.players[state.active].name}`;
+    $("turn-label").textContent = finalReady ? "Cinco rondas completadas" : roundComplete ? `Ronda ${state.round} terminada` : finalRound ? `Final de ${state.players[state.active].name}` : `Turno de ${state.players[state.active].name}`;
     $("active-round-score").textContent = state.players[state.active].round;
     $("active-total-score").textContent = state.players[state.active].total;
-    $("message").textContent = message || (roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
+    $("message").textContent = message || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? "Diez segundos para resolver el panel final." : state.phase === "SPECIAL_LETTER" ? `Panel con crono: letras libres por turnos. Premio provisional: ${AletheiaGame.specialPrize}.` : state.phase === "SPEED_RUNNING" ? `Velocidad decreciente: resuelve antes de que el premio baje de ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `Panel revelado: ${state.players[state.active].name} debe resolverlo.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
     $("spin").disabled = gamePaused || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
+    if (specialRound || finalRound) {
+      $("wheel-result").textContent = finalRound ? "FINAL" : state.special.type === "SPEED" ? state.special.prize : "CRONO";
+      $("wheel-action").hidden = false;
+      $("wheel-action").textContent = finalRound ? "500 PROVISIONALES" : state.special.type === "SPEED" ? "PREMIO ACTUAL" : "SIN RULETA";
+    }
     if (state.phase === "AWAITING_SPIN") {
       $("wheel-result").textContent = "PULSA";
       $("wheel-action").hidden = false;
       $("wheel-hub").classList.remove("has-result");
     }
     $("pass-turn").hidden = !humanTurn || roundComplete || gameComplete || state.phase !== "AWAITING_SPIN" || consonantsRemain || state.players[state.active].round >= AletheiaGame.vowelPrice;
-    $("solution").disabled = gamePaused || !humanTurn || roundComplete || gameComplete;
-    $("solve-form").querySelector("button").disabled = gamePaused || !humanTurn || roundComplete || gameComplete;
+    $("solution").disabled = gamePaused || !humanTurn || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK";
+    $("solve-form").querySelector("button").disabled = gamePaused || !humanTurn || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK";
     if (gameComplete) {
+      if (!state.statistics.endedAt) state.statistics.endedAt = Date.now();
       const highest = Math.max(...state.players.map(player => player.total));
       const winners = state.players.filter(player => player.total === highest);
       $("winner-name").textContent = winners.length === 1 ? `GANADOR: ${winners[0].name}` : `EMPATE: ${winners.map(player => player.name).join(" · ")}`;
-      $("winner-score").textContent = `${highest} puntos consolidados tras cinco rondas`;
+      $("winner-score").textContent = `${highest} puntos consolidados tras cinco rondas y la final`;
+      const elapsed = Math.max(0, state.statistics.endedAt - state.statistics.startedAt - state.statistics.pausedMs);
+      $("winner-duration").textContent = formatDuration(elapsed);
+      $("winner-pause-time").textContent = state.statistics.pausedMs ? `${formatDuration(state.statistics.pausedMs)} en pausa` : "Sin pausas";
+      const bestPlayer = state.players.reduce((best, player) => player.stats.bestLetterAward > best.stats.bestLetterAward ? player : best, state.players[0]);
+      $("winner-best-play").textContent = bestPlayer.stats.bestLetter ? `${bestPlayer.name}: ${bestPlayer.stats.bestLetterAward} con la ${bestPlayer.stats.bestLetter}` : "Sin premio por letra";
+      $("winner-stats").innerHTML = state.players.map(player => {
+        const winnerClass = player.total === highest ? " is-winner" : "";
+        return `<article class="tv-winner-player${winnerClass}"><small>${player.cpu ? "TRIPULACIÓN" : "HUMANO"}</small><strong>${escapeHtml(player.name)}</strong><b>${player.total}</b><span>TOTAL</span><dl><div><dt>Rondas</dt><dd>${player.stats.roundsWon}</dd></div><div><dt>Consonantes</dt><dd>${player.stats.correctConsonants} bien · ${player.stats.incorrectConsonants} mal</dd></div><div><dt>Vocales</dt><dd>${player.stats.vowelsBought}</dd></div><div><dt>Resoluciones</dt><dd>${player.stats.solvedPanels} bien · ${player.stats.wrongSolutions} mal</dd></div><div><dt>Quiebras</dt><dd>${player.stats.bankruptcies}</dd></div><div><dt>Pierde turno</dt><dd>${player.stats.lostTurns}</dd></div></dl></article>`;
+      }).join("");
       $("message").textContent = winners.length === 1 ? `${winners[0].name} gana la partida.` : "La partida termina en empate.";
     }
     $("scoreboard").innerHTML = state.players.map((player, i) => {
@@ -267,16 +328,68 @@
     }).join("");
     keyboard.querySelectorAll("button").forEach(button => {
       const vowel = vowels.has(button.dataset.letter);
-      button.disabled = gamePaused || !humanTurn || state.puzzle.revealed.includes(button.dataset.letter) || (vowel
-        ? state.phase !== "AWAITING_SPIN" || state.players[state.active].round < AletheiaGame.vowelPrice
-        : state.phase !== "AWAITING_LETTER");
+      const unavailable = state.puzzle.revealed.includes(button.dataset.letter);
+      const specialAvailable = state.phase === "SPECIAL_LETTER";
+      const finalAvailable = state.phase === "FINAL_PICK" && (vowel ? state.final.vowels < 1 : state.final.consonants < 3);
+      const normalAvailable = vowel ? state.phase === "AWAITING_SPIN" && state.players[state.active].round >= AletheiaGame.vowelPrice : state.phase === "AWAITING_LETTER";
+      button.disabled = gamePaused || !humanTurn || unavailable || (!specialAvailable && !finalAvailable && !normalAvailable);
     });
+    renderChallenge();
     $("event-log").innerHTML = state.events.slice().reverse().map(e => `<li><strong>${e.type}</strong> — ${e.detail}</li>`).join("");
     scheduleCpuTurn();
+    scheduleSpeedReveal();
   }
 
   function escapeHtml(value) { const node = document.createElement("span"); node.textContent = value; return node.innerHTML; }
   function escapeAttribute(value) { return escapeHtml(value).replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+  function formatDuration(milliseconds) {
+    const seconds = Math.max(0, Math.floor(milliseconds / 1000));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainder = seconds % 60;
+    return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}` : `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+  }
+
+  function renderChallenge() {
+    const overlay = $("challenge-overlay");
+    const categoryChoice = state.phase === "CATEGORY_CHOICE";
+    const question = state.phase === "QUESTION_BONUS" || state.phase === "QUESTION_RESULT";
+    overlay.hidden = !categoryChoice && !question;
+    if (overlay.hidden) { challengeKey = ""; return; }
+    const nextKey = categoryChoice ? `category:${state.round}:${state.categoryChoices.join("|")}` : `question:${state.round}:${state.question.text}`;
+    if (challengeKey !== nextKey) {
+      challengeKey = nextKey;
+      challengeReadyAt = Date.now() + 2000;
+      clearTimeout(challengeUnlockTimer);
+      challengeUnlockTimer = setTimeout(() => { if (state && (state.phase === "CATEGORY_CHOICE" || state.phase === "QUESTION_BONUS")) render(); }, 2050);
+    }
+    const locked = Date.now() < challengeReadyAt;
+    if (categoryChoice) {
+      $("challenge-kicker").textContent = "RONDA 2 · TÚ ELIGES";
+      $("challenge-title").textContent = `${state.players[state.active].name}, elige categoría`;
+      $("challenge-text").textContent = "La categoría elegida determinará el siguiente panel.";
+      $("challenge-options").innerHTML = state.categoryChoices.map(category => `<button class="tv-button tv-button-secondary" type="button" data-category-choice="${escapeAttribute(category)}" ${locked ? "disabled" : ""}>${escapeHtml(category)}</button>`).join("");
+      return;
+    }
+    $("challenge-kicker").textContent = "PREGUNTA DE BONIFICACIÓN";
+    $("challenge-title").textContent = state.phase === "QUESTION_RESULT" ? (state.question.wasCorrect ? `RESPUESTA CORRECTA · +${AletheiaGame.questionBonus}` : "RESPUESTA INCORRECTA") : `RESPONDE Y GANA ${AletheiaGame.questionBonus} CRÉDITOS ADICIONALES`;
+    $("challenge-text").textContent = state.question.text;
+    if (state.phase === "QUESTION_RESULT") {
+      $("challenge-options").innerHTML = `<strong class="tv-question-result ${state.question.wasCorrect ? "is-correct" : "is-wrong"}">${state.question.wasCorrect ? `+${AletheiaGame.questionBonus} CRÉDITOS` : `LA RESPUESTA ERA: ${escapeHtml(state.question.options[state.question.correct])}`}</strong>`;
+      if (!questionResultTimer) questionResultTimer = setTimeout(() => {
+        questionResultTimer = null;
+        if (state?.phase === "QUESTION_RESULT") act(() => engine.continueAfterQuestion(state));
+      }, 2200);
+      return;
+    }
+    $("challenge-options").innerHTML = state.question.options.map((option, index) => `<button class="tv-button tv-button-secondary" type="button" data-question-choice="${index}" ${locked ? "disabled" : ""}>${escapeHtml(option)}</button>`).join("");
+  }
+
+  function scheduleSpeedReveal() {
+    clearTimeout(speedTimer);
+    if (gamePaused || !state || state.phase !== "SPEED_RUNNING") return;
+    speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 1350);
+  }
 
   function finalVoiceIntent() {
     if (state.phase !== "GAME_COMPLETE") return "ronda-ganada";
@@ -376,7 +489,7 @@
     try {
       const previousEvents = state?.events?.length || 0;
       state = operation();
-      if ((state.events?.length || 0) > previousEvents) resetActionClock();
+      if ((state.events?.length || 0) > previousEvents && !["SPECIAL_LETTER", "SPEED_RUNNING", "SPEED_SOLVE", "FINAL_PICK", "FINAL_SOLVE"].includes(state.phase)) resetActionClock();
       render();
       announceEvents(state.events.slice(previousEvents));
     } catch (error) {
@@ -388,13 +501,13 @@
 
   function formatClock(milliseconds) {
     const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
-    return `00:${String(seconds).padStart(2, "0")}`;
+    return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
   }
 
   function updateClock() {
     clearTimeout(clockTimer);
-    if (!timedGame || !state) return;
-    if (state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") return;
+    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "FINAL_SOLVE")) return;
+    if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "QUESTION_BONUS"].includes(state.phase)) return;
     if (!gamePaused) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
     $("game-clock").textContent = formatClock(actionTimeRemaining);
     $("game-clock").classList.toggle("is-urgent", actionTimeRemaining <= 10000);
@@ -402,9 +515,11 @@
     else voice?.stopLoop("reloj");
     if (!gamePaused && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
       voice?.stopLoop("reloj");
-      state = engine.yieldTurn(state);
-      resetActionClock();
-      render("Tiempo agotado. El turno pasa al siguiente concursante.");
+      if (state.phase === "FINAL_SOLVE") state = engine.failFinal(state);
+      else if (state.phase === "SPECIAL_LETTER") state = engine.expireSpecial(state);
+      else state = engine.yieldTurn(state);
+      if (state.phase !== "GAME_COMPLETE" && state.phase !== "ROUND_COMPLETE") resetActionClock();
+      render(state.phase === "GAME_COMPLETE" ? "Tiempo agotado en la Ruleta Final." : state.phase === "ROUND_COMPLETE" ? "Tiempo agotado. La prueba termina sin premio." : "Tiempo agotado. El turno pasa al siguiente concursante.");
       voice?.playEffect("respuesta-incorrecta");
       voice?.play("tiempo-agotado");
       return;
@@ -413,9 +528,9 @@
   }
 
   function resetActionClock() {
-    if (!timedGame) return;
+    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "FINAL_SOLVE")) return;
     voice?.stopLoop("reloj");
-    actionTimeRemaining = 30000;
+    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPECIAL_LETTER" ? 60000 : 25000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
   }
@@ -473,6 +588,39 @@
     }
     const player = state.players[state.active];
     const profile = player.cpuProfile || AletheiaGame.defaultCpuProfile;
+    if (state.phase === "CATEGORY_CHOICE") {
+      const preferred = state.categoryChoices.find(category => profile.fortalezas.includes(AletheiaGame.normalize(category))) || state.categoryChoices[Math.floor(Math.random() * state.categoryChoices.length)];
+      act(() => engine.chooseCategory(state, preferred));
+      return;
+    }
+    if (state.phase === "QUESTION_BONUS") {
+      const knowsAnswer = Math.random() * 100 < profile.conocimiento;
+      const option = knowsAnswer ? state.question.correct : Math.floor(Math.random() * state.question.options.length);
+      act(() => engine.answerQuestion(state, option));
+      return;
+    }
+    if (state.phase === "FINAL_PICK") {
+      const wantVowel = state.final.consonants >= 3;
+      const letter = pickCpuLetter(player, wantVowel);
+      if (letter) act(() => engine.finalLetter(state, letter));
+      return;
+    }
+    if (state.phase === "FINAL_SOLVE") {
+      const progress = puzzleProgress();
+      const success = Math.random() * 100 < Math.min(94, profile.conocimiento * .65 + progress * 45);
+      act(() => engine.solve(state, success ? state.puzzle.solution : "RESPUESTA INCORRECTA"));
+      return;
+    }
+    if (state.phase === "SPECIAL_LETTER") {
+      if (cpuAttemptsSolution(player)) return;
+      const letter = pickCpuLetter(player, Math.random() < .28);
+      if (letter) act(() => engine.specialLetter(state, letter));
+      return;
+    }
+    if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") {
+      cpuAttemptsSolution(player, state.phase === "SPEED_SOLVE");
+      return;
+    }
     if (state.phase === "AWAITING_LETTER") {
       const consonant = pickCpuLetter(player, false);
       if (consonant) act(() => engine.letter(state, consonant));
@@ -494,9 +642,10 @@
 
   function scheduleCpuTurn() {
     clearTimeout(cpuTimer);
-    if (gamePaused || !state || !state.players[state.active]?.cpu || state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") return;
+    if (gamePaused || !state || !state.players[state.active]?.cpu || state.phase === "ROUND_COMPLETE" || state.phase === "QUESTION_RESULT" || state.phase === "FINAL_READY" || state.phase === "GAME_COMPLETE") return;
     const player = state.players[state.active];
-    const wait = Math.max(cpuDelay(player), cpuNotBefore - Date.now());
+    const sceneMinimum = state.phase === "CATEGORY_CHOICE" ? challengeReadyAt + 1000 : state.phase === "QUESTION_BONUS" ? challengeReadyAt + 3000 : 0;
+    const wait = Math.max(cpuDelay(player), cpuNotBefore - Date.now(), sceneMinimum - Date.now());
     $("message").textContent = `${player.name} está pensando…`;
     cpuTimer = setTimeout(runCpuTurn, wait);
   }
@@ -665,6 +814,8 @@
       : { cpu: true, person: selectedBySlot[slot] });
     timedGame = $("timed-game").checked;
     state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1));
+    state.statistics.startedAt = Date.now();
+    pauseStartedAt = 0;
     stopPrometeo();
     $("setup-panel").hidden = true; $("game-panel").hidden = false; render("Tres concursantes. Todo preparado. Comenzamos.");
     voice?.startMusic();
@@ -749,11 +900,20 @@
   $("next-round").addEventListener("click", () => {
     act(() => engine.nextRound(state));
     wheelDisplayRun += 1;
-    $("wheel-result").textContent = "PULSA";
-    $("wheel-action").hidden = false;
-    $("wheel-hub").classList.remove("has-result");
-    $("spin").setAttribute("aria-label", "Girar la ruleta");
+    if (state.phase === "AWAITING_SPIN") {
+      $("wheel-result").textContent = "PULSA";
+      $("wheel-action").textContent = "PARA GIRAR";
+      $("wheel-action").hidden = false;
+      $("wheel-hub").classList.remove("has-result");
+      $("spin").setAttribute("aria-label", "Girar la ruleta");
+    }
     $("solution").value = "";
+  });
+  $("challenge-options").addEventListener("click", event => {
+    const category = event.target.closest("[data-category-choice]");
+    if (category) { act(() => engine.chooseCategory(state, category.dataset.categoryChoice)); return; }
+    const answer = event.target.closest("[data-question-choice]");
+    if (answer) act(() => engine.answerQuestion(state, Number(answer.dataset.questionChoice)));
   });
   $("pass-turn").addEventListener("click", () => act(() => engine.yieldTurn(state)));
   function setGamePaused(paused) {
@@ -765,14 +925,20 @@
     $("game-panel").classList.toggle("is-paused", paused);
     clearTimeout(cpuTimer);
     clearTimeout(clockTimer);
+    clearTimeout(speedTimer);
     voice?.stopEffects();
     if (paused) {
+      pauseStartedAt = Date.now();
       if (timedGame) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
       $("message").textContent = "Partida en pausa.";
       voice?.pauseMusic();
       voice?.playEffect("partida-pausa");
       voice?.play("partida-pausada");
       return;
+    }
+    if (pauseStartedAt) {
+      state.statistics.pausedMs += Date.now() - pauseStartedAt;
+      pauseStartedAt = 0;
     }
     if (timedGame) {
       actionDeadline = Date.now() + actionTimeRemaining;
@@ -798,6 +964,7 @@
   $("pause-game").addEventListener("click", () => setGamePaused(!gamePaused));
   $("resume-game").addEventListener("click", () => setGamePaused(false));
   $("new-game").addEventListener("click", () => location.reload());
+  $("winner-new-game").addEventListener("click", () => location.reload());
   function updateSoundButtons() {
     const enabled = voice?.isEnabled() !== false;
     [$("setup-sound"), $("game-sound")].forEach(button => {

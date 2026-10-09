@@ -6,6 +6,10 @@
   const wheel = [200,"QUIEBRA",150,75,50,150,100,"PIERDE TURNO",25,100,75,50,25,"COMODÍN",25,75,25,50,75,"PIERDE TURNO",50,25,75,50];
   const VOWEL_PRICE = 50;
   const VOWELS = new Set(["A", "E", "I", "O", "U"]);
+  const ROUND_MODES = ["NORMAL", "CHOOSE", "SPECIAL", "NORMAL", "QUESTION"];
+  const SPECIAL_PRIZE = 300;
+  const QUESTION_BONUS = 100;
+  const FINAL_PRIZE = 500;
   // Provisional hasta trasladar esta decisión a personaje.juego.seleccionable.
   const excludedCpuIds = new Set(["oscar"]);
   const DEFAULT_CPU_PROFILE = Object.freeze({
@@ -71,7 +75,7 @@
       while (cpu.length < count) cpu.push(fallback[cpu.length]);
       return cpu;
     }
-    pickPuzzle(excludedIds = [], excludedCategories = []) {
+    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null) {
       const library = Array.isArray(global.aletheiaPaneles)
         ? global.aletheiaPaneles.filter(panel => panel.id && panel.categoria && panel.solucion)
         : [];
@@ -81,12 +85,34 @@
       const excluded = new Set(excludedIds);
       const excludedCategorySet = new Set(excludedCategories);
       const unused = library.filter(panel => !excluded.has(panel.id));
-      const unusedCategories = unused.filter(panel => !excludedCategorySet.has(panel.categoria));
-      const pool = unusedCategories.length ? unusedCategories : (unused.length ? unused : library);
+      const categoryFiltered = requiredCategory ? unused.filter(panel => panel.categoria === requiredCategory) : unused;
+      const unusedCategories = categoryFiltered.filter(panel => !excludedCategorySet.has(panel.categoria));
+      const pool = unusedCategories.length ? unusedCategories : (categoryFiltered.length ? categoryFiltered : (unused.length ? unused : library));
       const categories = [...new Set(pool.map(panel => panel.categoria))];
       const selectedCategory = categories[Math.floor(this.random() * categories.length)];
       const categoryPanels = pool.filter(panel => panel.categoria === selectedCategory);
       return categoryPanels[Math.floor(this.random() * categoryPanels.length)];
+    }
+    categoryChoices(state, count = 2) {
+      const used = new Set(state.usedPuzzleCategories || []);
+      const categories = [...new Set((global.aletheiaPaneles || []).map(panel => panel.categoria).filter(Boolean))].filter(category => !used.has(category));
+      const shuffled = [...categories];
+      for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(this.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, count);
+    }
+    pickQuestion() {
+      const questions = Array.isArray(global.aletheiaPreguntas) ? global.aletheiaPreguntas : [];
+      const fallback = { pregunta: "¿Cuál es el planeta rojo?", opciones: ["Marte", "Venus", "Júpiter"], correcta: 0 };
+      const selected = questions.length ? questions[Math.floor(this.random() * questions.length)] : fallback;
+      const paired = selected.opciones.map((option, index) => ({ option, correct: index === selected.correcta }));
+      for (let i = paired.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(this.random() * (i + 1));
+        [paired[i], paired[j]] = [paired[j], paired[i]];
+      }
+      return { text: selected.pregunta, options: paired.map(item => item.option), correct: paired.findIndex(item => item.correct) };
     }
     create(alias, selectedRivals, extraSlots, primaryAvatar = null) {
       const cpu = Array.isArray(selectedRivals) && selectedRivals.length === 2
@@ -98,6 +124,7 @@
       const selectedPuzzle = this.pickPuzzle();
       return {
         phase: "AWAITING_SPIN", active: 0, round: 1, maxRounds: 5, pending: null, lastSpin: null,
+        roundMode: ROUND_MODES[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], question: null, final: null,
         players: [
           { id: "human", name: alias || "Invitado", cpu: false, image: primaryAvatar?.image || null, role: primaryAvatar?.name ? `Avatar · ${primaryAvatar.name}` : "Concursante" },
           ...configuredSlots.map((slot, index) => {
@@ -105,7 +132,10 @@
             const person = slot.person || cpu[index];
             return { id: person.id, name: `${person.nombre} ${person.apellidos || ""}`.trim(), cpu: true, image: `assets/img/${person.imagen}`, role: person.cargo, cpuProfile: cpuProfile(person) };
           })
-        ].map((player, i) => ({ ...player, slotId: SLOT_IDS[i], round: 0, total: 0, wildcards: 0 })),
+        ].map((player, i) => ({
+          ...player, slotId: SLOT_IDS[i], round: 0, total: 0, wildcards: 0,
+          stats: { roundsWon: 0, correctConsonants: 0, incorrectConsonants: 0, vowelsBought: 0, solvedPanels: 0, wrongSolutions: 0, bankruptcies: 0, lostTurns: 0, bestLetter: null, bestLetterAward: 0 }
+        })),
         puzzle: {
           id: selectedPuzzle.id,
           category: selectedPuzzle.categoria,
@@ -116,6 +146,7 @@
         usedPuzzleIds: [selectedPuzzle.id],
         usedPuzzleCategories: [selectedPuzzle.categoria],
         roundWinner: null,
+        statistics: { startedAt: 0, endedAt: 0, pausedMs: 0 },
         events: [{ type: "PARTIDA INICIADA", detail: "Tres plazas preparadas" }]
       };
     }
@@ -125,10 +156,38 @@
       const index = Math.floor(this.random() * 24), result = wheel[index];
       state.lastSpin = { index, result };
       state.events.push({ type: "RULETA", detail: String(result) });
-      if (result === "PIERDE TURNO") return this.pass(state, "Pierde turno");
-      if (result === "QUIEBRA" || result === "BANCARROTA") { state.players[state.active].round = 0; return this.pass(state, "Quiebra"); }
+      if (result === "PIERDE TURNO") { state.players[state.active].stats.lostTurns += 1; return this.pass(state, "Pierde turno"); }
+      if (result === "QUIEBRA" || result === "BANCARROTA") { state.players[state.active].stats.bankruptcies += 1; state.players[state.active].round = 0; return this.pass(state, "Quiebra"); }
       if (result === "COMODÍN") { state.pending = result; state.phase = "AWAITING_LETTER"; return state; }
       state.pending = result; state.phase = "AWAITING_LETTER"; return state;
+    }
+    specialLetter(state, raw) {
+      if (state.phase !== "SPECIAL_LETTER") throw new Error("Esta acción no está disponible ahora.");
+      const letter = normalize(raw);
+      if (!/^\p{L}$/u.test(letter) || state.puzzle.revealed.includes(letter)) throw new Error("Esa letra no está disponible.");
+      const count = [...normalize(state.puzzle.solution)].filter(char => char === letter).length;
+      state.puzzle.revealed.push(letter);
+      const player = state.players[state.active];
+      if (VOWELS.has(letter)) player.stats.vowelsBought += 1;
+      else if (count) player.stats.correctConsonants += 1;
+      else player.stats.incorrectConsonants += 1;
+      state.events.push({ type: "LETRA RÁPIDA", detail: `${letter}: ${count} coincidencia(s)` });
+      if (this.isPuzzleComplete(state)) { player.round += SPECIAL_PRIZE; return this.completeRound(state, "Panel con crono completado"); }
+      state.active = (state.active + 1) % 3;
+      return state;
+    }
+    revealSpeedLetter(state) {
+      if (state.phase !== "SPEED_RUNNING") return state;
+      const available = [...new Set([...normalize(state.puzzle.solution)].filter(char => /^\p{L}$/u.test(char) && !state.puzzle.revealed.includes(char)))];
+      if (!available.length) { state.phase = "SPEED_SOLVE"; return state; }
+      const letter = available[Math.floor(this.random() * available.length)];
+      state.puzzle.revealed.push(letter);
+      state.special.reveals += 1;
+      state.special.prize = Math.max(50, SPECIAL_PRIZE - state.special.reveals * 25);
+      state.active = (state.active + 1) % 3;
+      state.events.push({ type: "VELOCIDAD", detail: `${letter} revelada · premio ${state.special.prize}` });
+      if (this.isPuzzleComplete(state)) state.phase = "SPEED_SOLVE";
+      return state;
     }
     letter(state, raw) {
       if (state.phase !== "AWAITING_LETTER") throw new Error("Primero debes girar la ruleta.");
@@ -139,8 +198,12 @@
       state.puzzle.revealed.push(letter);
       const isWildcard = state.pending === "COMODÍN";
       const award = isWildcard ? 0 : count * state.pending;
-      state.players[state.active].round += award;
-      if (isWildcard && count) state.players[state.active].wildcards += 1;
+      const player = state.players[state.active];
+      player.round += award;
+      if (count) player.stats.correctConsonants += 1;
+      else player.stats.incorrectConsonants += 1;
+      if (award > player.stats.bestLetterAward) { player.stats.bestLetter = letter; player.stats.bestLetterAward = award; }
+      if (isWildcard && count) player.wildcards += 1;
       state.events.push({ type: "LETRA", detail: isWildcard && count ? `${letter}: ${count} coincidencia(s), comodín conseguido` : `${letter}: ${count} coincidencia(s), +${award}` });
       state.pending = null;
       if (!count) return this.pass(state, "La letra no aparece");
@@ -153,6 +216,7 @@
       if (!VOWELS.has(vowel) || state.puzzle.revealed.includes(vowel)) throw new Error("Esa vocal no está disponible.");
       const player = state.players[state.active];
       if (player.round < VOWEL_PRICE) throw new Error(`Necesitas ${VOWEL_PRICE} para comprar una vocal.`);
+      player.stats.vowelsBought += 1;
       player.round -= VOWEL_PRICE;
       const count = [...normalize(state.puzzle.solution)].filter(char => char === vowel).length;
       state.puzzle.revealed.push(vowel);
@@ -172,36 +236,70 @@
     }
     yieldTurn(state) {
       if (state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") throw new Error("La ronda ya ha terminado.");
+      if (state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_RUNNING") {
+        state.active = (state.active + 1) % 3;
+        state.events.push({ type: "CAMBIO DE TURNO", detail: "Turno cedido durante la prueba" });
+        return state;
+      }
       return this.pass(state, "Turno cedido por el jugador");
     }
     solve(state, answer) {
       if (state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") throw new Error("La ronda ya ha terminado.");
       const correct = normalize(answer) === normalize(state.puzzle.solution);
       state.events.push({ type: "RESOLUCIÓN", detail: correct ? "Correcta" : "Incorrecta" });
-      if (!correct) return this.pass(state, "Respuesta incorrecta");
+      if (state.phase === "FINAL_SOLVE") return this.finishFinal(state, correct);
+      if (!correct) {
+        state.players[state.active].stats.wrongSolutions += 1;
+        if (state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") { state.active = (state.active + 1) % 3; return state; }
+        return this.pass(state, "Respuesta incorrecta");
+      }
+      state.players[state.active].stats.solvedPanels += 1;
+      if (state.phase === "SPECIAL_LETTER") state.players[state.active].round += SPECIAL_PRIZE;
+      if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
       return this.completeRound(state, "Panel resuelto");
     }
     completeRound(state, reason) {
       const winner = state.players[state.active];
       const consolidated = winner.round;
       winner.total += consolidated;
+      winner.stats.roundsWon += 1;
       state.roundWinner = state.active;
       state.events.push({ type: "RONDA GANADA", detail: `${winner.name}: +${consolidated} al total · ${reason}` });
       state.players.forEach(player => { player.round = 0; });
-      state.phase = state.round >= state.maxRounds ? "GAME_COMPLETE" : "ROUND_COMPLETE";
+      if (state.round >= state.maxRounds && state.roundMode === "QUESTION") {
+        state.question = this.pickQuestion();
+        state.phase = "QUESTION_BONUS";
+      } else {
+        state.phase = "ROUND_COMPLETE";
+      }
       state.pending = null; return state;
     }
     nextRound(state) {
+      if (state.phase === "FINAL_READY") return this.startFinal(state);
       if (state.phase !== "ROUND_COMPLETE") throw new Error("La ronda actual todavía no ha terminado.");
       const usedCategories = Array.isArray(state.usedPuzzleCategories)
         ? state.usedPuzzleCategories
         : [state.puzzle.category];
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories);
       state.round += 1;
       state.active = state.roundWinner;
       state.roundWinner = null;
       state.pending = null;
       state.lastSpin = null;
+      state.roundMode = ROUND_MODES[state.round - 1];
+      if (state.roundMode === "CHOOSE") {
+        state.categoryChoices = this.categoryChoices(state);
+        state.phase = "CATEGORY_CHOICE";
+        state.events.push({ type: "TÚ ELIGES", detail: "Elige la categoría del siguiente panel" });
+        return state;
+      }
+      return this.startRound(state, usedCategories);
+    }
+    chooseCategory(state, category) {
+      if (state.phase !== "CATEGORY_CHOICE" || !state.categoryChoices.includes(category)) throw new Error("Esa categoría no está disponible.");
+      return this.startRound(state, state.usedPuzzleCategories, category);
+    }
+    startRound(state, usedCategories, category = null) {
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category);
       state.puzzle = {
         id: selectedPuzzle.id,
         category: selectedPuzzle.categoria,
@@ -211,8 +309,77 @@
       };
       state.usedPuzzleIds.push(selectedPuzzle.id);
       state.usedPuzzleCategories = [...usedCategories, selectedPuzzle.categoria];
-      state.phase = "AWAITING_SPIN";
-      state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds}` });
+      state.categoryChoices = [];
+      state.special = null;
+      if (state.roundMode === "SPECIAL") {
+        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0 };
+        state.phase = state.specialRotation === "SPEED" ? "SPEED_RUNNING" : "SPECIAL_LETTER";
+      } else state.phase = "AWAITING_SPIN";
+      state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds} · ${state.roundMode}` });
+      return state;
+    }
+    answerQuestion(state, optionIndex) {
+      if (state.phase !== "QUESTION_BONUS") throw new Error("No hay ninguna pregunta activa.");
+      const correct = Number(optionIndex) === state.question.correct;
+      if (correct) state.players[state.roundWinner].total += QUESTION_BONUS;
+      state.question.answered = true;
+      state.question.wasCorrect = correct;
+      state.events.push({ type: "PREGUNTA", detail: correct ? `Correcta: +${QUESTION_BONUS}` : "Incorrecta" });
+      state.phase = "QUESTION_RESULT";
+      return state;
+    }
+    continueAfterQuestion(state) {
+      if (state.phase !== "QUESTION_RESULT") return state;
+      state.phase = "FINAL_READY";
+      return state;
+    }
+    startFinal(state) {
+      if (state.phase !== "FINAL_READY") throw new Error("La final todavía no está disponible.");
+      const highest = Math.max(...state.players.map(player => player.total));
+      const finalists = state.players.map((player, index) => ({ player, index })).filter(entry => entry.player.total === highest)
+        .sort((a, b) => b.player.stats.roundsWon - a.player.stats.roundsWon || b.player.stats.solvedPanels - a.player.stats.solvedPanels || b.player.stats.correctConsonants - a.player.stats.correctConsonants || a.index - b.index);
+      state.active = finalists[0].index;
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories);
+      state.puzzle = { id: selectedPuzzle.id, category: selectedPuzzle.categoria, clue: selectedPuzzle.pista || "", solution: selectedPuzzle.solucion, revealed: ["R", "S", "F", "Y", "O"] };
+      state.final = { picks: [], consonants: 0, vowels: 0, prize: FINAL_PRIZE, correct: null };
+      state.phase = "FINAL_PICK";
+      state.events.push({ type: "RULETA FINAL", detail: `${state.players[state.active].name} juega la final` });
+      return state;
+    }
+    finalLetter(state, raw) {
+      if (state.phase !== "FINAL_PICK") throw new Error("Ahora no puedes elegir letras para la final.");
+      const letter = normalize(raw);
+      if (!/^\p{L}$/u.test(letter) || state.puzzle.revealed.includes(letter) || state.final.picks.includes(letter)) throw new Error("Esa letra no está disponible.");
+      const vowel = VOWELS.has(letter);
+      if (vowel && state.final.vowels >= 1) throw new Error("Ya has elegido la vocal de la final.");
+      if (!vowel && state.final.consonants >= 3) throw new Error("Ya has elegido las tres consonantes de la final.");
+      state.final.picks.push(letter);
+      state.puzzle.revealed.push(letter);
+      if (vowel) state.final.vowels += 1; else state.final.consonants += 1;
+      state.events.push({ type: "LETRA FINAL", detail: letter });
+      if (state.final.vowels === 1 && state.final.consonants === 3) state.phase = "FINAL_SOLVE";
+      return state;
+    }
+    finishFinal(state, correct) {
+      state.final.correct = correct;
+      if (correct) {
+        state.players[state.active].total += state.final.prize;
+        state.players[state.active].stats.solvedPanels += 1;
+      } else state.players[state.active].stats.wrongSolutions += 1;
+      state.events.push({ type: "FINAL", detail: correct ? `Correcta: +${state.final.prize}` : "No resuelta" });
+      state.phase = "GAME_COMPLETE";
+      return state;
+    }
+    failFinal(state) {
+      if (state.phase !== "FINAL_SOLVE") return state;
+      return this.finishFinal(state, false);
+    }
+    expireSpecial(state) {
+      if (state.phase !== "SPECIAL_LETTER") return state;
+      state.roundWinner = state.active;
+      state.players.forEach(player => { player.round = 0; });
+      state.phase = "ROUND_COMPLETE";
+      state.events.push({ type: "CRONO", detail: "Tiempo agotado: prueba sin premio" });
       return state;
     }
     pass(state, reason) {
@@ -221,5 +388,5 @@
     }
   }
 
-  global.AletheiaGame = { Engine, normalize, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE };
+  global.AletheiaGame = { Engine, normalize, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE, roundModes: ROUND_MODES, specialPrize: SPECIAL_PRIZE, questionBonus: QUESTION_BONUS, finalPrize: FINAL_PRIZE };
 })(window);
