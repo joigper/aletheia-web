@@ -1390,3 +1390,349 @@ html.aletheia-mando-root body {
   }
 }
 
+/* La espera muestra solo información útil y legible de un vistazo. */
+
+.active-player-card {
+  display: grid;
+  grid-template-columns: minmax(88px,150px) minmax(0,1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.active-player-photo {
+  aspect-ratio: 4/5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--cyan);
+  border-radius: 16px;
+  color: var(--cyan);
+  background: radial-gradient(circle at 50% 25%,#29496c,#0b1323 72%);
+  box-shadow: 0 0 30px #57e6ff35;
+}
+
+.active-player-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.active-player-photo span {
+  font: 700 30px "Tektur",sans-serif;
+}
+
+.active-player-data {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.active-player-data small {
+  color: #8fa4ca;
+  font: 600 9px "Tektur",sans-serif;
+  letter-spacing: .14em;
+}
+
+.active-player-data strong {
+  overflow: hidden;
+  color: white;
+  font: 700 clamp(20px,4vw,38px)/1.05 "Tektur",sans-serif;
+  text-overflow: ellipsis;
+}
+
+.active-player-data > span {
+  color: #aebddb;
+  font-size: 14px;
+}
+
+.wait-letter, .wait-letter-space {
+  display: inline-block;
+  font-style: normal;
+  opacity: 0;
+  transform: translateY(34px) scale(.82);
+  animation: waitLetterIn .62s cubic-bezier(.22,.9,.32,1.28) calc(var(--i)*45ms + .08s) both;
+}
+
+.wait-letter:nth-child(odd) {
+  color: var(--cyan);
+  text-shadow: 0 0 18px #57e6ff55;
+}
+
+.wait-letter-space {
+  width: .32em;
+}
+
+@keyframes waitLetterIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-game {
+    grid-template-columns: minmax(245px,28%) minmax(0,1fr);
+    column-gap: 18px;
+  }
+}
+
+@media (orientation:landscape) {
+  .game-status strong {
+    font-size: clamp(24px,3vw,38px);
+  }
+}
+
+@media (orientation:landscape) {
+  .score-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (orientation:landscape) {
+  .score-strip > div {
+    min-height: 86px;
+    padding: 12px 18px;
+    align-items: center;
+  }
+}
+
+@media (orientation:landscape) {
+  .score-strip small {
+    max-width: 100px;
+    font-size: clamp(12px,1.6vw,20px);
+    line-height: 1.35;
+  }
+}
+
+@media (orientation:landscape) {
+  .score-strip strong {
+    font-size: clamp(44px,6vw,76px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-toolbar {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-toolbar button {
+    min-height: 54px;
+    padding: 6px;
+    border: 0;
+    color: #07101b;
+    font-size: clamp(9px,1.2vw,14px);
+    box-shadow: inset 0 0 0 2px #ffffff24,0 7px 18px #0006;
+  }
+}
+
+@media (orientation:landscape) {
+  #pause-demo {
+    background: linear-gradient(145deg,#ff405d,#bd1734);
+  }
+}
+
+@media (orientation:landscape) {
+  #sound-demo {
+    background: linear-gradient(145deg,#ffe448,#e5a900);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-toolbar button.is-active {
+    color: white;
+    background: linear-gradient(145deg,#1bbd90,#08775f);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting {
+    position: relative;
+    grid-template-columns: minmax(0,1fr) minmax(130px,25%);
+    grid-template-rows: auto auto auto minmax(0,1fr);
+    align-content: center;
+    justify-items: start;
+    column-gap: 24px;
+    padding: 10px 18px;
+    text-align: left;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting > small, .action-card.is-waiting > h1, .action-card.is-waiting > p {
+    grid-column: 1;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting > small {
+    font-size: clamp(11px,1.7vw,20px);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting > h1 {
+    font-size: clamp(42px,7.1vw,92px);
+    line-height: .98;
+    letter-spacing: .015em;
+    white-space: nowrap;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting > p {
+    font-size: clamp(15px,2vw,25px);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting .action-content {
+    grid-column: 2;
+    grid-row: 1/5;
+    align-self: center;
+    margin: 0;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting .active-player-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting .active-player-photo {
+    width: min(100%,190px);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting .active-player-data {
+    justify-items: center;
+    text-align: center;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-waiting .active-player-data strong {
+    font-size: clamp(16px,2.3vw,29px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-game {
+    grid-template-columns: minmax(220px,29%) minmax(0,1fr);
+    gap: 8px 14px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .game-status strong {
+    font-size: 25px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .game-clock {
+    min-width: 76px;
+    padding: 5px;
+    font-size: 20px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .score-strip {
+    gap: 7px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .score-strip > div {
+    min-height: 68px;
+    padding: 8px 13px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .score-strip small {
+    font-size: 11px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .score-strip strong {
+    font-size: 42px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-toolbar {
+    gap: 7px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-toolbar button {
+    min-height: 45px;
+    font-size: 9px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting {
+    padding: 5px 10px;
+    column-gap: 12px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting > small {
+    font-size: 10px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting > h1 {
+    font-size: clamp(37px,6.5vw,66px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting > p {
+    font-size: 13px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting .active-player-photo {
+    width: min(100%,125px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting .active-player-data strong {
+    font-size: 16px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-waiting .active-player-data > span {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .wait-letter, .wait-letter-space {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+

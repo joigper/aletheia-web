@@ -407,8 +407,9 @@
       revision: ++remoteStateRevision,
       status: state.phase === "GAME_COMPLETE" ? "finished" : gamePaused ? "paused" : "playing",
       paused: gamePaused, phase: state.phase, round: state.round, maxRounds: state.maxRounds,
-      activeSlot: state.active + 1, activeName: current.name, roundWinnerSlot: state.roundWinner == null ? 0 : state.roundWinner + 1, timed,
+      activeSlot: state.active + 1, activeName: current.name, activeRole: current.role || "Concursante", activeImage: current.image || "", roundWinnerSlot: state.roundWinner == null ? 0 : state.roundWinner + 1, timed,
       interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
+      speedReady: state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil,
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       consonantsRemain: engine.hasAvailableConsonants(state),
@@ -509,7 +510,7 @@
   function scheduleSpeedReveal() {
     clearTimeout(speedTimer);
     if (gamePaused || !state || state.phase !== "SPEED_RUNNING" || Date.now() < speedIntroUntil) return;
-    speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 6000);
+    speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 4000);
   }
 
   function finalVoiceIntent() {
@@ -1144,8 +1145,11 @@
     if (type === "pause") { setGamePaused(true); remoteAck(slot, seq, true, "Partida en pausa."); return; }
     if (type === "resume") { setGamePaused(false); remoteAck(slot, seq, true, "Partida reanudada."); return; }
     if (type === "next") {
-      const allowed = slot === (state.roundWinner == null ? 0 : state.roundWinner + 1) && ["ROUND_COMPLETE", "FINAL_READY"].includes(state.phase);
-      if (!allowed) { remoteAck(slot, seq, false, "Solo el ganador de la ronda puede continuar."); return; }
+      const winner = state.roundWinner == null ? null : state.players[state.roundWinner];
+      const controller = state.players[slot - 1];
+      const allowedController = winner?.cpu ? controller && !controller.cpu : slot === state.roundWinner + 1;
+      const allowed = allowedController && ["ROUND_COMPLETE", "FINAL_READY"].includes(state.phase);
+      if (!allowed) { remoteAck(slot, seq, false, "Este mando no puede continuar la ronda."); return; }
       advanceRound(); remoteAck(slot, seq, true, "Preparando el siguiente panel."); return;
     }
     if (type === "category") {
@@ -1156,6 +1160,17 @@
       const option = Number(event.detail?.value);
       if (slot !== (state.roundWinner == null ? 0 : state.roundWinner + 1) || state.phase !== "QUESTION_BONUS" || !Number.isInteger(option) || option < 0 || option >= state.question.options.length) { remoteAck(slot, seq, false, "Esa respuesta no está disponible."); return; }
       act(() => engine.answerQuestion(state, option)); remoteAck(slot, seq, true, "Respuesta registrada."); return;
+    }
+    if (type === "buzz") {
+      const playerIndex = slot - 1;
+      if (state.phase !== "SPEED_RUNNING" || Date.now() < speedIntroUntil || !state.players[playerIndex] || state.players[playerIndex].cpu) { remoteAck(slot, seq, false, "El pulsador no está disponible ahora."); return; }
+      clearTimeout(speedTimer);
+      state.active = playerIndex;
+      state.phase = "SPEED_SOLVE";
+      state.events.push({ type: "PULSADOR", detail: `${state.players[playerIndex].name} detiene el panel` });
+      render(`${state.players[playerIndex].name} ha pulsado. Debe resolver el panel.`);
+      remoteAck(slot, seq, true, "Has detenido el panel. Escribe la solución.");
+      return;
     }
     if (gamePaused) { remoteAck(slot, seq, false, "La partida está en pausa."); return; }
     if (slot !== state.active + 1 || state.players[state.active]?.cpu) { remoteAck(slot, seq, false, `Ahora juega ${state.players[state.active]?.name || "otro concursante"}.`); return; }
