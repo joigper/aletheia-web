@@ -1,7 +1,23 @@
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-import { getDatabase, get, onDisconnect, onValue, ref, remove, serverTimestamp, set, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-import { connectionSettings, firebaseConfig } from "./aletheia-firebase-config.js";
+(function () {
+"use strict";
+
+async function initializeAletheiaConnection() {
+const pageIsHost = Boolean(document.getElementById("setup-panel"));
+const pageIsController = Boolean(document.getElementById("remote-app"));
+if (!pageIsHost && !pageIsController) return;
+
+const settings = window.AletheiaFirebaseConfig;
+if (!settings) throw new Error("No se ha cargado aletheia-firebase-config.js.");
+
+const [firebaseAppModule, firebaseAuthModule, firebaseDatabaseModule] = await Promise.all([
+  import("https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js"),
+  import("https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js"),
+  import("https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js")
+]);
+const { initializeApp, getApps } = firebaseAppModule;
+const { getAuth, signInAnonymously } = firebaseAuthModule;
+const { getDatabase, get, onDisconnect, onValue, ref, remove, serverTimestamp, set, update } = firebaseDatabaseModule;
+const { connectionSettings, firebaseConfig } = settings;
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -247,5 +263,27 @@ function initController() {
   });
 }
 
-if (document.getElementById("setup-panel")) initHost();
-if (document.getElementById("remote-app")) initController();
+if (pageIsHost) initHost();
+if (pageIsController) initController();
+}
+
+function reportConnectionError(error) {
+  console.error("No se pudo iniciar la conexión de ALÉTHEIA-TV", error);
+  const message = document.getElementById("setup-message");
+  if (message) message.textContent = "No se pudo cargar la conexión de los mandos. Comprueba que todos los archivos estén publicados.";
+  const pill = document.getElementById("connection-pill");
+  if (pill) {
+    pill.innerHTML = "<i></i> SIN CONEXIÓN";
+    pill.dataset.status = "error";
+  }
+}
+
+function startConnection() {
+  if (window.__aletheiaConnectionStarted) return;
+  window.__aletheiaConnectionStarted = true;
+  initializeAletheiaConnection().catch(reportConnectionError);
+}
+
+if (document.readyState === "complete") setTimeout(startConnection, 0);
+else window.addEventListener("load", startConnection, { once: true });
+})();

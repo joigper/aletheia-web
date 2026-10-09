@@ -1,5 +1,6 @@
 (function(){
   "use strict";
+  if(!document.getElementById("remote-app"))return;
   const $=selector=>document.querySelector(selector);
   const $$=selector=>[...document.querySelectorAll(selector)];
   let selectedAvatar={id:"",name:"Sin seleccionar",initials:"—",image:null};
