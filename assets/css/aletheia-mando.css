@@ -463,6 +463,21 @@ html.aletheia-mando-root body {
   opacity: .25;
 }
 
+.letter-grid.vowel-only {
+  grid-template-columns: repeat(5,1fr);
+}
+
+.remote-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 9px;
+}
+
+.remote-choice-grid .remote-button {
+  min-height: 58px;
+  font-size: 13px;
+}
+
 .remote-wait-orb {
   width: 76px;
   height: 76px;

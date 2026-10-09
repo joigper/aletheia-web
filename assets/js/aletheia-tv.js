@@ -411,7 +411,12 @@
       interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
+      consonantsRemain: engine.hasAvailableConsonants(state),
+      canBuyVowel: state.phase === "AWAITING_SPIN" && current.round >= AletheiaGame.vowelPrice,
       availableLetters,
+      categoryChoices: state.phase === "CATEGORY_CHOICE" || state.phase === "CATEGORY_RESULT" ? [...state.categoryChoices] : [],
+      selectedCategory: state.phase === "CATEGORY_RESULT" ? state.selectedCategory || "" : "",
+      question: ["QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase) && state.question ? { text: state.question.text, options: [...state.question.options], selected: state.question.selected ?? -1, wasCorrect: state.phase === "QUESTION_RESULT" ? Boolean(state.question.wasCorrect) : null } : null,
       players: Object.fromEntries(state.players.map((player,index) => [String(index + 1), { slot:index+1,name:player.name,round:player.round,total:player.total,cpu:player.cpu }]))
     } }));
   }
@@ -1143,11 +1148,21 @@
       if (!allowed) { remoteAck(slot, seq, false, "Solo el ganador de la ronda puede continuar."); return; }
       advanceRound(); remoteAck(slot, seq, true, "Preparando el siguiente panel."); return;
     }
+    if (type === "category") {
+      if (slot !== state.active + 1 || state.phase !== "CATEGORY_CHOICE" || !state.categoryChoices.includes(event.detail?.value)) { remoteAck(slot, seq, false, "Esa categoría no está disponible."); return; }
+      act(() => engine.chooseCategory(state, event.detail.value)); remoteAck(slot, seq, true, `Categoría ${event.detail.value} seleccionada.`); return;
+    }
+    if (type === "question") {
+      const option = Number(event.detail?.value);
+      if (slot !== (state.roundWinner == null ? 0 : state.roundWinner + 1) || state.phase !== "QUESTION_BONUS" || !Number.isInteger(option) || option < 0 || option >= state.question.options.length) { remoteAck(slot, seq, false, "Esa respuesta no está disponible."); return; }
+      act(() => engine.answerQuestion(state, option)); remoteAck(slot, seq, true, "Respuesta registrada."); return;
+    }
     if (gamePaused) { remoteAck(slot, seq, false, "La partida está en pausa."); return; }
     if (slot !== state.active + 1 || state.players[state.active]?.cpu) { remoteAck(slot, seq, false, `Ahora juega ${state.players[state.active]?.name || "otro concursante"}.`); return; }
     if (Date.now() < interactionLockedUntil) { remoteAck(slot, seq, false, "La jugada anterior aún está terminando."); return; }
     if (type === "spin") {
       if (state.phase !== "AWAITING_SPIN") { remoteAck(slot, seq, false, "Ahora debes elegir una letra."); return; }
+      if (!engine.hasAvailableConsonants(state)) { render("No quedan consonantes: compra una vocal o resuelve el panel."); remoteAck(slot, seq, false, "No quedan consonantes. Compra una vocal o resuelve el panel."); return; }
       performSpin(); remoteAck(slot, seq, true, "Giro aceptado."); return;
     }
     if (type === "letter" && value.length === 1) {
