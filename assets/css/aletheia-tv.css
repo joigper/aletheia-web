@@ -3353,7 +3353,7 @@ html, body {
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-game {
     grid-template-columns: minmax(205px,28%) minmax(0,1fr);
-    grid-template-rows: 36px minmax(150px,1fr) 122px 48px;
+    grid-template-rows: 40px minmax(146px,1fr) 132px 56px;
     grid-template-areas: "message message" "wheel puzzle" "wheel controls" "contestants contestants";
     gap: 4px;
   }
@@ -3367,9 +3367,9 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message {
-    min-height: 36px;
-    padding: 3px 7px;
-    gap: 6px;
+    min-height: 40px;
+    padding: 3px 8px;
+    gap: 7px;
     border-left: 3px solid #e8bb51;
   }
 }
@@ -3378,7 +3378,7 @@ html, body {
   .tv-message::before {
     content: "AHORA";
     color: #e8bb51;
-    font: 700 7px "Tektur",sans-serif;
+    font: 700 8px "Tektur",sans-serif;
     letter-spacing: .08em;
   }
 }
@@ -3386,7 +3386,7 @@ html, body {
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message p {
     min-width: 0;
-    font-size: 10px;
+    font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3407,70 +3407,70 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-clock {
-    min-width: 52px;
-    padding: 3px 5px;
-    font-size: 13px;
+    min-width: 58px;
+    padding: 3px 6px;
+    font-size: 16px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-button, .tv-restart-button {
-    min-width: 64px;
-    min-height: 26px;
-    padding: 3px 6px!important;
-    font-size: 7px!important;
+    min-width: 72px;
+    min-height: 30px;
+    padding: 3px 7px!important;
+    font-size: 8px!important;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle {
-    padding: 4px 8px 5px;
+    padding: 5px 9px 6px;
     border-color: #35738b;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-meta {
-    font-size: 8px;
+    font-size: 10px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-context {
-    gap: 0;
+    gap: 1px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-context #clue {
     max-width: 45vw;
-    font-size: 9px;
+    font-size: 11px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-meta #category {
-    font-size: 9px;
+    font-size: 11px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-board {
-    gap: 2px;
+    gap: 3px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-row {
-    grid-template-columns: repeat(var(--columns),clamp(22px,3.05vw,30px));
+    grid-template-columns: repeat(var(--columns),clamp(24px,3.05vw,32px));
     gap: 3px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-board .tile {
-    height: 25px;
-    font-size: 14px;
+    height: 28px;
+    font-size: 16px;
     border-width: 1px;
   }
 }
@@ -3527,16 +3527,16 @@ html, body {
     padding: 4px 7px;
     gap: 3px;
     border-color: #7354a5;
-    grid-template-rows: 24px minmax(0,1fr) 28px;
+    grid-template-rows: 28px minmax(0,1fr) 31px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-control-heading {
-    min-height: 24px;
+    min-height: 28px;
     padding: 0;
     border: 0;
-    gap: 7px;
+    gap: 8px;
   }
 }
 
@@ -3558,7 +3558,7 @@ html, body {
   .tv-control-heading > div:first-child > small::after {
     content: "ACCIÓN CONTEXTUAL";
     color: #aa87dc;
-    font: 700 7px "Tektur",sans-serif;
+    font: 700 8px "Tektur",sans-serif;
     letter-spacing: .08em;
   }
 }
@@ -3566,34 +3566,34 @@ html, body {
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title {
     min-height: 0;
-    gap: 5px;
+    gap: 6px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title h2 {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title #next-round {
-    min-width: 92px;
-    min-height: 22px;
-    padding: 2px 6px;
-    font-size: 7px;
+    min-width: 102px;
+    min-height: 26px;
+    padding: 3px 7px;
+    font-size: 8px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money {
-    min-width: 112px;
-    height: 24px;
-    padding: 2px 6px;
+    min-width: 126px;
+    height: 28px;
+    padding: 2px 7px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 7px;
     border-radius: 5px;
   }
 }
@@ -3606,14 +3606,14 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money > strong {
-    font-size: 16px;
+    font-size: 19px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money span {
-    padding-left: 6px;
-    font-size: 7px;
+    padding-left: 7px;
+    font-size: 8px;
   }
 }
 
@@ -3621,7 +3621,7 @@ html, body {
   .tv-active-money b {
     display: inline;
     margin: 0 0 0 3px;
-    font-size: 12px;
+    font-size: 15px;
   }
 }
 
@@ -3634,9 +3634,9 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .keyboard button {
-    min-height: 17px;
+    min-height: 20px;
     padding: 0;
-    font-size: 9px;
+    font-size: 11px;
     border-radius: 3px;
   }
 }
@@ -3644,7 +3644,7 @@ html, body {
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form {
     grid-template-columns: minmax(0,1fr) auto auto;
-    gap: 3px;
+    gap: 4px;
   }
 }
 
@@ -3657,16 +3657,16 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
-    min-height: 26px;
-    height: 26px;
-    padding: 2px 6px;
-    font-size: 9px;
+    min-height: 30px;
+    height: 30px;
+    padding: 3px 7px;
+    font-size: 10px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form .tv-button {
-    min-width: 68px;
+    min-width: 76px;
   }
 }
 
@@ -3678,26 +3678,26 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .scoreboard {
-    height: 48px;
+    height: 56px;
     gap: 4px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player {
-    min-height: 48px;
-    height: 48px;
-    padding: 3px 5px;
-    grid-template-columns: 34px minmax(0,1fr) auto;
-    gap: 5px;
+    min-height: 56px;
+    height: 56px;
+    padding: 4px 6px;
+    grid-template-columns: 40px minmax(0,1fr) auto;
+    gap: 6px;
     border-radius: 6px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player img, .player-initials {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     border-radius: 4px;
   }
 }
@@ -3710,39 +3710,39 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-copy small, .player-copy em {
-    font-size: 7px;
+    font-size: 8px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-copy strong {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score {
-    min-width: 64px;
-    padding-left: 5px;
+    min-width: 72px;
+    padding-left: 6px;
     gap: 0 4px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score small, .player-score span i {
-    font-size: 6px;
+    font-size: 7px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score strong {
-    font-size: 14px;
+    font-size: 17px;
   }
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score span b {
-    font-size: 12px;
+    font-size: 15px;
   }
 }
 
@@ -3768,7 +3768,7 @@ html, body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-overlay p {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 
