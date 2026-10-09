@@ -17,6 +17,14 @@
   let pendingCommand=false;
   let pendingCommandTimer=null;
 
+  function animateConfigurationTitle(){
+    const title=$("#config-title");
+    const text="CONFIGURACIÓN";
+    title.setAttribute("aria-label",text);
+    title.innerHTML=[...text].map((letter,index)=>`<span class="config-letter" style="--i:${index}" aria-hidden="true">${letter}</span>`).join("");
+  }
+  animateConfigurationTitle();
+
   async function enterFullscreen(){
     const root=document.documentElement;
     try{if(root.requestFullscreen)await root.requestFullscreen({navigationUI:"hide"});else if(root.webkitRequestFullscreen)root.webkitRequestFullscreen()}catch(error){console.info("El navegador mantiene sus barras",error)}
@@ -159,7 +167,7 @@
   const scenes={
     spin:{kicker:"ES TU TURNO",title:"GIRA LA RULETA",copy:"También puedes intentar resolver el panel.",content:'<button class="remote-button remote-spin" type="button" data-action="spin"><span>GIRAR</span><small>RULETA</small></button><button class="remote-button remote-secondary" type="button" data-action="solve-open">RESOLVER PANEL</button>'},
     letters:{kicker:"PREMIO: 75 POR COINCIDENCIA",title:"ELIGE CONSONANTE",copy:"Las vocales cuestan 50 créditos.",content:`<div class="letter-grid">${alphabet.map(letter=>`<button type="button" class="${vowels.has(letter)?"vowel":""}" ${vowels.has(letter)?"disabled":""}>${letter}</button>`).join("")}</div>`},
-    wait:{kicker:"TURNO DE OTRO JUGADOR",title:"ESPERA TU TURNO",copy:"Sigue el panel en la pantalla principal.",content:'<div class="active-player-card"><div class="active-player-photo" id="active-player-photo"><span>?</span></div><div class="active-player-data"><small>JUGADOR ACTIVO</small><strong id="active-player-name">OTRO JUGADOR</strong><span id="active-player-role">Concursante</span></div></div>'},
+    wait:{kicker:"INFORMACIÓN DE PARTIDA",title:"ESPERA TU TURNO",copy:"",content:""},
     speed:{kicker:"PANEL DE VELOCIDAD",title:"¿CONOCES LA SOLUCIÓN?",copy:"La primera pulsación detendrá el panel para todos.",content:'<button class="remote-button remote-danger" type="button" data-action="solve-now"><span>RESOLVER YA</span></button>'},
     solve:{kicker:"HAS DETENIDO EL PANEL",title:"ESCRIBE LA SOLUCIÓN",copy:"Dispones de 10 segundos.",content:'<form class="solve-form"><input class="solve-input" maxlength="80" autocomplete="off" placeholder="Solución completa"><button class="remote-button solve-submit" type="submit">COMPROBAR RESPUESTA</button></form>'},
     next:{kicker:"PANEL COMPLETADO",title:"HAS GANADO LA RONDA",copy:"Cuando estés preparado, continúa la partida.",content:'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>'},
@@ -168,7 +176,7 @@
     question:{kicker:"PREGUNTA DE BONIFICACIÓN",title:"RESPONDE Y GANA 100 CRÉDITOS",copy:"Selecciona una respuesta.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'}
   };
   function renderScene(name){
-    const scene=scenes[name]||scenes.spin;$("#action-card").classList.toggle("is-waiting",name==="wait");$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
+    const scene=scenes[name]||scenes.spin;$("#action-card").classList.remove("is-turn-waiting");$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
     $("#action-content [data-action='spin']")?.addEventListener("click",event=>{if(onlineController){event.currentTarget.disabled=true;event.currentTarget.querySelector("span").textContent="ENVIADO";sendCommand("spin")}else renderScene("letters")});
     $("#action-content [data-action='next']")?.addEventListener("click",event=>{event.currentTarget.disabled=true;sendCommand("next")});
     $("#action-content [data-action='solve-open']")?.addEventListener("click",()=>{renderScene("solve");setTimeout(()=>$(".solve-input")?.focus(),50)});
@@ -177,6 +185,8 @@
     $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{$$("#action-content .letter-grid button").forEach(item=>item.disabled=true);if(onlineController)sendCommand("letter",button.textContent);$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="Esperando confirmación del plató…"}));
   }
   function renderWaitingPlayer(detail,title="ESPERA TU TURNO"){
+    $("#action-card").classList.add("is-turn-waiting");
+    $("#action-content").innerHTML='<div class="active-player-card"><div class="active-player-photo" id="active-player-photo"><span>?</span></div><div class="active-player-data"><small>JUGADOR ACTIVO</small><strong id="active-player-name">OTRO JUGADOR</strong><span id="active-player-role">Concursante</span></div></div>';
     const titleNode=$("#action-title");
     titleNode.setAttribute("aria-label",title);
     titleNode.innerHTML=[...title].map((letter,index)=>letter===" "?' <span class="wait-letter-space" aria-hidden="true"> </span>':`<span class="wait-letter" style="--i:${index}" aria-hidden="true">${letter}</span>`).join("");

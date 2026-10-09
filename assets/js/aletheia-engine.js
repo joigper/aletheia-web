@@ -10,6 +10,8 @@
   const SPECIAL_PRIZE = 300;
   const QUESTION_BONUS = 100;
   const FINAL_PRIZE = 500;
+  const PANEL_HISTORY_KEY = "aletheia-tv-panel-history-v1";
+  const PANEL_HISTORY_LIMIT = 500;
   // Provisional hasta trasladar esta decisión a personaje.juego.seleccionable.
   const excludedCpuIds = new Set(["oscar"]);
   const DEFAULT_CPU_PROFILE = Object.freeze({
@@ -46,6 +48,25 @@
       .replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
   }
 
+  function readPanelHistory() {
+    try {
+      const stored = JSON.parse(global.localStorage?.getItem(PANEL_HISTORY_KEY) || "[]");
+      return Array.isArray(stored)
+        ? stored.filter(item => item && typeof item.id === "string" && typeof item.solution === "string").slice(-PANEL_HISTORY_LIMIT)
+        : [];
+    } catch (_) { return []; }
+  }
+
+  function rememberPuzzle(panel) {
+    try {
+      if (!global.localStorage || !panel?.id) return;
+      const solution = normalize(panel.solucion);
+      const history = readPanelHistory().filter(item => item.id !== panel.id && item.solution !== solution);
+      history.push({ id: panel.id, solution });
+      global.localStorage.setItem(PANEL_HISTORY_KEY, JSON.stringify(history.slice(-PANEL_HISTORY_LIMIT)));
+    } catch (_) { /* El juego continúa aunque el navegador bloquee el almacenamiento local. */ }
+  }
+
   class Engine {
     constructor(random = Math.random) { this.random = random; }
     getRoster() {
@@ -75,7 +96,7 @@
       while (cpu.length < count) cpu.push(fallback[cpu.length]);
       return cpu;
     }
-    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null) {
+    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = []) {
       const library = Array.isArray(global.aletheiaPaneles)
         ? global.aletheiaPaneles.filter(panel => panel.id && panel.categoria && panel.solucion)
         : [];
@@ -84,18 +105,28 @@
       }
       const excluded = new Set(excludedIds);
       const excludedCategorySet = new Set(excludedCategories);
-      const unused = library.filter(panel => !excluded.has(panel.id));
-      const categoryFiltered = requiredCategory ? unused.filter(panel => panel.categoria === requiredCategory) : unused;
-      const unusedCategories = categoryFiltered.filter(panel => !excludedCategorySet.has(panel.categoria));
-      const pool = unusedCategories.length ? unusedCategories : (categoryFiltered.length ? categoryFiltered : (unused.length ? unused : library));
-      const categories = [...new Set(pool.map(panel => panel.categoria))];
-      const selectedCategory = categories[Math.floor(this.random() * categories.length)];
-      const categoryPanels = pool.filter(panel => panel.categoria === selectedCategory);
-      return categoryPanels[Math.floor(this.random() * categoryPanels.length)];
+      const excludedSolutionSet = new Set(excludedSolutions.map(normalize));
+      const history = readPanelHistory();
+      const recentIds = new Set(history.map(item => item.id));
+      const recentSolutions = new Set(history.map(item => item.solution));
+      const unused = library.filter(panel => !excluded.has(panel.id) && !excludedSolutionSet.has(normalize(panel.solucion)));
+      const required = requiredCategory ? unused.filter(panel => panel.categoria === requiredCategory) : unused;
+      const unusedCategories = required.filter(panel => !excludedCategorySet.has(panel.categoria));
+      const eligible = unusedCategories.length ? unusedCategories : (required.length ? required : (unused.length ? unused : library));
+      const fresh = eligible.filter(panel => !recentIds.has(panel.id) && !recentSolutions.has(normalize(panel.solucion)));
+      const pool = fresh.length ? fresh : eligible;
+      const selected = pool[Math.floor(this.random() * pool.length)];
+      rememberPuzzle(selected);
+      return selected;
     }
     categoryChoices(state, count = 2) {
       const used = new Set(state.usedPuzzleCategories || []);
-      const categories = [...new Set((global.aletheiaPaneles || []).map(panel => panel.categoria).filter(Boolean))].filter(category => !used.has(category));
+      const history = readPanelHistory();
+      const recentIds = new Set(history.map(item => item.id));
+      const recentSolutions = new Set(history.map(item => item.solution));
+      const available = (global.aletheiaPaneles || []).filter(panel => !recentIds.has(panel.id) && !recentSolutions.has(normalize(panel.solucion)));
+      const source = available.length ? available : (global.aletheiaPaneles || []);
+      const categories = [...new Set(source.map(panel => panel.categoria).filter(Boolean))].filter(category => !used.has(category));
       const shuffled = [...categories];
       for (let i = shuffled.length - 1; i > 0; i -= 1) {
         const j = Math.floor(this.random() * (i + 1));
@@ -147,6 +178,7 @@
           revealed: []
         },
         usedPuzzleIds: [selectedPuzzle.id],
+        usedPuzzleSolutions: [normalize(selectedPuzzle.solucion)],
         usedPuzzleCategories: [selectedPuzzle.categoria],
         roundWinner: null,
         statistics: { startedAt: 0, endedAt: 0, pausedMs: 0 },
@@ -316,7 +348,7 @@
       return this.startRound(state, state.usedPuzzleCategories, state.selectedCategory);
     }
     startRound(state, usedCategories, category = null) {
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category);
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions);
       state.puzzle = {
         id: selectedPuzzle.id,
         category: selectedPuzzle.categoria,
@@ -325,6 +357,7 @@
         revealed: []
       };
       state.usedPuzzleIds.push(selectedPuzzle.id);
+      state.usedPuzzleSolutions.push(normalize(selectedPuzzle.solucion));
       state.usedPuzzleCategories = [...usedCategories, selectedPuzzle.categoria];
       state.categoryChoices = [];
       state.selectedCategory = null;
@@ -362,7 +395,7 @@
       const finalists = state.players.map((player, index) => ({ player, index })).filter(entry => entry.player.total === highest)
         .sort((a, b) => b.player.stats.roundsWon - a.player.stats.roundsWon || b.player.stats.solvedPanels - a.player.stats.solvedPanels || b.player.stats.correctConsonants - a.player.stats.correctConsonants || a.index - b.index);
       state.active = finalists[0].index;
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories);
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories, null, state.usedPuzzleSolutions);
       state.puzzle = { id: selectedPuzzle.id, category: selectedPuzzle.categoria, clue: selectedPuzzle.pista || "", solution: selectedPuzzle.solucion, revealed: ["R", "S", "F", "Y", "O"] };
       state.final = { picks: [], consonants: 0, vowels: 0, prize: FINAL_PRIZE, correct: null };
       state.phase = "FINAL_PICK";

@@ -1551,78 +1551,86 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) {
-  .action-card.is-waiting {
-    position: relative;
-    grid-template-columns: minmax(0,1fr) minmax(130px,25%);
-    grid-template-rows: auto auto auto minmax(0,1fr);
-    align-content: center;
-    justify-items: start;
-    column-gap: 24px;
-    padding: 10px 18px;
+  .action-card.is-turn-waiting {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0,1fr);
+    align-content: stretch;
+    justify-items: stretch;
+    gap: 8px;
+    padding: 4px 10px 6px;
     text-align: left;
   }
 }
 
 @media (orientation:landscape) {
-  .action-card.is-waiting > small, .action-card.is-waiting > h1, .action-card.is-waiting > p {
-    grid-column: 1;
+  .action-card.is-turn-waiting > small, .action-card.is-turn-waiting > p {
+    display: none;
   }
 }
 
 @media (orientation:landscape) {
-  .action-card.is-waiting > small {
-    font-size: clamp(11px,1.7vw,20px);
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting > h1 {
-    font-size: clamp(42px,7.1vw,92px);
-    line-height: .98;
-    letter-spacing: .015em;
-    white-space: nowrap;
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting > p {
-    font-size: clamp(15px,2vw,25px);
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting .action-content {
-    grid-column: 2;
-    grid-row: 1/5;
+  .action-card.is-turn-waiting > h1 {
     align-self: center;
-    margin: 0;
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting .active-player-card {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 8px;
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting .active-player-photo {
-    width: min(100%,190px);
-  }
-}
-
-@media (orientation:landscape) {
-  .action-card.is-waiting .active-player-data {
-    justify-items: center;
+    font-size: clamp(44px,7.2vw,94px);
+    line-height: 1;
+    letter-spacing: .02em;
+    white-space: nowrap;
     text-align: center;
   }
 }
 
 @media (orientation:landscape) {
-  .action-card.is-waiting .active-player-data strong {
-    font-size: clamp(16px,2.3vw,29px);
+  .action-card.is-turn-waiting .action-content {
+    align-self: stretch;
+    min-height: 0;
+    margin: 0;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-card {
+    height: 100%;
+    min-height: 0;
+    grid-template-columns: minmax(190px,1.15fr) minmax(180px,.85fr);
+    justify-items: stretch;
+    gap: 22px;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-photo {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-data {
+    align-content: center;
+    justify-items: center;
+    padding: 8px;
+    text-align: center;
+    border-block: 1px solid #35445f;
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-data small {
+    font-size: clamp(11px,1.5vw,18px);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-data strong {
+    font-size: clamp(27px,4vw,52px);
+  }
+}
+
+@media (orientation:landscape) {
+  .action-card.is-turn-waiting .active-player-data > span {
+    font-size: clamp(16px,2.2vw,28px);
   }
 }
 
@@ -1686,50 +1694,398 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting {
-    padding: 5px 10px;
-    column-gap: 12px;
+  .action-card.is-turn-waiting {
+    gap: 5px;
+    padding: 2px 6px 3px;
   }
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting > small {
+  .action-card.is-turn-waiting > h1 {
+    font-size: clamp(39px,6.6vw,68px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-turn-waiting .active-player-card {
+    grid-template-columns: minmax(190px,1.15fr) minmax(170px,.85fr);
+    gap: 12px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-turn-waiting .active-player-data {
+    padding: 5px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .action-card.is-turn-waiting .active-player-data small {
     font-size: 10px;
   }
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting > h1 {
-    font-size: clamp(37px,6.5vw,66px);
+  .action-card.is-turn-waiting .active-player-data strong {
+    font-size: clamp(23px,3.5vw,36px);
   }
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting > p {
-    font-size: 13px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting .active-player-photo {
-    width: min(100%,125px);
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting .active-player-data strong {
-    font-size: 16px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .action-card.is-waiting .active-player-data > span {
-    font-size: 10px;
+  .action-card.is-turn-waiting .active-player-data > span {
+    font-size: clamp(13px,1.8vw,19px);
   }
 }
 
 @media (prefers-reduced-motion:reduce) {
   .wait-letter, .wait-letter-space {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Configuración panorámica: el carrusel conserva toda su superficie y el título flota encima. */
+
+.config-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px) scale(.82);
+  animation: waitLetterIn .62s cubic-bezier(.22,.9,.32,1.28) calc(var(--i)*45ms + .08s) both;
+}
+
+.config-letter:nth-child(odd) {
+  color: var(--cyan);
+  text-shadow: 0 0 16px #57e6ff4d;
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape.is-active {
+    position: relative;
+    display: block;
+    padding: 8px 12px;
+    isolation: isolate;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-identity {
+    display: contents;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-title-row {
+    position: absolute;
+    z-index: 20;
+    top: 12px;
+    left: 16px;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-title-row > img, .remote-config-landscape .config-title-row .screen-heading p {
+    display: none;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-title-row .screen-heading {
+    gap: 5px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-title-row .screen-heading > span {
+    font-size: clamp(10px,1.5vw,17px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .config-title-row .screen-heading h1 {
+    font-size: clamp(34px,5.3vw,68px);
+    line-height: 1;
+    letter-spacing: .01em;
+    white-space: nowrap;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .avatar-carousel {
+    position: absolute;
+    z-index: 2;
+    inset: 10px 12px 94px;
+    display: block;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .avatar-carousel legend {
+    position: absolute;
+    z-index: 15;
+    top: 2px;
+    left: 50%;
+    width: auto;
+    transform: translateX(-50%);
+    font-size: clamp(9px,1.3vw,15px);
+    white-space: nowrap;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-stage {
+    position: absolute;
+    inset: 27px 0 17px;
+    height: auto;
+    overflow: hidden;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-track {
+    inset: 0 56px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-card {
+    width: auto;
+    height: calc(100% - 4px);
+    aspect-ratio: 421/526;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-card.is-left-1 {
+    transform: translateX(-92%) scale(.78);
+    opacity: .72;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-card.is-right-1 {
+    transform: translateX(92%) scale(.78);
+    opacity: .72;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-card.is-left-2 {
+    transform: translateX(-158%) scale(.6);
+    opacity: .3;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-card.is-right-2 {
+    transform: translateX(158%) scale(.6);
+    opacity: .3;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-arrow {
+    top: 51%;
+    width: 58px;
+    height: 96px;
+    font-size: 49px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-prev {
+    left: 2px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-next {
+    right: 2px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-dots {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    font-size: clamp(9px,1.2vw,14px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .carousel-caption {
+    display: none;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .remote-field {
+    position: absolute;
+    z-index: 25;
+    left: 20%;
+    bottom: 10px;
+    width: 42%;
+    grid-template-columns: auto minmax(0,1fr);
+    align-items: center;
+    gap: 10px;
+    font-size: clamp(9px,1.2vw,13px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .remote-field input {
+    min-height: 62px;
+    font-size: clamp(20px,2.7vw,34px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape #confirm-player {
+    position: absolute;
+    z-index: 25;
+    right: 2.5%;
+    bottom: 15px;
+    width: 34%;
+    max-width: none;
+    min-height: 62px;
+    font-size: clamp(12px,1.7vw,20px);
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .privacy-note {
+    position: absolute;
+    z-index: 25;
+    right: 2.5%;
+    bottom: 3px;
+    width: 34%;
+    max-width: none;
+    overflow: hidden;
+    font-size: 7px;
+    line-height: 1;
+    white-space: nowrap;
+    text-align: center;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-config-landscape .selfie-inline-actions {
+    position: absolute;
+    z-index: 30;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape.is-active {
+    padding: 5px 9px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .config-title-row {
+    top: 7px;
+    left: 12px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .config-title-row .screen-heading > span {
+    font-size: 9px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .config-title-row .screen-heading h1 {
+    font-size: clamp(30px,4.9vw,49px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .avatar-carousel {
+    inset: 5px 9px 70px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .avatar-carousel legend {
+    font-size: 9px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .carousel-stage {
+    inset: 20px 0 13px;
+    height: auto;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .carousel-track {
+    inset-inline: 48px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .carousel-card {
+    width: auto;
+    height: calc(100% - 3px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .carousel-arrow {
+    width: 50px;
+    height: 76px;
+    font-size: 42px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .remote-field {
+    left: 19%;
+    bottom: 5px;
+    width: 43%;
+    gap: 7px;
+    font-size: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .remote-field input {
+    min-height: 52px;
+    padding: 7px 12px;
+    font-size: 22px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape #confirm-player {
+    right: 2%;
+    bottom: 12px;
+    width: 34.5%;
+    min-height: 52px;
+    font-size: 11px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape .privacy-note {
+    right: 2%;
+    bottom: 3px;
+    width: 34.5%;
+    font-size: 6px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .config-letter {
     animation: none;
     opacity: 1;
     transform: none;
