@@ -38,43 +38,42 @@
 </head>
 
 <body>
+    <div id="remote-fullscreen-entry" class="remote-fullscreen-entry"><img src="assets/img/aletheia-tv-icon-transparente.svg" alt=""><strong>MANDO ALÉTHEIA-TV</strong>
+        <p>Utiliza el teléfono en horizontal.</p><button class="remote-button remote-primary" id="open-remote-fullscreen" type="button">ABRIR MANDO A PANTALLA COMPLETA</button>
+    </div>
     <main id="remote-app" class="remote-shell">
         <section class="remote-screen remote-config-landscape is-active" data-screen="config" aria-labelledby="config-title">
             <div class="config-identity">
-                <div class="config-title-row"><img src="assets/img/ocio/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true">
+                <div class="config-title-row"><img src="assets/img/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true">
                     <div class="screen-heading"><span>PLAZA 1 · JUGADOR HUMANO</span>
                         <h1 id="config-title">CONFIGURA TU MANDO</h1>
                         <p>Elige cómo aparecerás en el plató.</p>
-                    </div><span id="connection-pill" class="connection-pill"><i></i> ENLACE PREPARADO</span>
+                    </div>
                 </div><label class="remote-field">TU ALIAS<input autocomplete="nickname" id="remote-alias" maxlength="18" placeholder="Escribe tu nombre" value="Invitado"></label>
+                <div class="carousel-caption"><strong id="avatar-name">Cargando tripulación…</strong><span id="avatar-role">Archivo ALÉTHEIA</span></div><button class="remote-button remote-primary" id="confirm-player" type="button">CONFIRMAR JUGADOR</button>
+                <p class="privacy-note">El selfie se reduce y se envía temporalmente al plató. Se elimina con la sala.</p>
             </div>
             <fieldset class="avatar-carousel" aria-label="Selección de avatar">
                 <legend>DESLIZA PARA ELEGIR AVATAR</legend>
                 <div id="carousel-stage" class="carousel-stage"><button class="carousel-arrow carousel-prev" id="avatar-prev" type="button" aria-label="Avatar anterior">‹</button>
                     <div id="avatar-track" class="carousel-track"></div><button class="carousel-arrow carousel-next" id="avatar-next" type="button" aria-label="Avatar siguiente">›</button>
                 </div>
-                <div class="carousel-caption"><strong id="avatar-name">Cargando tripulación…</strong><span id="avatar-role">Archivo ALÉTHEIA</span></div>
                 <div id="avatar-dots" class="carousel-dots" aria-hidden="true"></div>
                 <div id="selfie-inline-actions" class="selfie-inline-actions" hidden=""><button id="selfie-cancel" type="button">CANCELAR</button><button id="selfie-capture" type="button">FOTO</button><button id="selfie-repeat" type="button" hidden="">REPETIR</button><button id="selfie-use" type="button" hidden="">ACEPTAR</button></div>
             </fieldset>
-            <aside class="config-confirm">
-                <div class="config-selected-avatar">
-                    <div id="selected-avatar-mini" class="selected-avatar-mini"><span>—</span></div>
-                    <div><small>AVATAR SELECCIONADO</small><strong id="selected-avatar-label">—</strong></div>
-                </div>
-                <div class="config-confirm-actions"><button class="remote-button remote-primary" id="confirm-player" type="button">CONFIRMAR JUGADOR</button>
-                    <p class="privacy-note">El selfie se reduce y se envía temporalmente al plató. Se elimina con la sala.</p>
-                </div>
-            </aside>
         </section>
         <section class="remote-screen remote-lobby" data-screen="lobby" aria-labelledby="lobby-title" hidden="">
             <div id="lobby-portrait" class="player-portrait"><span>ML</span></div>
-            <div class="screen-heading"><span>PLAZA 1 PREPARADA</span>
-                <h1 id="lobby-title">MANDO CONECTADO</h1>
-                <p><strong id="lobby-name">Invitado</strong> · <span id="lobby-avatar">Marcus Lowe</span></p>
+            <div class="lobby-identity">
+                <div class="screen-heading"><span>PLAZA 1 PREPARADA</span>
+                    <h1 id="lobby-title">MANDO CONECTADO</h1>
+                    <p><strong id="lobby-name">Invitado</strong> · <span id="lobby-avatar">Marcus Lowe</span></p>
+                </div>
+                <div class="signal-animation" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
             </div>
-            <div class="signal-animation" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="remote-notice"><small>ESTADO DEL PLATÓ</small><strong>Esperando a los demás jugadores…</strong></div><button class="remote-button remote-primary" id="controller-start" type="button" hidden="">COMENZAR PARTIDA</button><button class="remote-button remote-secondary" id="demo-start" type="button">SIMULAR COMIENZO</button>
+            <div class="lobby-actions">
+                <div class="remote-notice"><small>ESTADO DEL PLATÓ</small><strong>Esperando a los demás jugadores…</strong></div><button class="remote-button remote-primary" id="controller-start" type="button" hidden="">COMENZAR PARTIDA</button><button class="remote-button remote-secondary" id="demo-start" type="button">SIMULAR COMIENZO</button>
+            </div>
         </section>
         <section class="remote-screen remote-game" data-screen="game" hidden="">
             <div class="game-status">
@@ -133,8 +132,8 @@
     <script src="assets/js/aletheia-firebase-config.js"></script>
     <script src="assets/js/aletheia-pruebas.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="assets/js/aletheia-conexion.js"></script>
     <script src="assets/js/aletheia-engine.js"></script>
+    <script src="assets/js/aletheia-conexion.js"></script>
     <script src="assets/js/aletheia-mando.js"></script>
     <script src="assets/js/aletheia-tv.js"></script>
 </body>

@@ -244,6 +244,37 @@ html.aletheia-mando-root body {
   text-align: center;
 }
 
+.remote-fullscreen-entry {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  color: white;
+  background: radial-gradient(circle at 50% 35%,#1b3152,#02040a 72%);
+  text-align: center;
+}
+
+.remote-fullscreen-entry img {
+  width: 72px;
+}
+
+.remote-fullscreen-entry strong {
+  font: 700 24px "Tektur";
+}
+
+.remote-fullscreen-entry p {
+  margin: 0 0 8px;
+  color: #b9c7df;
+}
+
+.remote-fullscreen-entry .remote-button {
+  width: min(440px,86vw);
+}
+
 .player-portrait {
   width: 130px;
   height: 130px;
@@ -573,40 +604,14 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:560px) {
   .remote-shell {
-    width: min(100%,880px);
-    grid-template-rows: auto minmax(0,1fr);
+    width: min(100%,1100px);
+    grid-template-rows: minmax(0,1fr);
   }
 }
 
 @media (orientation:landscape) and (max-height:560px) {
   .remote-screen {
     padding: 12px 18px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:560px) {
-  .remote-screen[data-screen="config"] {
-    grid-template-columns: 1fr 1.3fr;
-    align-items: center;
-  }
-}
-
-@media (orientation:landscape) and (max-height:560px) {
-  .remote-screen[data-screen="config"] .screen-heading, .remote-screen[data-screen="config"] .remote-field {
-    grid-column: 1;
-  }
-}
-
-@media (orientation:landscape) and (max-height:560px) {
-  .avatar-picker {
-    grid-column: 2;
-    grid-row: 1/4;
-  }
-}
-
-@media (orientation:landscape) and (max-height:560px) {
-  .remote-screen[data-screen="config"] .remote-button, .privacy-note {
-    grid-column: 1;
   }
 }
 
@@ -660,7 +665,7 @@ html.aletheia-mando-root body {
 .remote-orientation-lock {
   display: none;
   position: fixed;
-  z-index: 999;
+  z-index: 1300;
   inset: 0;
   padding: 24px;
   place-content: center;
@@ -1040,9 +1045,9 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) {
   .remote-config-landscape {
-    grid-template-columns: minmax(180px,.85fr) minmax(330px,1.8fr) minmax(210px,1fr);
-    align-items: stretch;
-    gap: 12px;
+    grid-template-columns: minmax(260px,.9fr) minmax(430px,1.7fr);
+    align-items: center;
+    gap: 18px;
   }
 }
 
@@ -1079,11 +1084,61 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) {
-  .config-confirm {
-    grid-template-columns: 76px minmax(0,1fr);
-    border-left: 1px solid #303e57;
-    padding-left: 12px;
+  .config-identity .carousel-caption {
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (orientation:landscape) {
+  .config-identity .remote-button {
+    max-width: 420px;
+  }
+}
+
+@media (orientation:landscape) {
+  .config-identity .privacy-note {
+    max-width: 420px;
+    text-align: left;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-lobby {
+    grid-template-columns: 150px minmax(260px,1fr) minmax(260px,.9fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: 20px;
+    text-align: left;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-lobby .player-portrait {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+@media (orientation:landscape) {
+  .lobby-identity {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
     text-align: center;
+  }
+}
+
+@media (orientation:landscape) {
+  .lobby-actions {
+    display: grid;
+    gap: 10px;
+  }
+}
+
+@media (orientation:landscape) {
+  .remote-lobby .screen-heading h1 {
+    font-size: clamp(24px,4vw,42px);
   }
 }
 
@@ -1121,8 +1176,8 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .remote-config-landscape {
-    grid-template-columns: minmax(135px,.75fr) minmax(275px,1.75fr) minmax(175px,.9fr);
-    gap: 8px;
+    grid-template-columns: minmax(250px,.9fr) minmax(400px,1.65fr);
+    gap: 12px;
   }
 }
 
@@ -1146,13 +1201,6 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .config-title-row .connection-pill {
-    padding: 3px 5px;
-    font-size: 6px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
   .config-identity .screen-heading p {
     display: none;
   }
@@ -1166,30 +1214,15 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .config-confirm {
-    grid-template-columns: 62px minmax(0,1fr);
-    gap: 5px;
-    padding-left: 8px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .config-confirm .privacy-note {
-    font-size: 7px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .config-confirm .remote-button {
+  .config-identity .remote-button {
     min-height: 42px;
     font-size: 10px;
   }
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .selected-avatar-mini {
-    width: 58px;
-    height: 58px;
+  .config-identity .privacy-note {
+    font-size: 7px;
   }
 }
 
@@ -1208,6 +1241,38 @@ html.aletheia-mando-root body {
 @media (orientation:landscape) and (max-height:430px) {
   .carousel-caption span {
     font-size: 9px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-lobby {
+    grid-template-columns: 125px minmax(260px,1fr) minmax(250px,.9fr);
+    gap: 14px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-lobby .player-portrait {
+    width: 118px;
+    height: 118px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-lobby .screen-heading h1 {
+    font-size: 30px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-notice {
+    padding: 10px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-notice strong {
+    font-size: 13px;
   }
 }
 

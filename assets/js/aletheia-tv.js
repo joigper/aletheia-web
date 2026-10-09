@@ -388,6 +388,29 @@
     $("event-log").innerHTML = state.events.slice().reverse().map(e => `<li><strong>${e.type}</strong> — ${e.detail}</li>`).join("");
     scheduleCpuTurn();
     scheduleSpeedReveal();
+    publishPublicGameState();
+  }
+
+  function publishPublicGameState() {
+    if (!state || !window.AletheiaPlayMode?.remoteActive) return;
+    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "FINAL_SOLVE";
+    const timed = Boolean(timedGame || forcedClock);
+    const current = state.players[state.active];
+    const availableLetters = alphabet.filter(letter => {
+      if (state.puzzle.revealed.includes(letter)) return false;
+      if (state.phase === "SPECIAL_LETTER") return true;
+      if (state.phase === "FINAL_PICK") return vowels.has(letter) ? state.final.vowels < 1 : state.final.consonants < 3;
+      return vowels.has(letter) ? state.phase === "AWAITING_SPIN" && current.round >= AletheiaGame.vowelPrice : state.phase === "AWAITING_LETTER";
+    });
+    window.dispatchEvent(new CustomEvent("aletheia:game-state", { detail: {
+      status: state.phase === "GAME_COMPLETE" ? "finished" : gamePaused ? "paused" : "playing",
+      paused: gamePaused, phase: state.phase, round: state.round, maxRounds: state.maxRounds,
+      activeSlot: state.active + 1, activeName: current.name, timed,
+      remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
+      pending: state.pending || "", message: $("message").textContent,
+      availableLetters,
+      players: state.players.map((player,index) => ({ slot:index+1,name:player.name,round:player.round,total:player.total,cpu:player.cpu }))
+    } }));
   }
 
   function escapeHtml(value) { const node = document.createElement("span"); node.textContent = value; return node.innerHTML; }
@@ -1064,6 +1087,7 @@
       voice?.pauseMusic();
       voice?.playEffect("partida-pausa");
       voice?.play("partida-pausada");
+      publishPublicGameState();
       return;
     }
     if (pauseStartedAt) {
@@ -1093,6 +1117,29 @@
   enforceMobileLandscape();
   $("pause-game").addEventListener("click", () => setGamePaused(!gamePaused));
   $("resume-game").addEventListener("click", () => setGamePaused(false));
+  window.addEventListener("aletheia:remote-command", event => {
+    if (!state || !window.AletheiaPlayMode?.remoteActive) return;
+    const slot = Number(event.detail?.slot), type = event.detail?.type, value = String(event.detail?.value || "").toUpperCase();
+    if (type === "pause") { setGamePaused(true); return; }
+    if (type === "resume") { setGamePaused(false); return; }
+    if (slot !== state.active + 1 || state.players[state.active]?.cpu || gamePaused) return;
+    if (type === "spin") { performSpin(); return; }
+    if (type === "letter" && value.length === 1) {
+      act(() => {
+        if (state.phase === "SPECIAL_LETTER") return engine.specialLetter(state, value);
+        if (state.phase === "FINAL_PICK") return engine.finalLetter(state, value);
+        return vowels.has(value) ? engine.buyVowel(state, value) : engine.letter(state, value);
+      });
+      return;
+    }
+    if (type === "solve" && value.trim()) { act(() => engine.solve(state, value.trim())); return; }
+    if (type === "pass" && typeof engine.yieldTurn === "function") act(() => engine.yieldTurn(state));
+  });
+  window.addEventListener("aletheia:remote-presence", event => {
+    if (!state || $("game-panel").hidden || state.phase === "GAME_COMPLETE" || event.detail?.connected !== false || gamePaused) return;
+    setGamePaused(true);
+    $("message").textContent = `La plaza ${event.detail.slot} ha perdido la conexión. La partida queda en pausa.`;
+  });
   $("new-game").addEventListener("click", () => location.reload());
   $("winner-new-game").addEventListener("click", () => location.reload());
   function updateSoundButtons() {

@@ -12,6 +12,15 @@
   let cameraStream=null;
   let pendingSelfie=null;
   let selfieCaptureActive=false;
+  const onlineController=new URLSearchParams(location.search).has("sala");
+  let remoteGameState=null;
+
+  async function enterFullscreen(){
+    const root=document.documentElement;
+    try{if(root.requestFullscreen)await root.requestFullscreen({navigationUI:"hide"});else if(root.webkitRequestFullscreen)root.webkitRequestFullscreen()}catch(error){console.info("El navegador mantiene sus barras",error)}
+    $("#remote-fullscreen-entry").hidden=true;updateVisibleHeight();
+  }
+  $("#open-remote-fullscreen").addEventListener("click",enterFullscreen);
 
   function updateVisibleHeight(){
     const height=Math.round(window.visualViewport?.height||window.innerHeight);
@@ -58,9 +67,9 @@
     return offset;
   }
   function renderSelectedMini(){
-    $("#selected-avatar-mini").innerHTML=portraitMarkup();
-    $("#selected-avatar-label").textContent=selectedAvatar.name;
-    $("#selected-avatar-mini img")?.addEventListener("error",event=>{event.currentTarget.replaceWith(Object.assign(document.createElement("span"),{textContent:selectedAvatar.initials}))});
+    const mini=$("#selected-avatar-mini"),label=$("#selected-avatar-label");
+    if(mini){mini.innerHTML=portraitMarkup();mini.querySelector("img")?.addEventListener("error",event=>{event.currentTarget.replaceWith(Object.assign(document.createElement("span"),{textContent:selectedAvatar.initials}))})}
+    if(label)label.textContent=selectedAvatar.name;
   }
   function renderCarousel(){
     const current=avatars[carouselIndex];
@@ -154,19 +163,36 @@
   };
   function renderScene(name){
     const scene=scenes[name]||scenes.spin;$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
-    $("#action-content [data-action='spin']")?.addEventListener("click",()=>{renderScene("letters")});
+    $("#action-content [data-action='spin']")?.addEventListener("click",()=>{if(onlineController)sendCommand("spin");else renderScene("letters")});
     $("#action-content [data-action='solve-now']")?.addEventListener("click",()=>{renderScene("solve");setTimeout(()=>$(".solve-input")?.focus(),50)});
-    $("#action-content .solve-form")?.addEventListener("submit",event=>{event.preventDefault();$("#action-kicker").textContent="RESPUESTA ENVIADA";$("#action-title").textContent="ESPERA AL PLATÓ";$("#action-copy").textContent="Prometeo está comprobando la solución.";$("#action-content").innerHTML='<div class="remote-wait-orb" aria-hidden="true"></div>'});
-    $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{button.disabled=true;$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="La pantalla principal mostrará el resultado."}));
+    $("#action-content .solve-form")?.addEventListener("submit",event=>{event.preventDefault();const value=event.currentTarget.querySelector("input").value.trim();if(onlineController&&value)sendCommand("solve",value);$("#action-kicker").textContent="RESPUESTA ENVIADA";$("#action-title").textContent="ESPERA AL PLATÓ";$("#action-copy").textContent="Prometeo está comprobando la solución.";$("#action-content").innerHTML='<div class="remote-wait-orb" aria-hidden="true"></div>'});
+    $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{button.disabled=true;if(onlineController)sendCommand("letter",button.textContent);$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="La pantalla principal mostrará el resultado."}));
+  }
+  function sendCommand(type,value=""){window.dispatchEvent(new CustomEvent("aletheia:mando-command",{detail:{type,value}}))}
+  function renderRemoteGame(detail){
+    remoteGameState=detail;showScreen("game");clearInterval(clockTimer);
+    $("#game-name").textContent=detail.player?.name||$("#lobby-name").textContent;
+    $("#round-score").textContent=detail.player?.round??0;$("#total-score").textContent=detail.player?.total??0;
+    $("#game-clock").hidden=!detail.timed;$("#game-clock").textContent=detail.clock||"00:00";
+    if(detail.timed&&!detail.paused){let remaining=Number(detail.remainingMs||0);const paint=()=>{const seconds=Math.max(0,Math.ceil(remaining/1000));$("#game-clock").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;remaining=Math.max(0,remaining-1000)};paint();clockTimer=setInterval(paint,1000)}
+    const mine=Number(detail.slot)===Number(detail.activeSlot);
+    if(detail.paused){renderScene("wait");$("#action-kicker").textContent="PARTIDA EN PAUSA";$("#action-title").textContent="EL PLATÓ ESTÁ DETENIDO";$("#action-copy").textContent="Cualquier jugador puede reanudar la partida."}
+    else if(!mine)renderScene("wait");
+    else if(detail.phase==="AWAITING_SPIN")renderScene("spin");
+    else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
+    else if(detail.phase==="SPEED_RUNNING")renderScene("speed");
+    else renderScene("solve");
+    const pause=$("#pause-demo");pause.classList.toggle("is-active",Boolean(detail.paused));pause.querySelector("span").textContent=detail.paused?"REANUDAR":"PAUSA";
   }
   $("#demo-start").addEventListener("click",()=>{showScreen("game");renderScene("spin");startClock()});
   window.addEventListener("aletheia:mando-room-state",event=>{
     const status=event.detail?.status;
-    if(status==="playing"){showScreen("game");renderScene("spin");startClock()}
+    if(status==="playing"){showScreen("game");if(!onlineController){renderScene("spin");startClock()}}
     else if(status==="finished"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="La partida ha terminado. Consulta el resultado en el plató."}
     else if(status==="offline"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="El plató se ha desconectado."}
   });
   $$("[data-demo]").forEach(button=>button.addEventListener("click",()=>renderScene(button.dataset.demo)));
-  $("#pause-demo").addEventListener("click",event=>{event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"REANUDAR":"PAUSA"});
+  window.addEventListener("aletheia:mando-game-state",event=>renderRemoteGame(event.detail||{}));
+  $("#pause-demo").addEventListener("click",event=>{if(onlineController){sendCommand(remoteGameState?.paused?"resume":"pause");return}event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"REANUDAR":"PAUSA"});
   $("#sound-demo").addEventListener("click",event=>{event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"SILENCIO":"SONIDO"});
 })();

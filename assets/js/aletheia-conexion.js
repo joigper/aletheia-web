@@ -23,8 +23,8 @@ const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 const roomAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false };
-const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, starting: false };
+const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, unsubscribeCommands: null, heartbeatWatch: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false, commandSeq: {} };
+const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, unsubscribeGame: null, starting: false, heartbeat: null, commandSeq: 0, serverOffset: 0 };
 
 function randomText(length, alphabet = roomAlphabet) {
   const bytes = new Uint8Array(length);
@@ -120,6 +120,10 @@ function observeSlots() {
       renderQr(slot, player);
     });
     updateHostControls(connected);
+    if (document.getElementById("game-panel") && !document.getElementById("game-panel").hidden) {
+      const missing = state.humanSlots.find(slot => !players[slot]?.connected || Date.now() - Number(players[slot]?.lastSeen || 0) > 35000);
+      if (missing) window.dispatchEvent(new CustomEvent("aletheia:remote-presence", { detail: { slot: missing, connected: false } }));
+    }
     setSetupMessage(connected === state.humanSlots.length
       ? `Los ${connected} mandos están conectados. Ya puedes comenzar o seguir cambiando las plazas HUMANO/CPU.`
       : `Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados. Puedes seguir cambiando las plazas HUMANO/CPU.`);
@@ -127,6 +131,24 @@ function observeSlots() {
     console.error("No se pudo observar la sala", error);
     setSetupMessage("No se pudo leer la sala. Comprueba las reglas de Firebase.");
   });
+}
+
+function observeCommands() {
+  state.unsubscribeCommands?.();
+  state.unsubscribeCommands = onValue(ref(database, `rooms/${state.roomId}/commands`), snapshot => {
+    const commands = snapshot.val() || {};
+    Object.entries(commands).forEach(([slotText, command]) => {
+      const slot = Number(slotText), seq = Number(command?.seq || 0);
+      if (!seq || seq <= Number(state.commandSeq[slot] || 0)) return;
+      state.commandSeq[slot] = seq;
+      window.dispatchEvent(new CustomEvent("aletheia:remote-command", { detail: { slot, type: command.type, value: command.value || "" } }));
+    });
+  });
+}
+
+async function publishGameState(publicState) {
+  if (!state.active || !state.roomId || !publicState) return;
+  await set(ref(database, `rooms/${state.roomId}/game`), { ...publicState, publishedAt: serverTimestamp() }).catch(error => console.error("No se pudo sincronizar la partida", error));
 }
 
 async function reconcileHumanSlots() {
@@ -194,6 +216,7 @@ async function createRoom() {
   state.humanSlots.forEach(slot => renderQr(slot));
   updateHostControls(0);
   observeSlots();
+  observeCommands();
   state.unsubscribeStatus?.();
   state.unsubscribeStatus = onValue(ref(database, `rooms/${state.roomId}/meta/status`), snapshot => {
     if (snapshot.val() === "playing" && !document.getElementById("setup-panel")?.hidden) document.getElementById("start-game")?.click();
@@ -205,6 +228,7 @@ async function closeRoom() {
   state.unsubscribe = null;
   state.unsubscribeStatus?.();
   state.unsubscribeStatus = null;
+  state.unsubscribeCommands?.(); state.unsubscribeCommands = null;
   if (state.roomId && auth.currentUser) await remove(ref(database, `rooms/${state.roomId}`)).catch(() => {});
   document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
   document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
@@ -258,6 +282,7 @@ function initHost() {
   document.getElementById("start-game")?.addEventListener("click", () => {
     if (state.active && state.roomId) update(ref(database, `rooms/${state.roomId}/meta`), { status: "playing" }).catch(() => {});
   });
+  window.addEventListener("aletheia:game-state", event => { void publishGameState(event.detail); });
   window.addEventListener("aletheia:setup-selection", event => {
     state.selectionBusy = Boolean(event.detail?.busy);
     updateHostControls(state.humanSlots.filter(slot => state.players[slot]?.connected).length);
@@ -300,6 +325,7 @@ function observeControllerRoom() {
   if (!invitation) return;
   controllerState.unsubscribeMeta?.();
   controllerState.unsubscribeSlots?.();
+  controllerState.unsubscribeGame?.();
   controllerState.unsubscribeMeta = onValue(ref(database, `rooms/${invitation.roomId}/meta`), snapshot => {
     const meta = snapshot.val();
     if (!meta) {
@@ -318,6 +344,14 @@ function observeControllerRoom() {
     controllerState.players = snapshot.val() || {};
     updateControllerLobby();
   }, error => console.error("No se pudo leer el estado de los jugadores", error));
+  controllerState.unsubscribeGame = onValue(ref(database, `rooms/${invitation.roomId}/game`), snapshot => {
+    const game = snapshot.val(); if (!game) return;
+    const player = Array.isArray(game.players) ? game.players.find(item => Number(item.slot) === invitation.slot) : null;
+    const elapsed = Math.max(0, Date.now() + controllerState.serverOffset - Number(game.publishedAt || 0));
+    const remaining = Math.max(0, Number(game.remainingMs || 0) - elapsed);
+    const seconds = Math.ceil(remaining / 1000);
+    window.dispatchEvent(new CustomEvent("aletheia:mando-game-state", { detail: { ...game, slot: invitation.slot, player, clock: `${String(Math.floor(seconds / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}` } }));
+  }, error => console.error("No se pudo leer la partida", error));
 }
 
 async function connectController(player) {
@@ -344,7 +378,23 @@ async function connectController(player) {
     if (label.textContent.includes("PLAZA")) label.textContent = `PLAZA ${invitation.slot} · JUGADOR HUMANO`;
   });
   controllerState.invitation = invitation;
+  onValue(ref(database, ".info/serverTimeOffset"), snapshot => { controllerState.serverOffset = Number(snapshot.val() || 0); }, { onlyOnce: true });
+  clearInterval(controllerState.heartbeat);
+  controllerState.heartbeat = setInterval(() => update(slotRef, { connected: true, lastSeen: serverTimestamp() }).catch(() => {}), 10000);
   observeControllerRoom();
+}
+
+async function sendControllerCommand(command) {
+  const invitation = controllerState.invitation;
+  if (!invitation || !auth.currentUser) return;
+  controllerState.commandSeq = Math.max(Date.now(), controllerState.commandSeq + 1);
+  await set(ref(database, `rooms/${invitation.roomId}/commands/${invitation.slot}`), {
+    controllerUid: auth.currentUser.uid,
+    seq: controllerState.commandSeq,
+    type: String(command.type || "").slice(0, 20),
+    value: String(command.value || "").slice(0, 100),
+    createdAt: serverTimestamp()
+  }).catch(error => console.error("No se pudo enviar la orden", error));
 }
 
 function initController() {
@@ -382,6 +432,7 @@ function initController() {
       if (notice) notice.textContent = "No se pudo ocupar esta plaza. Vuelve a escanear el código del plató.";
     }
   });
+  window.addEventListener("aletheia:mando-command", event => { void sendControllerCommand(event.detail || {}); });
 }
 
 if (pageIsHost) initHost();
