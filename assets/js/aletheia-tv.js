@@ -23,6 +23,40 @@
   const keyboard = $("keyboard");
   let wheelRotation = 0;
   let wheelDisplayRun = 0;
+  const prometeoBasePath = "assets/img/ocio/";
+  const prometeoIdlePrincipal = "Prometeo04B.mp4";
+  const prometeoGestures = ["Prometeo01B.mp4", "Prometeo02B.mp4", "Prometeo03B.mp4", "Prometeo06B.mp4", "Prometeo07B.mp4", "Prometeo08B.mp4", "Prometeo09B.mp4"];
+  const prometeoActive = $("prometeo-video-a");
+  prometeoActive?.removeAttribute("poster");
+  let lastPrometeoGesture = null;
+
+  function choosePrometeoGesture() {
+    if (Math.random() < 0.70) return prometeoIdlePrincipal;
+    const available = prometeoGestures.filter(clip => clip !== lastPrometeoGesture);
+    const clip = available[Math.floor(Math.random() * available.length)];
+    lastPrometeoGesture = clip;
+    return clip;
+  }
+
+  function playNextPrometeo() {
+    const nextSource = prometeoBasePath + choosePrometeoGesture();
+    prometeoActive.pause();
+    prometeoActive.src = nextSource;
+    prometeoActive.muted = true;
+    prometeoActive.load();
+    const startPlayback = () => {
+      const playback = prometeoActive.play();
+      if (playback !== undefined) playback.catch(() => {});
+    };
+    if (prometeoActive.readyState >= 3) startPlayback();
+    else prometeoActive.addEventListener("canplay", startPlayback, { once: true });
+  }
+
+  function stopPrometeo() {
+    prometeoActive?.pause();
+  }
+
+  prometeoActive.addEventListener("ended", playNextPrometeo);
 
   AletheiaGame.wheel.forEach((value, index) => {
     const label = document.createElement("span");
@@ -42,13 +76,127 @@
     keyboard.append(button);
   });
 
+  const panelRowSizes = [12, 14, 14, 12];
+  let previousPanelKey = "";
+  let previousVisibleLetters = new Set();
+  let panelJustChanged = false;
+
+  function splitPanelText(text) {
+    const words = text.trim().split(/\s+/);
+    const rowWindows = [[1], [1, 2], [0, 1, 2], [0, 1, 2, 3]];
+
+    for (const rows of rowWindows) {
+      const candidates = [];
+      const partition = (wordIndex, rowIndex, lines) => {
+        if (rowIndex === rows.length) {
+          if (wordIndex === words.length) candidates.push(lines.slice());
+          return;
+        }
+        const wordsRemaining = words.length - wordIndex;
+        const rowsRemaining = rows.length - rowIndex;
+        for (let end = wordIndex + 1; end <= words.length; end += 1) {
+          if (words.length - end < rowsRemaining - 1) break;
+          const line = words.slice(wordIndex, end).join(" ");
+          if (line.length > panelRowSizes[rows[rowIndex]]) break;
+          partition(end, rowIndex + 1, [...lines, line]);
+        }
+      };
+      partition(0, 0, []);
+      if (candidates.length) {
+        const best = candidates.sort((a, b) => {
+          const score = lines => lines.reduce((total, line, index) => {
+            const free = panelRowSizes[rows[index]] - line.length;
+            return total + free * free;
+          }, 0);
+          return score(a) - score(b);
+        })[0];
+        const result = ["", "", "", ""];
+        rows.forEach((row, index) => { result[row] = best[index]; });
+        return result;
+      }
+    }
+    return ["", text.slice(0, 14), text.slice(14, 28), text.slice(28, 40)];
+  }
+
   function maskedPuzzle() {
     const normalized = AletheiaGame.normalize(state.puzzle.solution);
-    return [...normalized].map(char => {
-      if (char === " ") return '<span class="space" aria-hidden="true"></span>';
-      const visible = state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE" || state.puzzle.revealed.includes(char);
-      return `<span class="tile">${visible ? char : ""}</span>`;
+    const panelKey = `${state.round}:${normalized}`;
+    const samePanel = panelKey === previousPanelKey;
+    panelJustChanged = !samePanel;
+    const completed = state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE";
+    const visibleLetters = new Set(completed ? [...normalized].filter(char => char !== " ") : state.puzzle.revealed);
+    const rows = splitPanelText(normalized);
+
+    const html = panelRowSizes.map((size, rowIndex) => {
+      const line = rows[rowIndex];
+      const offset = Math.floor((size - line.length) / 2);
+      const cells = Array.from({ length: size }, (_, cellIndex) => {
+        const cellOrder = panelRowSizes.slice(0, rowIndex).reduce((sum, rowSize) => sum + rowSize, 0) + cellIndex;
+        const cellStyle = ` style="--cell-order:${cellOrder}"`;
+        const lineIndex = cellIndex - offset;
+        if (lineIndex < 0 || lineIndex >= line.length) return `<span class="tile tile-inactive"${cellStyle} aria-hidden="true"></span>`;
+        const char = line[lineIndex];
+        if (char === " ") return `<span class="tile tile-space"${cellStyle} aria-hidden="true"></span>`;
+        const visible = visibleLetters.has(char);
+        const newlyRevealed = samePanel && !completed && visible && !previousVisibleLetters.has(char);
+        return `<span class="tile${visible ? " is-visible" : ""}${newlyRevealed ? " is-new" : ""}"${cellStyle}><span${newlyRevealed ? ` data-letter="${char}"` : ""}>${visible && !newlyRevealed ? char : ""}</span></span>`;
+      }).join("");
+      return `<div class="letter-row" style="--columns:${size}">${cells}</div>`;
     }).join("");
+
+    previousPanelKey = panelKey;
+    previousVisibleLetters = visibleLetters;
+    return html;
+  }
+
+  function animateNewPanelLetters() {
+    const reel = [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"];
+    $("letter-board").querySelectorAll(".tile.is-new > span[data-letter]").forEach((slot, index) => {
+      const tile = slot.parentElement;
+      const finalLetter = slot.dataset.letter;
+      window.setTimeout(() => {
+        tile.classList.add("is-cycling");
+        let frame = 0;
+        const frames = 10 + Math.floor(Math.random() * 4);
+        const ticker = window.setInterval(() => {
+          slot.textContent = reel[Math.floor(Math.random() * reel.length)];
+          frame += 1;
+          if (frame < frames) return;
+          window.clearInterval(ticker);
+          slot.textContent = finalLetter;
+          tile.classList.remove("is-cycling", "is-new");
+          tile.classList.add("is-settled");
+        }, 75);
+      }, index * 55);
+    });
+  }
+
+  function animatePanelReset() {
+    const reel = [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789"];
+    $("letter-board").querySelectorAll(".tile").forEach((tile, index) => {
+      let slot = tile.querySelector("span");
+      const temporarySlot = !slot;
+      if (!slot) {
+        slot = document.createElement("span");
+        tile.append(slot);
+      }
+      const finalText = slot.textContent;
+      window.setTimeout(() => {
+        tile.classList.add("is-resetting");
+        let frame = 0;
+        const frames = 8 + (index % 4);
+        const ticker = window.setInterval(() => {
+          slot.textContent = reel[(index + frame * 7) % reel.length];
+          frame += 1;
+          if (frame < frames) return;
+          window.clearInterval(ticker);
+          slot.textContent = finalText;
+          tile.classList.remove("is-resetting");
+          tile.classList.add("is-reset-complete");
+          if (temporarySlot && !finalText) window.setTimeout(() => slot.remove(), 120);
+        }, 72);
+      }, index * 18);
+    });
   }
 
   function render(message) {
@@ -67,10 +215,17 @@
     $("category").textContent = state.puzzle.category;
     $("clue").textContent = state.puzzle.clue;
     $("letter-board").innerHTML = maskedPuzzle();
+    $("letter-board").classList.toggle("is-completing", roundComplete);
+    $("letter-board").classList.toggle("is-opening", panelJustChanged && !roundComplete);
+    if (panelJustChanged && !roundComplete) {
+      animatePanelReset();
+    } else if (!roundComplete) {
+      animateNewPanelLetters();
+    }
     $("turn-label").textContent = roundComplete ? `Ronda ${state.round} terminada` : `Turno de ${state.players[state.active].name}`;
     $("active-round-score").textContent = state.players[state.active].round;
     $("active-total-score").textContent = state.players[state.active].total;
-    $("message").textContent = message || (roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta${state.players[state.active].round >= AletheiaGame.vowelPrice ? ", compra una vocal" : ""} o intenta resolver.`);
+    $("message").textContent = message || (roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
     $("spin").disabled = gamePaused || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
     if (state.phase === "AWAITING_SPIN") {
       $("wheel-result").textContent = "PULSA";
@@ -376,6 +531,7 @@
       : { cpu: true, person: selectedBySlot[slot] });
     timedGame = $("timed-game").checked;
     state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1));
+    stopPrometeo();
     $("setup-panel").hidden = true; $("game-panel").hidden = false; render("Tres concursantes. Todo preparado. Comenzamos.");
     $("game-clock").hidden = !timedGame;
     resetActionClock();

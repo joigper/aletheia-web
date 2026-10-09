@@ -56,7 +56,9 @@
                 </header>
                 <div class="tv-participants-grid">
                     <aside class="tv-prometheus tv-panel" aria-label="Espacio reservado para PROMETEO">
-                        <div class="tv-prometheus-image"><img src="assets/img/PROMETEOALFA.jpg" alt="Imagen provisional de PROMETEO"><span>REFERENCIA TEMPORAL</span></div>
+                        <div class="tv-prometheus-image tv-prometheus-stage" aria-label="PROMETEO, presentador de ALÉTHEIA-TV"><video class="true tv-prometheus-video is-active" id="prometeo-video-a" autoplay="" muted="" preload="auto">
+                                <source src="assets/img/ocio/Prometeo05B.mp4" type="video/mp4">
+                            </video><span>PRESENTADOR IA</span></div>
                         <div class="tv-prometheus-copy"><small>PRESENTADOR</small><strong>PROMETEO</strong></div>
                     </aside>
                     <section class="tv-human-card tv-contestant-card tv-panel" data-slot="slot-1" data-controller="human">
@@ -88,8 +90,9 @@
                     <div class="tv-game-tools"><span id="game-clock" class="tv-clock" hidden="" aria-live="off">00:30</span><button class="tv-button tv-pause-button" id="pause-game" type="button" aria-pressed="false">PAUSA</button><button class="tv-button tv-restart-button" id="new-game" type="button">REINICIAR PARTIDA</button></div>
                 </div>
                 <section id="puzzle-panel" class="tv-puzzle tv-panel">
-                    <div class="tv-puzzle-meta"><span id="round-label">RONDA 1 DE 5</span><strong id="category"></strong></div>
-                    <p id="clue"></p>
+                    <div class="tv-puzzle-meta">
+                        <div class="tv-puzzle-context"><span id="round-label">RONDA 1 DE 5</span><small id="clue"></small></div><strong id="category"></strong>
+                    </div>
                     <div id="letter-board" class="letter-board" aria-label="Panel de letras"></div>
                 </section>
                 <section id="winner-panel" class="tv-winner tv-panel" hidden=""><small>PARTIDA FINALIZADA</small>
@@ -109,9 +112,8 @@
                             </div>
                             <div class="tv-active-money"><small>SALDO DE RONDA</small><strong id="active-round-score">0</strong><span>TOTAL <b id="active-total-score">0</b></span></div>
                         </div>
-                        <p class="tv-keyboard-help">CONSONANTES DESPUÉS DE GIRAR · VOCALES 50</p>
                         <div id="keyboard" class="keyboard"></div>
-                        <form id="solve-form"><label>Resolver panel<input autocomplete="off" id="solution" placeholder="Escribe la solución"></label><button class="tv-button tv-button-secondary" type="submit">RESOLVER</button></form><button class="tv-button tv-pass-button" id="pass-turn" type="button" hidden="">PASAR TURNO</button>
+                        <form id="solve-form"><label>Resolver panel<input autocomplete="off" id="solution" placeholder="Escribe la solución"></label><button class="tv-button tv-button-secondary" type="submit">RESOLVER</button><button class="tv-button tv-pass-button" id="pass-turn" type="button" hidden="">PASAR TURNO</button></form>
                     </section>
                 </div>
                 <section class="tv-contestants">

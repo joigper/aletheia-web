@@ -311,7 +311,7 @@ html, body {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-rows: 56px minmax(110px,.65fr) minmax(230px,1.3fr) auto;
+  grid-template-rows: 56px minmax(190px,.78fr) minmax(230px,1.22fr) auto;
   gap: 10px;
 }
 
@@ -337,8 +337,9 @@ html, body {
 
 .tv-puzzle {
   min-height: 0;
-  padding: 12px 18px;
+  padding: 10px 18px;
   text-align: center;
+  overflow: hidden;
 }
 
 .tv-puzzle-meta {
@@ -349,31 +350,72 @@ html, body {
 }
 
 .tv-puzzle p {
-  margin: 5px 0;
+  margin: 3px 0 5px;
 }
 
 .letter-board {
-  display: flex;
+  display: grid;
+  gap: 4px;
+  padding-top: 2px;
+  perspective: 900px;
+}
+
+.letter-row {
+  display: grid;
+  grid-template-columns: repeat(var(--columns),clamp(25px,2.15vw,36px));
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 5px;
+  gap: 5px;
 }
 
 .tile {
-  width: 38px;
-  height: 43px;
+  height: clamp(27px,3.55vh,36px);
+  position: relative;
   display: grid;
   place-items: center;
-  font: 700 23px "Tektur";
-  color: #08111b;
-  background: linear-gradient(#fff,#bdddea);
-  border: 2px solid #68889a;
-  border-radius: 5px;
+  overflow: hidden;
+  font: 700 clamp(15px,2.1vh,21px) "Tektur";
+  color: #07111a;
+  background: linear-gradient(180deg,#f8fdff 0 48%,#b9dbe8 52% 100%);
+  border: 1px solid #6d91a2;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 #fff,0 2px 5px #0007;
 }
 
-.space {
-  width: 18px;
+.tile::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #607d8a88;
+  box-shadow: 0 1px #fff7;
+}
+
+.tile > span {
+  position: relative;
+  z-index: 1;
+}
+
+.tile-inactive {
+  background: #0a1120;
+  border-color: #26334a;
+  box-shadow: inset 0 0 8px #000;
+  opacity: .38;
+}
+
+.tile-inactive::after, .tile-space::after {
+  display: none;
+}
+
+.tile-space {
+  background: #111a2b;
+  border-color: #33425d;
+  box-shadow: inset 0 0 10px #0009;
+}
+
+.tile.is-new {
+  animation: tvPanelFlip .48s cubic-bezier(.2,.75,.25,1);
 }
 
 .tv-play-area {
@@ -568,6 +610,21 @@ html, body {
   }
 }
 
+@keyframes tvPanelFlip {
+  0% {
+    transform: rotateX(-88deg);
+    filter: brightness(.25);
+  }
+  55% {
+    transform: rotateX(8deg);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+}
+
 @media (max-height:760px) {
   .aletheia-tv-page {
     grid-template-rows: 112px 1px minmax(0,1fr);
@@ -575,15 +632,47 @@ html, body {
 }
 
 @media (max-height:760px) {
-  .aletheia-tv-header img {
-    width: 94px;
-    height: 94px;
+  .tv-app {
+    padding: 10px 0;
   }
 }
 
 @media (max-height:760px) {
-  .tv-app {
-    padding: 10px 0;
+  .tv-game {
+    grid-template-rows: 50px minmax(154px,.72fr) minmax(220px,1.28fr) auto;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-puzzle {
+    padding: 7px 14px;
+  }
+}
+
+@media (max-height:760px) {
+  .letter-board {
+    gap: 3px;
+  }
+}
+
+@media (max-height:760px) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(22px,2vw,32px));
+    gap: 4px;
+  }
+}
+
+@media (max-height:760px) {
+  .tile {
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+@media (max-height:760px) {
+  .aletheia-tv-header img {
+    width: 94px;
+    height: 94px;
   }
 }
 
@@ -2163,6 +2252,879 @@ html, body {
 @media (max-height:760px) {
   .player-score span b {
     font-size: 19px;
+  }
+}
+
+/* PROMETEO vivo: dos vídeos superpuestos para enlazar gestos sin parpadeos. */
+
+.tv-prometheus-stage {
+  position: relative;
+  overflow: hidden;
+  background: #080808;
+}
+
+.tv-prometheus-video, .tv-prometheus-video.is-active {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 1;
+}
+
+.tv-prometheus-stage > span {
+  z-index: 3;
+}
+
+/* Panel fijo de concurso: 12 · 14 · 14 · 12. */
+
+.tv-game {
+  grid-template-rows: 64px minmax(190px,.78fr) minmax(250px,1.22fr) auto;
+}
+
+.tv-puzzle {
+  padding: 10px 18px;
+}
+
+.letter-board {
+  display: grid;
+  align-self: center;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.letter-row {
+  display: grid;
+  grid-template-columns: repeat(var(--columns),clamp(25px,2.15vw,36px));
+  justify-content: center;
+  gap: 5px;
+}
+
+.letter-board .tile {
+  width: auto;
+  height: clamp(27px,3.55vh,36px);
+  font-size: clamp(15px,2.1vh,21px);
+  box-shadow: inset 0 1px 0 #fff,0 2px 5px #0007;
+}
+
+.letter-board .tile-inactive {
+  box-shadow: inset 0 0 8px #000;
+}
+
+.letter-board .tile-space {
+  box-shadow: inset 0 0 10px #0009;
+}
+
+@media (max-height:760px) {
+  .tv-game {
+    grid-template-rows: 54px minmax(154px,.72fr) minmax(220px,1.28fr) auto;
+  }
+}
+
+@media (max-height:760px) {
+  .letter-board {
+    gap: 3px;
+  }
+}
+
+@media (max-height:760px) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(22px,2vw,32px));
+    gap: 4px;
+  }
+}
+
+@media (max-height:760px) {
+  .letter-board .tile {
+    width: auto;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+/* La salida de emergencia comparte línea con Resolver para no quedar bajo el marcador. */
+
+#solve-form {
+  grid-template-columns: minmax(0,1fr) auto auto;
+}
+
+#solve-form .tv-pass-button {
+  min-height: 46px;
+  align-self: end;
+  white-space: nowrap;
+}
+
+/* Jerarquía de juego: el panel es el elemento protagonista. */
+
+.tv-game {
+  grid-template-rows: 58px minmax(255px,1fr) minmax(275px,.95fr) auto;
+  gap: 9px;
+}
+
+.tv-message {
+  min-height: 58px;
+}
+
+.tv-puzzle {
+  padding: 12px 22px 16px;
+  border-color: #42627a;
+  background: radial-gradient(circle at 50% 44%,#17263b 0,#11182a 48%,#080d19 100%);
+  box-shadow: inset 0 0 45px #57e6ff0b,0 14px 36px #0007;
+}
+
+.tv-puzzle-meta {
+  font-size: 14px;
+}
+
+.tv-puzzle p {
+  margin: 2px 0 7px;
+  font-size: clamp(18px,1.35vw,24px);
+}
+
+.letter-board {
+  gap: 6px;
+}
+
+.letter-row {
+  grid-template-columns: repeat(var(--columns),clamp(36px,2.85vw,52px));
+  gap: 7px;
+}
+
+.letter-board .tile {
+  height: clamp(39px,4.9vh,52px);
+  font-size: clamp(21px,2.55vh,29px);
+  border-width: 2px;
+  box-shadow: inset 0 1px 0 #fff,0 4px 9px #0009;
+}
+
+.letter-board .tile-inactive {
+  box-shadow: inset 0 0 12px #000;
+}
+
+.tv-play-area {
+  grid-template-columns: minmax(285px,350px) minmax(0,1fr);
+  gap: 10px;
+}
+
+.wheel {
+  width: min(32vh,330px);
+}
+
+.tv-wheel-panel {
+  padding: 8px;
+}
+
+.tv-controls {
+  padding: 11px 16px;
+  gap: 7px;
+}
+
+.tv-control-heading {
+  gap: 14px;
+  padding-bottom: 6px;
+}
+
+.tv-control-heading h2 {
+  font-size: clamp(19px,1.35vw,24px);
+}
+
+.tv-active-money {
+  min-width: 184px;
+  padding: 6px 11px;
+}
+
+.tv-active-money > strong {
+  font-size: clamp(29px,2.5vw,42px);
+}
+
+.keyboard {
+  gap: 5px;
+}
+
+.keyboard button {
+  min-height: 30px;
+  font-size: 13px;
+}
+
+#solve-form {
+  gap: 7px;
+}
+
+#solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+  min-height: 40px;
+}
+
+.tv-contestants {
+  padding-top: 6px;
+}
+
+.player {
+  min-height: 74px;
+}
+
+.player img, .player-initials {
+  width: 52px;
+  height: 52px;
+}
+
+@media (max-height:850px) {
+  .tv-game {
+    grid-template-rows: 52px minmax(205px,.9fr) minmax(245px,1.1fr) auto;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-message {
+    min-height: 52px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-puzzle {
+    padding: 8px 18px 10px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-puzzle p {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board {
+    gap: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(30px,2.55vw,43px));
+    gap: 5px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board .tile {
+    height: 36px;
+    font-size: 20px;
+  }
+}
+
+@media (max-height:850px) {
+  .wheel {
+    width: min(30vh,285px);
+  }
+}
+
+@media (max-height:850px) {
+  .tv-controls {
+    padding: 9px 13px;
+    gap: 5px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-control-heading {
+    padding-bottom: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .keyboard {
+    gap: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .keyboard button {
+    min-height: 27px;
+  }
+}
+
+@media (max-height:850px) {
+  #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+    min-height: 36px;
+  }
+}
+
+@media (max-height:850px) {
+  .player {
+    min-height: 66px;
+  }
+}
+
+/* El panel absorbe el espacio recuperado por la pista y la ayuda contextual. */
+
+.tv-game {
+  grid-template-rows: 54px minmax(290px,1.08fr) minmax(255px,.92fr) auto;
+}
+
+.tv-message {
+  min-height: 54px;
+}
+
+.tv-puzzle {
+  grid-template-rows: auto minmax(0,1fr);
+  padding: 11px 22px 15px;
+}
+
+.tv-puzzle-meta {
+  align-items: flex-start;
+}
+
+.tv-puzzle-context {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  text-align: left;
+}
+
+.tv-puzzle-context #clue {
+  max-width: 44vw;
+  color: #d8e3f7;
+  font: 500 clamp(13px,1vw,17px) "Exo 2",sans-serif;
+  letter-spacing: 0;
+}
+
+.tv-puzzle-meta #category {
+  padding-top: 2px;
+  font-size: 14px;
+}
+
+.letter-board {
+  align-self: stretch;
+  align-content: center;
+  gap: 7px;
+}
+
+.letter-row {
+  grid-template-columns: repeat(var(--columns),clamp(40px,3.15vw,58px));
+  gap: 8px;
+}
+
+.letter-board .tile {
+  height: clamp(43px,5.3vh,56px);
+  font-size: clamp(23px,2.8vh,31px);
+}
+
+.tv-play-area {
+  grid-template-columns: minmax(260px,315px) minmax(0,1fr);
+}
+
+.wheel {
+  width: min(28vh,292px);
+}
+
+.wheel .wheel-sector-label {
+  transform: rotate(var(--sector-angle)) translateY(calc(clamp(94px,12.4vh,126px) * -1)) rotate(90deg);
+}
+
+.tv-controls {
+  grid-template-rows: auto minmax(0,1fr) auto;
+  overflow: hidden;
+}
+
+.keyboard {
+  align-self: center;
+}
+
+.tv-control-heading {
+  min-height: 0;
+}
+
+#solve-form {
+  align-self: end;
+  min-width: 0;
+}
+
+#solve-form label {
+  min-width: 0;
+}
+
+#solve-form input {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-height:850px) {
+  .tv-game {
+    grid-template-rows: 50px minmax(230px,1fr) minmax(225px,1fr) auto;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-puzzle {
+    padding: 7px 16px 9px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-puzzle-context #clue {
+    font-size: 12px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board {
+    gap: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(33px,2.75vw,46px));
+    gap: 6px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board .tile {
+    height: 38px;
+    font-size: 21px;
+  }
+}
+
+@media (max-height:850px) {
+  .wheel {
+    width: min(25vh,245px);
+  }
+}
+
+@media (max-height:850px) {
+  .wheel .wheel-sector-label {
+    transform: rotate(var(--sector-angle)) translateY(calc(clamp(82px,10.8vh,105px) * -1)) rotate(90deg);
+  }
+}
+
+@media (max-height:850px) {
+  .tv-controls {
+    padding: 7px 11px;
+  }
+}
+
+@media (max-height:850px) {
+  .keyboard button {
+    min-height: 25px;
+  }
+}
+
+@media (max-height:850px) {
+  #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+    min-height: 34px;
+  }
+}
+
+/* Composición de plató: ruleta a toda altura, panel y control a la derecha. */
+
+.tv-game {
+  grid-template-columns: minmax(390px,30%) minmax(0,1fr);
+  grid-template-rows: 54px minmax(285px,1.15fr) minmax(205px,.85fr) auto;
+  grid-template-areas: "message message" "wheel puzzle" "wheel controls" "contestants contestants";
+  gap: 10px;
+}
+
+.tv-message {
+  grid-area: message;
+}
+
+.tv-puzzle {
+  grid-area: puzzle;
+}
+
+.tv-play-area {
+  display: contents;
+}
+
+.tv-wheel-panel {
+  grid-area: wheel;
+  padding: 12px;
+}
+
+.tv-controls {
+  grid-area: controls;
+}
+
+.tv-contestants {
+  grid-area: contestants;
+}
+
+.tv-winner {
+  grid-column: 1/-1;
+  grid-row: 2/4;
+}
+
+.wheel {
+  width: min(100%,48vh,520px);
+}
+
+.wheel .wheel-sector-label {
+  transform: rotate(var(--sector-angle)) translateY(calc(clamp(155px,20.5vh,224px) * -1)) rotate(90deg);
+}
+
+.tv-puzzle {
+  padding: 10px 20px 13px;
+}
+
+.letter-board {
+  gap: 5px;
+}
+
+.letter-row {
+  grid-template-columns: repeat(var(--columns),clamp(38px,2.75vw,54px));
+  gap: 7px;
+}
+
+.letter-board .tile {
+  height: clamp(41px,4.8vh,52px);
+  font-size: clamp(22px,2.5vh,29px);
+}
+
+.tv-controls {
+  padding: 9px 15px;
+  gap: 5px;
+}
+
+.tv-control-heading {
+  padding-bottom: 4px;
+}
+
+.keyboard {
+  gap: 4px;
+}
+
+.keyboard button {
+  min-height: 26px;
+  font-size: 12px;
+}
+
+#solve-form {
+  gap: 6px;
+}
+
+#solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+  min-height: 35px;
+}
+
+.tv-contestants {
+  padding-top: 0;
+}
+
+@media (max-height:850px) {
+  .tv-game {
+    grid-template-columns: minmax(310px,29%) minmax(0,1fr);
+    grid-template-rows: 48px minmax(225px,1.1fr) minmax(185px,.9fr) auto;
+  }
+}
+
+@media (max-height:850px) {
+  .wheel {
+    width: min(100%,43vh,360px);
+  }
+}
+
+@media (max-height:850px) {
+  .wheel .wheel-sector-label {
+    transform: rotate(var(--sector-angle)) translateY(calc(clamp(112px,17.8vh,154px) * -1)) rotate(90deg);
+  }
+}
+
+@media (max-height:850px) {
+  .tv-puzzle {
+    padding: 7px 14px 9px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board {
+    gap: 3px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(31px,2.4vw,44px));
+    gap: 5px;
+  }
+}
+
+@media (max-height:850px) {
+  .letter-board .tile {
+    height: 35px;
+    font-size: 19px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-controls {
+    padding: 7px 11px;
+    gap: 4px;
+  }
+}
+
+@media (max-height:850px) {
+  .tv-control-heading {
+    padding-bottom: 3px;
+  }
+}
+
+@media (max-height:850px) {
+  .keyboard {
+    gap: 3px;
+  }
+}
+
+@media (max-height:850px) {
+  .keyboard button {
+    min-height: 23px;
+    font-size: 11px;
+  }
+}
+
+@media (max-height:850px) {
+  #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+    min-height: 32px;
+  }
+}
+
+.tv-puzzle .letter-board {
+  grid-template-rows: repeat(4,minmax(0,1fr));
+  align-content: stretch;
+}
+
+.tv-puzzle .letter-row {
+  align-items: center;
+}
+
+/* Revelado mecánico y cierre del panel. */
+
+.letter-board .tile.is-new {
+  animation: none;
+}
+
+.letter-board .tile.is-cycling {
+  transform-origin: center;
+  animation: tvPanelTick .15s linear infinite;
+}
+
+.letter-board .tile.is-settled {
+  animation: tvPanelSettle .32s ease-out;
+}
+
+.letter-board.is-completing .tile {
+  transform-origin: center;
+  animation: tvPanelFinal 1.15s ease-in-out both;
+  animation-delay: calc(var(--cell-order) * 12ms);
+}
+
+.letter-board.is-completing .tile-inactive, .letter-board.is-completing .tile-space {
+  animation-name: tvPanelFinalBlank;
+}
+
+.letter-board.is-opening .tile {
+  transform-origin: center;
+  animation: tvPanelOpening 1.12s ease-in-out both;
+  animation-delay: calc(var(--cell-order) * 12ms);
+}
+
+.letter-board.is-opening .tile-inactive, .letter-board.is-opening .tile-space {
+  animation-name: tvPanelOpeningBlank;
+}
+
+@keyframes tvPanelTick {
+  0% {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+  48% {
+    transform: rotateX(-78deg);
+    filter: brightness(.42);
+  }
+  52% {
+    transform: rotateX(78deg);
+    filter: brightness(1.45);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes tvPanelSettle {
+  0% {
+    transform: scale(1.13);
+    filter: brightness(1.6);
+    box-shadow: 0 0 22px #57e6ffaa;
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes tvPanelFinal {
+  0%, 100% {
+    transform: rotateX(0) scale(1);
+    filter: brightness(1);
+  }
+  20% {
+    transform: rotateX(-52deg) scale(.96);
+    filter: brightness(.55);
+  }
+  42% {
+    transform: rotateX(48deg) scale(1.04);
+    filter: brightness(1.65);
+  }
+  65% {
+    transform: rotateX(-18deg);
+    filter: brightness(1.2);
+  }
+  82% {
+    transform: rotateX(7deg);
+  }
+}
+
+@keyframes tvPanelFinalBlank {
+  0% {
+    transform: rotateX(0);
+    filter: brightness(.55);
+    background: #0a1120;
+  }
+  28% {
+    transform: rotateX(-70deg);
+    filter: brightness(1.5);
+    background: #bfe8f3;
+  }
+  52% {
+    transform: rotateX(65deg);
+    background: #4e788a;
+  }
+  75% {
+    transform: rotateX(-12deg);
+    background: #111a2b;
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(.35);
+    background: #03060c;
+    border-color: #111827;
+    box-shadow: inset 0 0 14px #000;
+  }
+}
+
+@keyframes tvPanelOpening {
+  0% {
+    transform: rotateX(-88deg) scale(.92);
+    filter: brightness(.2);
+    background: #07101c;
+  }
+  34% {
+    transform: rotateX(58deg);
+    filter: brightness(1.5);
+    background: #d8f3fa;
+  }
+  62% {
+    transform: rotateX(-24deg);
+    filter: brightness(.8);
+  }
+  82% {
+    transform: rotateX(8deg);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: rotateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes tvPanelOpeningBlank {
+  0% {
+    transform: rotateX(-88deg);
+    filter: brightness(.15);
+    background: #07101c;
+  }
+  34% {
+    transform: rotateX(58deg);
+    filter: brightness(1.35);
+    background: #9bc9d8;
+  }
+  62% {
+    transform: rotateX(-24deg);
+    background: #213547;
+  }
+  82% {
+    transform: rotateX(8deg);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(.35);
+    background: #03060c;
+    border-color: #111827;
+    box-shadow: inset 0 0 14px #000;
+  }
+}
+
+/* Reinicio mecánico tipo panel de aeropuerto: caracteres reales, no destello colectivo. */
+
+.letter-board.is-opening .tile, .letter-board.is-completing .tile {
+  animation: none;
+}
+
+.letter-board .tile.is-resetting {
+  transform-origin: center;
+  animation: tvPanelMechanicalReset .144s steps(2,end) infinite;
+  color: #07111a;
+  background: linear-gradient(180deg,#f8fdff 0 48%,#9ec7d6 52% 100%);
+  border-color: #6d91a2;
+  opacity: 1;
+}
+
+.letter-board .tile.is-reset-complete {
+  animation: tvPanelMechanicalStop .24s ease-out;
+}
+
+.letter-board .tile-inactive.is-reset-complete, .letter-board .tile-space.is-reset-complete {
+  color: transparent;
+  background: #03060c;
+  border-color: #111827;
+  box-shadow: inset 0 0 14px #000;
+  opacity: .38;
+}
+
+@keyframes tvPanelMechanicalReset {
+  0% {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+  49% {
+    transform: rotateX(-82deg);
+    filter: brightness(.35);
+  }
+  50% {
+    transform: rotateX(82deg);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes tvPanelMechanicalStop {
+  0% {
+    transform: rotateX(34deg);
+    filter: brightness(1.5);
+  }
+  65% {
+    transform: rotateX(-8deg);
+  }
+  100% {
+    transform: rotateX(0);
+    filter: brightness(1);
   }
 }
 
