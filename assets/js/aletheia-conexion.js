@@ -23,7 +23,8 @@ const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 const roomAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, active: false };
+const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy) };
+const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, starting: false };
 
 function randomText(length, alphabet = roomAlphabet) {
   const bytes = new Uint8Array(length);
@@ -86,10 +87,11 @@ function setSetupMessage(text) {
 function updateHostControls(connectedCount = 0) {
   const button = document.getElementById("enable-remotes");
   const start = document.getElementById("start-game");
-  document.querySelectorAll("[data-toggle-slot]").forEach(toggle => { toggle.disabled = state.active; });
+  document.querySelectorAll("[data-toggle-slot]").forEach(toggle => { toggle.disabled = state.active || state.selectionBusy; });
   if (button) {
-    button.textContent = state.active ? "CANCELAR MANDOS" : "USAR MÓVILES COMO MANDO";
+    button.textContent = state.active ? "CANCELAR MANDOS" : state.selectionBusy ? "SELECCIONANDO TRIPULACIÓN…" : "USAR MÓVILES COMO MANDO";
     button.classList.toggle("is-active", state.active);
+    button.disabled = state.selectionBusy;
   }
   if (start && state.active) start.disabled = connectedCount !== state.humanSlots.length;
 }
@@ -119,8 +121,8 @@ function observeSlots() {
     });
     updateHostControls(connected);
     setSetupMessage(connected === state.humanSlots.length
-      ? `Los ${connected} mandos están conectados. Ya puedes comenzar la partida.`
-      : `Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados.`);
+      ? `Configuración cerrada. Los ${connected} mandos están conectados y ya puedes comenzar. Cancela los mandos si necesitas cambiar las plazas.`
+      : `Configuración cerrada · Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados. Cancela los mandos para cambiar las plazas.`);
   }, error => {
     console.error("No se pudo observar la sala", error);
     setSetupMessage("No se pudo leer la sala. Comprueba las reglas de Firebase.");
@@ -141,7 +143,7 @@ async function createRoom() {
   const invitationTokens = Object.fromEntries(state.humanSlots.map(slot => [slot, randomText(32)]));
   const invitations = Object.fromEntries(state.humanSlots.map(slot => [slot, { token: invitationTokens[slot] }]));
   await set(ref(database, `rooms/${roomId}`), {
-    meta: { hostUid: user.uid, createdAt: serverTimestamp(), status: "waiting" },
+    meta: { hostUid: user.uid, createdAt: serverTimestamp(), status: "waiting", humanSlots: state.humanSlots.join("") },
     invitations
   });
   state.roomId = roomId;
@@ -151,11 +153,17 @@ async function createRoom() {
   state.humanSlots.forEach(slot => renderQr(slot));
   updateHostControls(0);
   observeSlots();
+  state.unsubscribeStatus?.();
+  state.unsubscribeStatus = onValue(ref(database, `rooms/${state.roomId}/meta/status`), snapshot => {
+    if (snapshot.val() === "playing" && !document.getElementById("setup-panel")?.hidden) document.getElementById("start-game")?.click();
+  });
 }
 
 async function closeRoom() {
   state.unsubscribe?.();
   state.unsubscribe = null;
+  state.unsubscribeStatus?.();
+  state.unsubscribeStatus = null;
   if (state.roomId && auth.currentUser) await remove(ref(database, `rooms/${state.roomId}`)).catch(() => {});
   document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
   document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
@@ -171,6 +179,7 @@ async function closeRoom() {
 }
 
 async function toggleHostRoom() {
+  if (state.selectionBusy) return;
   const button = document.getElementById("enable-remotes");
   if (button) button.disabled = true;
   try {
@@ -200,6 +209,12 @@ function initHost() {
   document.getElementById("start-game")?.addEventListener("click", () => {
     if (state.active && state.roomId) update(ref(database, `rooms/${state.roomId}/meta`), { status: "playing" }).catch(() => {});
   });
+  window.addEventListener("aletheia:setup-selection", event => {
+    state.selectionBusy = Boolean(event.detail?.busy);
+    updateHostControls(state.humanSlots.filter(slot => state.players[slot]?.connected).length);
+    if (state.selectionBusy && !state.active) setSetupMessage("Primero estoy terminando de seleccionar la tripulación. Después podrás configurar las plazas y activar los mandos.");
+  });
+  updateHostControls(0);
 }
 
 function setRemoteStatus(label, mode = "") {
@@ -212,6 +227,48 @@ function setRemoteStatus(label, mode = "") {
 function invitationFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return { roomId: (params.get("sala") || "").toUpperCase(), slot: Number(params.get("plaza")), token: params.get("invitacion") || "" };
+}
+
+function updateControllerLobby() {
+  const invitation = controllerState.invitation;
+  if (!invitation) return;
+  const expected = controllerState.expectedSlots;
+  const connected = expected.filter(slot => controllerState.players[slot]?.connected).length;
+  const ready = expected.length > 0 && connected === expected.length;
+  const notice = document.querySelector(".remote-notice strong");
+  const start = document.getElementById("controller-start");
+  if (invitation.slot === 1) {
+    if (notice) notice.textContent = ready ? `${connected} de ${expected.length} jugadores preparados. Puedes comenzar.` : `Esperando jugadores: ${connected} de ${expected.length} conectados.`;
+    if (start) { start.hidden = !ready; start.disabled = controllerState.starting; }
+  } else {
+    if (notice) notice.textContent = ready ? "Todos preparados. Esperando a que la plaza 1 comience…" : `Esperando jugadores: ${connected} de ${expected.length} conectados.`;
+    if (start) start.hidden = true;
+  }
+}
+
+function observeControllerRoom() {
+  const invitation = controllerState.invitation;
+  if (!invitation) return;
+  controllerState.unsubscribeMeta?.();
+  controllerState.unsubscribeSlots?.();
+  controllerState.unsubscribeMeta = onValue(ref(database, `rooms/${invitation.roomId}/meta`), snapshot => {
+    const meta = snapshot.val();
+    if (!meta) {
+      setRemoteStatus("SALA CERRADA", "error");
+      window.dispatchEvent(new CustomEvent("aletheia:mando-room-state", { detail: { status: "offline" } }));
+      return;
+    }
+    controllerState.expectedSlots = String(meta.humanSlots || "1").split("").map(Number).filter(slot => [1, 2, 3].includes(slot));
+    updateControllerLobby();
+    window.dispatchEvent(new CustomEvent("aletheia:mando-room-state", { detail: { status: meta.status } }));
+  }, error => {
+    console.error("No se pudo leer el estado del plató", error);
+    setRemoteStatus("SIN SINCRONIZACIÓN", "error");
+  });
+  controllerState.unsubscribeSlots = onValue(ref(database, `rooms/${invitation.roomId}/slots`), snapshot => {
+    controllerState.players = snapshot.val() || {};
+    updateControllerLobby();
+  }, error => console.error("No se pudo leer el estado de los jugadores", error));
 }
 
 async function connectController(player) {
@@ -237,6 +294,8 @@ async function connectController(player) {
   document.querySelectorAll("[data-screen] .screen-heading span").forEach(label => {
     if (label.textContent.includes("PLAZA")) label.textContent = `PLAZA ${invitation.slot} · JUGADOR HUMANO`;
   });
+  controllerState.invitation = invitation;
+  observeControllerRoom();
 }
 
 function initController() {
@@ -245,6 +304,23 @@ function initController() {
   setRemoteStatus(`SALA ${invitation.roomId}`, "pending");
   const demoButton = document.getElementById("demo-start");
   if (demoButton) demoButton.hidden = true;
+  document.getElementById("controller-start")?.addEventListener("click", async event => {
+    const invitation = controllerState.invitation;
+    if (!invitation || invitation.slot !== 1 || controllerState.starting) return;
+    controllerState.starting = true;
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = "INICIANDO…";
+    try {
+      await set(ref(database, `rooms/${invitation.roomId}/meta/status`), "playing");
+    } catch (error) {
+      console.error("No se pudo iniciar la partida desde el mando", error);
+      controllerState.starting = false;
+      event.currentTarget.disabled = false;
+      event.currentTarget.textContent = "COMENZAR PARTIDA";
+      const notice = document.querySelector(".remote-notice strong");
+      if (notice) notice.textContent = "No se pudo iniciar. Inténtalo de nuevo o utiliza el botón del plató.";
+    }
+  });
   window.addEventListener("aletheia:mando-confirm", async event => {
     try {
       await connectController(event.detail || {});

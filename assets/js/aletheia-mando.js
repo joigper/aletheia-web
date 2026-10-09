@@ -9,6 +9,8 @@
   let selfieImage=null;
   let swipeStartX=null;
   let avatars=[];
+  let cameraStream=null;
+  let pendingSelfie=null;
 
   function thumbnailPath(filename){
     const stem=String(filename||"").replace(/^.*[\\/]/,"").replace(/\.[^.]+$/,"");
@@ -68,7 +70,7 @@
       }else visual.innerHTML=avatar.selfie?'<b class="camera-mark">＋</b>':`<b>${avatar.initials}</b>`;
       const label=document.createElement("span");label.className="carousel-card-label";label.textContent=avatar.selfie?"SELFIE":avatar.shortName;
       card.append(visual,label);
-      card.addEventListener("click",()=>{if(index!==carouselIndex){carouselIndex=index;renderCarousel()}else if(avatar.selfie)$("#selfie-input").click()});
+      card.addEventListener("click",()=>{if(index!==carouselIndex){carouselIndex=index;renderCarousel()}else if(avatar.selfie)void openSelfieCamera()});
       track.append(card);
     });
     $("#avatar-name").textContent=current.selfie&&selfieImage?"Selfie preparado":current.name;
@@ -81,31 +83,35 @@
   $("#avatar-next").addEventListener("click",()=>moveCarousel(1));
   $("#carousel-stage").addEventListener("pointerdown",event=>{swipeStartX=event.clientX});
   $("#carousel-stage").addEventListener("pointerup",event=>{if(swipeStartX===null)return;const distance=event.clientX-swipeStartX;swipeStartX=null;if(Math.abs(distance)>35)moveCarousel(distance>0?-1:1)});
-  function prepareSelfie(file){
-    return new Promise((resolve,reject)=>{
-      const reader=new FileReader();
-      reader.onerror=reject;
-      reader.onload=()=>{
-        const image=new Image();
-        image.onerror=reject;
-        image.onload=()=>{
-          const size=320,canvas=document.createElement("canvas"),context=canvas.getContext("2d");
-          canvas.width=size;canvas.height=size;
-          const scale=Math.max(size/image.width,size/image.height);
-          const width=image.width*scale,height=image.height*scale;
-          context.drawImage(image,(size-width)/2,(size-height)/2,width,height);
-          resolve(canvas.toDataURL("image/jpeg",.76));
-        };
-        image.src=reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
+  function stopSelfieCamera(){cameraStream?.getTracks().forEach(track=>track.stop());cameraStream=null;$("#selfie-preview").srcObject=null}
+  function resetSelfieCameraView(){pendingSelfie=null;$("#selfie-preview").hidden=false;$("#selfie-canvas").hidden=true;$("#selfie-capture").hidden=false;$("#selfie-repeat").hidden=true;$("#selfie-use").hidden=true;$("#selfie-camera-status").textContent="Coloca tu rostro en el centro y pulsa el botón."}
+  async function requestFrontCamera(){
+    const preferred={audio:false,video:{facingMode:{exact:"user"},width:{ideal:1280},height:{ideal:720}}};
+    try{return await navigator.mediaDevices.getUserMedia(preferred)}
+    catch(error){
+      if(error?.name!=="OverconstrainedError"&&error?.name!=="NotFoundError")throw error;
+      return navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"user"}}});
+    }
   }
-  $("#selfie-input").addEventListener("change",async event=>{
-    const file=event.target.files?.[0];if(!file)return;
-    try{selfieImage=await prepareSelfie(file);carouselIndex=avatars.findIndex(avatar=>avatar.selfie);renderCarousel()}
-    catch(error){console.warn("No se pudo preparar el selfie",error)}
-  });
+  async function openSelfieCamera(){
+    const dialog=$("#selfie-camera");resetSelfieCameraView();dialog.hidden=false;
+    if(!navigator.mediaDevices?.getUserMedia){$("#selfie-camera-status").textContent="Este navegador no permite utilizar la cámara desde esta página.";$("#selfie-capture").hidden=true;return}
+    try{cameraStream=await requestFrontCamera();$("#selfie-preview").srcObject=cameraStream;await $("#selfie-preview").play()}
+    catch(error){console.warn("No se pudo abrir la cámara frontal",error);$("#selfie-camera-status").textContent="No se pudo abrir la cámara frontal. Autoriza la cámara en el navegador y vuelve a intentarlo.";$("#selfie-capture").hidden=true;$("#selfie-repeat").hidden=false}
+  }
+  function captureSelfie(){
+    const video=$("#selfie-preview"),canvas=$("#selfie-canvas"),context=canvas.getContext("2d");
+    if(!video.videoWidth||!video.videoHeight)return;
+    const sourceSize=Math.min(video.videoWidth,video.videoHeight),sourceX=(video.videoWidth-sourceSize)/2,sourceY=(video.videoHeight-sourceSize)/2;
+    context.save();context.translate(canvas.width,0);context.scale(-1,1);context.drawImage(video,sourceX,sourceY,sourceSize,sourceSize,0,0,canvas.width,canvas.height);context.restore();
+    pendingSelfie=canvas.toDataURL("image/jpeg",.76);video.hidden=true;canvas.hidden=false;$("#selfie-capture").hidden=true;$("#selfie-repeat").hidden=false;$("#selfie-use").hidden=false;$("#selfie-camera-status").textContent="¿Te gusta? Puedes repetirla o usarla como avatar.";stopSelfieCamera();
+  }
+  function closeSelfieCamera(){stopSelfieCamera();$("#selfie-camera").hidden=true;resetSelfieCameraView()}
+  $("#selfie-capture").addEventListener("click",captureSelfie);
+  $("#selfie-cancel").addEventListener("click",closeSelfieCamera);
+  $("#selfie-repeat").addEventListener("click",()=>{stopSelfieCamera();void openSelfieCamera()});
+  $("#selfie-use").addEventListener("click",()=>{if(!pendingSelfie)return;selfieImage=pendingSelfie;carouselIndex=avatars.findIndex(avatar=>avatar.selfie);$("#selfie-camera").hidden=true;resetSelfieCameraView();renderCarousel()});
+  window.addEventListener("pagehide",stopSelfieCamera);
   if(document.readyState==="complete")initializeAvatars();
   else window.addEventListener("load",initializeAvatars,{once:true});
   $("#confirm-player").addEventListener("click",()=>{
@@ -134,6 +140,12 @@
     $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{button.disabled=true;$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="La pantalla principal mostrará el resultado."}));
   }
   $("#demo-start").addEventListener("click",()=>{showScreen("game");renderScene("spin");startClock()});
+  window.addEventListener("aletheia:mando-room-state",event=>{
+    const status=event.detail?.status;
+    if(status==="playing"){showScreen("game");renderScene("spin");startClock()}
+    else if(status==="finished"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="La partida ha terminado. Consulta el resultado en el plató."}
+    else if(status==="offline"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="El plató se ha desconectado."}
+  });
   $$("[data-demo]").forEach(button=>button.addEventListener("click",()=>renderScene(button.dataset.demo)));
   $("#pause-demo").addEventListener("click",event=>{event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"REANUDAR":"PAUSA"});
   $("#sound-demo").addEventListener("click",event=>{event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"SILENCIO":"SONIDO"});
