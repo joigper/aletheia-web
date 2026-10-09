@@ -56,6 +56,7 @@
                 </div>
                 <div class="carousel-caption"><strong id="avatar-name">Cargando tripulación…</strong><span id="avatar-role">Archivo ALÉTHEIA</span></div>
                 <div id="avatar-dots" class="carousel-dots" aria-hidden="true"></div>
+                <div id="selfie-inline-actions" class="selfie-inline-actions" hidden=""><button id="selfie-cancel" type="button">CANCELAR</button><button id="selfie-capture" type="button">FOTO</button><button id="selfie-repeat" type="button" hidden="">REPETIR</button><button id="selfie-use" type="button" hidden="">ACEPTAR</button></div>
             </fieldset>
             <aside class="config-confirm">
                 <div id="selected-avatar-mini" class="selected-avatar-mini"><span>—</span></div>
@@ -90,15 +91,6 @@
             <nav class="demo-nav" aria-label="Escenas de demostración"><small>VISTA PREVIA</small><button type="button" data-demo="spin">GIRAR</button><button type="button" data-demo="letters">LETRAS</button><button type="button" data-demo="wait">ESPERA</button><button type="button" data-demo="speed">VELOCIDAD</button></nav>
         </section>
     </main>
-    <section id="selfie-camera" class="selfie-camera" role="dialog" aria-modal="true" aria-labelledby="selfie-camera-title" hidden="">
-        <div class="selfie-camera-panel">
-            <div class="selfie-camera-copy"><small>AVATAR PERSONAL</small><strong id="selfie-camera-title">MIRA A CÁMARA</strong>
-                <p id="selfie-camera-status">Coloca tu rostro en el centro y pulsa el botón.</p>
-            </div>
-            <div class="selfie-camera-view"><video class="true" id="selfie-preview" autoplay="" muted=""></video><canvas id="selfie-canvas" width="320" height="320" hidden=""></canvas><span class="selfie-camera-guide" aria-hidden="true"></span></div>
-            <div class="selfie-camera-actions"><button class="remote-button remote-secondary" id="selfie-cancel" type="button">CANCELAR</button><button class="remote-button remote-primary" id="selfie-capture" type="button">HACER FOTO</button><button class="remote-button remote-secondary" id="selfie-repeat" type="button" hidden="">REPETIR</button><button class="remote-button remote-primary" id="selfie-use" type="button" hidden="">USAR FOTO</button></div>
-        </div>
-    </section>
     <div class="remote-orientation-lock" role="dialog" aria-modal="true">
         <div class="orientation-phone"><span></span></div><small>ALÉTHEIA-TV · MANDO</small><strong>GIRA EL TELÉFONO</strong>
         <p>El mando está diseñado para utilizarse en posición horizontal.</p>
@@ -138,9 +130,9 @@
     <script src="assets/js/aletheia-firebase-config.js"></script>
     <script src="assets/js/aletheia-pruebas.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="assets/js/aletheia-mando.js"></script>
     <script src="assets/js/aletheia-conexion.js"></script>
     <script src="assets/js/aletheia-engine.js"></script>
+    <script src="assets/js/aletheia-mando.js"></script>
     <script src="assets/js/aletheia-tv.js"></script>
 </body>
 

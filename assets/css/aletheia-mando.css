@@ -8,7 +8,10 @@ html.aletheia-mando-root {
   --text: #f2f7ff;
   --muted: #91a4c7;
   color-scheme: dark;
+  width: 100%;
+  height: 100%;
   min-height: 100%;
+  overflow: hidden;
   background: var(--ink);
 }
 
@@ -17,8 +20,14 @@ html.aletheia-mando-root {
 }
 
 html.aletheia-mando-root body {
-  min-height: 100%;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: var(--remote-visible-height,100dvh);
+  min-height: 0;
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   color: var(--text);
   background: radial-gradient(circle at 50% -15%,#1c3152 0,#070b14 38%,#02040a 82%);
   font-family: "Exo 2",sans-serif;
@@ -26,13 +35,14 @@ html.aletheia-mando-root body {
 
 .remote-shell {
   width: min(100%,560px);
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: var(--remote-visible-height,100dvh);
+  min-height: 0;
   margin: auto;
   padding: max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
   display: grid;
   grid-template-rows: auto minmax(0,1fr);
   gap: 14px;
+  overflow: hidden;
 }
 
 .remote-header {
@@ -92,6 +102,7 @@ html.aletheia-mando-root body {
   align-content: start;
   gap: 15px;
   padding: 18px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: linear-gradient(155deg,#151e33f2,#080d19f5);
@@ -820,6 +831,7 @@ html.aletheia-mando-root body {
 }
 
 .carousel-image {
+  position: relative;
   min-height: 0;
   display: grid;
   place-items: center;
@@ -962,6 +974,47 @@ html.aletheia-mando-root body {
   font-size: 9px;
 }
 
+.selfie-inline-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.selfie-inline-guide {
+  position: absolute;
+  inset: 12% 22%;
+  border: 1px solid #fff9;
+  border-radius: 50%;
+  box-shadow: 0 0 0 999px #02040a24;
+  pointer-events: none;
+}
+
+.selfie-inline-actions {
+  width: min(100%,340px);
+  margin: 3px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 5px;
+}
+
+.selfie-inline-actions button {
+  min-height: 30px;
+  padding: 3px;
+  border: 1px solid #47607f;
+  border-radius: 7px;
+  color: #dceaff;
+  background: #0a1425;
+  font: 600 8px "Tektur";
+  cursor: pointer;
+}
+
+.selfie-inline-actions button:last-child, .selfie-inline-actions button:nth-child(2) {
+  color: #061018;
+  border-color: var(--cyan);
+  background: var(--cyan);
+}
+
 @media (orientation:portrait) {
   .remote-orientation-lock {
     display: grid;
@@ -1081,6 +1134,101 @@ html.aletheia-mando-root body {
 @media (orientation:landscape) {
   .remote-spin {
     min-height: 145px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-header {
+    grid-template-columns: 27px minmax(0,1fr) auto;
+    padding-bottom: 3px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-header img {
+    width: 24px;
+    height: 29px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-header small {
+    display: none;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-header strong {
+    font-size: 11px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .connection-pill {
+    padding-block: 4px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .remote-config-landscape {
+    grid-template-columns: minmax(140px,.8fr) minmax(300px,2fr) minmax(125px,.65fr);
+    gap: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-identity {
+    gap: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-identity .screen-heading p {
+    display: none;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-identity .remote-field input {
+    min-height: 42px;
+    padding-block: 7px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-confirm {
+    gap: 5px;
+    padding-left: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-confirm .privacy-note {
+    font-size: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-confirm .remote-button {
+    min-height: 46px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .selfie-inline-actions button {
+    min-height: 25px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .carousel-caption {
+    min-height: 25px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .carousel-caption span {
+    font-size: 9px;
   }
 }
 

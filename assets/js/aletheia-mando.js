@@ -11,6 +11,16 @@
   let avatars=[];
   let cameraStream=null;
   let pendingSelfie=null;
+  let selfieCaptureActive=false;
+
+  function updateVisibleHeight(){
+    const height=Math.round(window.visualViewport?.height||window.innerHeight);
+    document.documentElement.style.setProperty("--remote-visible-height",`${height}px`);
+  }
+  updateVisibleHeight();
+  window.visualViewport?.addEventListener("resize",updateVisibleHeight);
+  window.addEventListener("resize",updateVisibleHeight);
+  window.addEventListener("orientationchange",()=>setTimeout(updateVisibleHeight,120));
 
   function thumbnailPath(filename){
     const stem=String(filename||"").replace(/^.*[\\/]/,"").replace(/\.[^.]+$/,"");
@@ -78,13 +88,19 @@
     $("#avatar-dots").textContent=`${carouselIndex+1} / ${avatars.length}`;
     renderSelectedMini();
   }
-  function moveCarousel(direction){if(!avatars.length)return;carouselIndex=(carouselIndex+direction+avatars.length)%avatars.length;renderCarousel()}
+  function moveCarousel(direction){if(!avatars.length)return;if(selfieCaptureActive)cancelSelfieCapture();carouselIndex=(carouselIndex+direction+avatars.length)%avatars.length;renderCarousel()}
   $("#avatar-prev").addEventListener("click",()=>moveCarousel(-1));
   $("#avatar-next").addEventListener("click",()=>moveCarousel(1));
   $("#carousel-stage").addEventListener("pointerdown",event=>{swipeStartX=event.clientX});
   $("#carousel-stage").addEventListener("pointerup",event=>{if(swipeStartX===null)return;const distance=event.clientX-swipeStartX;swipeStartX=null;if(Math.abs(distance)>35)moveCarousel(distance>0?-1:1)});
-  function stopSelfieCamera(){cameraStream?.getTracks().forEach(track=>track.stop());cameraStream=null;$("#selfie-preview").srcObject=null}
-  function resetSelfieCameraView(){pendingSelfie=null;$("#selfie-preview").hidden=false;$("#selfie-canvas").hidden=true;$("#selfie-capture").hidden=false;$("#selfie-repeat").hidden=true;$("#selfie-use").hidden=true;$("#selfie-camera-status").textContent="Coloca tu rostro en el centro y pulsa el botón."}
+  function stopSelfieCamera(){cameraStream?.getTracks().forEach(track=>track.stop());cameraStream=null}
+  function selfieVisual(){return $("#avatar-track .carousel-card.is-current .carousel-image")}
+  function setSelfieButtons(mode){
+    $("#selfie-inline-actions").hidden=mode==="closed";
+    $("#selfie-capture").hidden=mode!=="live";
+    $("#selfie-repeat").hidden=mode!=="captured"&&mode!=="error";
+    $("#selfie-use").hidden=mode!=="captured";
+  }
   async function requestFrontCamera(){
     const preferred={audio:false,video:{facingMode:{exact:"user"},width:{ideal:1280},height:{ideal:720}}};
     try{return await navigator.mediaDevices.getUserMedia(preferred)}
@@ -94,23 +110,27 @@
     }
   }
   async function openSelfieCamera(){
-    const dialog=$("#selfie-camera");resetSelfieCameraView();dialog.hidden=false;
-    if(!navigator.mediaDevices?.getUserMedia){$("#selfie-camera-status").textContent="Este navegador no permite utilizar la cámara desde esta página.";$("#selfie-capture").hidden=true;return}
-    try{cameraStream=await requestFrontCamera();$("#selfie-preview").srcObject=cameraStream;await $("#selfie-preview").play()}
-    catch(error){console.warn("No se pudo abrir la cámara frontal",error);$("#selfie-camera-status").textContent="No se pudo abrir la cámara frontal. Autoriza la cámara en el navegador y vuelve a intentarlo.";$("#selfie-capture").hidden=true;$("#selfie-repeat").hidden=false}
+    stopSelfieCamera();pendingSelfie=null;selfieCaptureActive=true;setSelfieButtons("live");
+    const visual=selfieVisual();if(!visual)return;
+    visual.innerHTML='<video class="selfie-inline-preview" autoplay muted playsinline></video><span class="selfie-inline-guide" aria-hidden="true"></span>';
+    $("#avatar-name").textContent="Cámara frontal";$("#avatar-role").textContent="Centra tu rostro y pulsa FOTO";
+    if(!navigator.mediaDevices?.getUserMedia){visual.innerHTML='<b class="camera-mark">!</b>';$("#avatar-role").textContent="Este navegador no permite utilizar la cámara";setSelfieButtons("error");return}
+    try{cameraStream=await requestFrontCamera();const preview=visual.querySelector("video");preview.srcObject=cameraStream;await preview.play()}
+    catch(error){console.warn("No se pudo abrir la cámara frontal",error);visual.innerHTML='<b class="camera-mark">!</b>';$("#avatar-role").textContent="Autoriza la cámara y pulsa REPETIR";setSelfieButtons("error")}
   }
   function captureSelfie(){
-    const video=$("#selfie-preview"),canvas=$("#selfie-canvas"),context=canvas.getContext("2d");
+    const video=selfieVisual()?.querySelector("video");if(!video)return;
+    const canvas=document.createElement("canvas"),context=canvas.getContext("2d");canvas.width=320;canvas.height=320;
     if(!video.videoWidth||!video.videoHeight)return;
     const sourceSize=Math.min(video.videoWidth,video.videoHeight),sourceX=(video.videoWidth-sourceSize)/2,sourceY=(video.videoHeight-sourceSize)/2;
     context.save();context.translate(canvas.width,0);context.scale(-1,1);context.drawImage(video,sourceX,sourceY,sourceSize,sourceSize,0,0,canvas.width,canvas.height);context.restore();
-    pendingSelfie=canvas.toDataURL("image/jpeg",.76);video.hidden=true;canvas.hidden=false;$("#selfie-capture").hidden=true;$("#selfie-repeat").hidden=false;$("#selfie-use").hidden=false;$("#selfie-camera-status").textContent="¿Te gusta? Puedes repetirla o usarla como avatar.";stopSelfieCamera();
+    pendingSelfie=canvas.toDataURL("image/jpeg",.76);stopSelfieCamera();selfieVisual().innerHTML=`<img src="${pendingSelfie}" alt="Vista previa del selfie">`;$("#avatar-name").textContent="¿Te gusta?";$("#avatar-role").textContent="Pulsa ACEPTAR o REPETIR";setSelfieButtons("captured");
   }
-  function closeSelfieCamera(){stopSelfieCamera();$("#selfie-camera").hidden=true;resetSelfieCameraView()}
+  function cancelSelfieCapture(render=true){stopSelfieCamera();pendingSelfie=null;selfieCaptureActive=false;setSelfieButtons("closed");if(render)renderCarousel()}
   $("#selfie-capture").addEventListener("click",captureSelfie);
-  $("#selfie-cancel").addEventListener("click",closeSelfieCamera);
-  $("#selfie-repeat").addEventListener("click",()=>{stopSelfieCamera();void openSelfieCamera()});
-  $("#selfie-use").addEventListener("click",()=>{if(!pendingSelfie)return;selfieImage=pendingSelfie;carouselIndex=avatars.findIndex(avatar=>avatar.selfie);$("#selfie-camera").hidden=true;resetSelfieCameraView();renderCarousel()});
+  $("#selfie-cancel").addEventListener("click",()=>cancelSelfieCapture());
+  $("#selfie-repeat").addEventListener("click",()=>void openSelfieCamera());
+  $("#selfie-use").addEventListener("click",()=>{if(!pendingSelfie)return;selfieImage=pendingSelfie;selfieCaptureActive=false;pendingSelfie=null;setSelfieButtons("closed");renderCarousel()});
   window.addEventListener("pagehide",stopSelfieCamera);
   if(document.readyState==="complete")initializeAvatars();
   else window.addEventListener("load",initializeAvatars,{once:true});
