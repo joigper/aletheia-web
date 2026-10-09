@@ -124,7 +124,7 @@
       const selectedPuzzle = this.pickPuzzle();
       return {
         phase: "AWAITING_SPIN", active: 0, round: 1, maxRounds: 5, pending: null, lastSpin: null,
-        roundMode: ROUND_MODES[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], question: null, final: null,
+        roundMode: ROUND_MODES[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
         players: [
           { id: "human", name: alias || "Invitado", cpu: false, image: primaryAvatar?.image || null, role: primaryAvatar?.name ? `Avatar · ${primaryAvatar.name}` : "Concursante" },
           ...configuredSlots.map((slot, index) => {
@@ -243,16 +243,23 @@
       }
       return this.pass(state, "Turno cedido por el jugador");
     }
-    solve(state, answer) {
+    solve(state, answer, solverIndex = state.active) {
       if (state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") throw new Error("La ronda ya ha terminado.");
+      const speedRound = state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
+      const validSolver = Number.isInteger(solverIndex) && solverIndex >= 0 && solverIndex < state.players.length ? solverIndex : state.active;
+      const outOfTurnSpeedAttempt = speedRound && validSolver !== state.active;
       const correct = normalize(answer) === normalize(state.puzzle.solution);
       state.events.push({ type: "RESOLUCIÓN", detail: correct ? "Correcta" : "Incorrecta" });
       if (state.phase === "FINAL_SOLVE") return this.finishFinal(state, correct);
       if (!correct) {
-        state.players[state.active].stats.wrongSolutions += 1;
-        if (state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") { state.active = (state.active + 1) % 3; return state; }
+        state.players[validSolver].stats.wrongSolutions += 1;
+        if (state.phase === "SPECIAL_LETTER" || speedRound) {
+          if (!outOfTurnSpeedAttempt) state.active = (state.active + 1) % 3;
+          return state;
+        }
         return this.pass(state, "Respuesta incorrecta");
       }
+      if (speedRound) state.active = validSolver;
       state.players[state.active].stats.solvedPanels += 1;
       if (state.phase === "SPECIAL_LETTER") state.players[state.active].round += SPECIAL_PRIZE;
       if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
@@ -296,7 +303,14 @@
     }
     chooseCategory(state, category) {
       if (state.phase !== "CATEGORY_CHOICE" || !state.categoryChoices.includes(category)) throw new Error("Esa categoría no está disponible.");
-      return this.startRound(state, state.usedPuzzleCategories, category);
+      state.selectedCategory = category;
+      state.phase = "CATEGORY_RESULT";
+      state.events.push({ type: "CATEGORÍA ELEGIDA", detail: `${state.players[state.active].name}: ${category}` });
+      return state;
+    }
+    continueCategory(state) {
+      if (state.phase !== "CATEGORY_RESULT" || !state.selectedCategory) return state;
+      return this.startRound(state, state.usedPuzzleCategories, state.selectedCategory);
     }
     startRound(state, usedCategories, category = null) {
       const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category);
@@ -310,6 +324,7 @@
       state.usedPuzzleIds.push(selectedPuzzle.id);
       state.usedPuzzleCategories = [...usedCategories, selectedPuzzle.categoria];
       state.categoryChoices = [];
+      state.selectedCategory = null;
       state.special = null;
       if (state.roundMode === "SPECIAL") {
         state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0 };
@@ -322,10 +337,15 @@
       if (state.phase !== "QUESTION_BONUS") throw new Error("No hay ninguna pregunta activa.");
       const correct = Number(optionIndex) === state.question.correct;
       if (correct) state.players[state.roundWinner].total += QUESTION_BONUS;
+      state.question.selected = Number(optionIndex);
       state.question.answered = true;
       state.question.wasCorrect = correct;
       state.events.push({ type: "PREGUNTA", detail: correct ? `Correcta: +${QUESTION_BONUS}` : "Incorrecta" });
-      state.phase = "QUESTION_RESULT";
+      state.phase = "QUESTION_SELECTION";
+      return state;
+    }
+    revealQuestionResult(state) {
+      if (state.phase === "QUESTION_SELECTION") state.phase = "QUESTION_RESULT";
       return state;
     }
     continueAfterQuestion(state) {
