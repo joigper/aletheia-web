@@ -71,7 +71,7 @@
       while (cpu.length < count) cpu.push(fallback[cpu.length]);
       return cpu;
     }
-    pickPuzzle(excludedIds = []) {
+    pickPuzzle(excludedIds = [], excludedCategories = []) {
       const library = Array.isArray(global.aletheiaPaneles)
         ? global.aletheiaPaneles.filter(panel => panel.id && panel.categoria && panel.solucion)
         : [];
@@ -79,9 +79,14 @@
         return { id: "fallback", categoria: "ALÉTHEIA", pista: "Una nave que busca la verdad", solucion: "ALÉTHEIA" };
       }
       const excluded = new Set(excludedIds);
-      const available = library.filter(panel => !excluded.has(panel.id));
-      const pool = available.length ? available : library;
-      return pool[Math.floor(this.random() * pool.length)];
+      const excludedCategorySet = new Set(excludedCategories);
+      const unused = library.filter(panel => !excluded.has(panel.id));
+      const unusedCategories = unused.filter(panel => !excludedCategorySet.has(panel.categoria));
+      const pool = unusedCategories.length ? unusedCategories : (unused.length ? unused : library);
+      const categories = [...new Set(pool.map(panel => panel.categoria))];
+      const selectedCategory = categories[Math.floor(this.random() * categories.length)];
+      const categoryPanels = pool.filter(panel => panel.categoria === selectedCategory);
+      return categoryPanels[Math.floor(this.random() * categoryPanels.length)];
     }
     create(alias, selectedRivals, extraSlots, primaryAvatar = null) {
       const cpu = Array.isArray(selectedRivals) && selectedRivals.length === 2
@@ -109,6 +114,7 @@
           revealed: []
         },
         usedPuzzleIds: [selectedPuzzle.id],
+        usedPuzzleCategories: [selectedPuzzle.categoria],
         roundWinner: null,
         events: [{ type: "PARTIDA INICIADA", detail: "Tres plazas preparadas" }]
       };
@@ -187,7 +193,10 @@
     }
     nextRound(state) {
       if (state.phase !== "ROUND_COMPLETE") throw new Error("La ronda actual todavía no ha terminado.");
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds);
+      const usedCategories = Array.isArray(state.usedPuzzleCategories)
+        ? state.usedPuzzleCategories
+        : [state.puzzle.category];
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories);
       state.round += 1;
       state.active = state.roundWinner;
       state.roundWinner = null;
@@ -201,6 +210,7 @@
         revealed: []
       };
       state.usedPuzzleIds.push(selectedPuzzle.id);
+      state.usedPuzzleCategories = [...usedCategories, selectedPuzzle.categoria];
       state.phase = "AWAITING_SPIN";
       state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds}` });
       return state;
