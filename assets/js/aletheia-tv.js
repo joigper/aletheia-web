@@ -407,7 +407,8 @@
       revision: ++remoteStateRevision,
       status: state.phase === "GAME_COMPLETE" ? "finished" : gamePaused ? "paused" : "playing",
       paused: gamePaused, phase: state.phase, round: state.round, maxRounds: state.maxRounds,
-      activeSlot: state.active + 1, activeName: current.name, timed,
+      activeSlot: state.active + 1, activeName: current.name, roundWinnerSlot: state.roundWinner == null ? 0 : state.roundWinner + 1, timed,
+      interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       availableLetters,
@@ -1061,7 +1062,7 @@
     const humanSolver = speedRound ? state.players.findIndex(player => !player.cpu) : state.active;
     act(() => engine.solve(state, answer, humanSolver >= 0 ? humanSolver : state.active));
   });
-  $("next-round").addEventListener("click", () => {
+  function advanceRound() {
     act(() => engine.nextRound(state));
     wheelDisplayRun += 1;
     if (state.phase === "AWAITING_SPIN") {
@@ -1072,7 +1073,8 @@
       $("spin").setAttribute("aria-label", "Girar la ruleta");
     }
     $("solution").value = "";
-  });
+  }
+  $("next-round").addEventListener("click", advanceRound);
   $("challenge-options").addEventListener("click", event => {
     const category = event.target.closest("[data-category-choice]");
     if (category) { act(() => engine.chooseCategory(state, category.dataset.categoryChoice)); return; }
@@ -1128,23 +1130,40 @@
   enforceMobileLandscape();
   $("pause-game").addEventListener("click", () => setGamePaused(!gamePaused));
   $("resume-game").addEventListener("click", () => setGamePaused(false));
+  function remoteAck(slot, seq, accepted, message) {
+    window.dispatchEvent(new CustomEvent("aletheia:remote-ack", { detail: { slot, seq, accepted, message } }));
+  }
   window.addEventListener("aletheia:remote-command", event => {
     if (!state || !window.AletheiaPlayMode?.remoteActive) return;
-    const slot = Number(event.detail?.slot), type = event.detail?.type, value = String(event.detail?.value || "").toUpperCase();
-    if (type === "pause") { setGamePaused(true); return; }
-    if (type === "resume") { setGamePaused(false); return; }
-    if (slot !== state.active + 1 || state.players[state.active]?.cpu || gamePaused) return;
-    if (type === "spin") { performSpin(); return; }
+    const slot = Number(event.detail?.slot), seq = Number(event.detail?.seq || 0), type = event.detail?.type, value = String(event.detail?.value || "").toUpperCase();
+    if (type === "pause") { setGamePaused(true); remoteAck(slot, seq, true, "Partida en pausa."); return; }
+    if (type === "resume") { setGamePaused(false); remoteAck(slot, seq, true, "Partida reanudada."); return; }
+    if (type === "next") {
+      const allowed = slot === (state.roundWinner == null ? 0 : state.roundWinner + 1) && ["ROUND_COMPLETE", "FINAL_READY"].includes(state.phase);
+      if (!allowed) { remoteAck(slot, seq, false, "Solo el ganador de la ronda puede continuar."); return; }
+      advanceRound(); remoteAck(slot, seq, true, "Preparando el siguiente panel."); return;
+    }
+    if (gamePaused) { remoteAck(slot, seq, false, "La partida está en pausa."); return; }
+    if (slot !== state.active + 1 || state.players[state.active]?.cpu) { remoteAck(slot, seq, false, `Ahora juega ${state.players[state.active]?.name || "otro concursante"}.`); return; }
+    if (Date.now() < interactionLockedUntil) { remoteAck(slot, seq, false, "La jugada anterior aún está terminando."); return; }
+    if (type === "spin") {
+      if (state.phase !== "AWAITING_SPIN") { remoteAck(slot, seq, false, "Ahora debes elegir una letra."); return; }
+      performSpin(); remoteAck(slot, seq, true, "Giro aceptado."); return;
+    }
     if (type === "letter" && value.length === 1) {
+      const beforeEvents = state.events.length;
       act(() => {
         if (state.phase === "SPECIAL_LETTER") return engine.specialLetter(state, value);
         if (state.phase === "FINAL_PICK") return engine.finalLetter(state, value);
         return vowels.has(value) ? engine.buyVowel(state, value) : engine.letter(state, value);
       });
+      const accepted = state.events.length > beforeEvents;
+      remoteAck(slot, seq, accepted, accepted ? state.events[state.events.length - 1].detail : "Esa letra no está disponible ahora.");
       return;
     }
-    if (type === "solve" && value.trim()) { act(() => engine.solve(state, value.trim())); return; }
-    if (type === "pass" && typeof engine.yieldTurn === "function") act(() => engine.yieldTurn(state));
+    if (type === "solve" && value.trim()) { const before=state.events.length; act(() => engine.solve(state, value.trim())); remoteAck(slot,seq,state.events.length>before,state.events.length>before?state.events[state.events.length-1].detail:"No se pudo comprobar la respuesta."); return; }
+    if (type === "pass" && typeof engine.yieldTurn === "function") { act(() => engine.yieldTurn(state)); remoteAck(slot,seq,true,"Turno cedido."); return; }
+    remoteAck(slot, seq, false, "La acción no está disponible.");
   });
   window.addEventListener("aletheia:remote-presence", event => {
     if (!state || $("game-panel").hidden || state.phase === "GAME_COMPLETE" || event.detail?.connected !== false || gamePaused) return;

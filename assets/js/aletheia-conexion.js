@@ -24,7 +24,7 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 const roomAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, unsubscribeCommands: null, disconnectStatus: null, heartbeatWatch: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false, commandSeq: {}, publishQueue: Promise.resolve(), publishedRevision: 0 };
-const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, unsubscribeGame: null, starting: false, heartbeat: null, commandSeq: 0, serverOffset: 0, gameRevision: 0, closed: false };
+const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, unsubscribeGame: null, unsubscribeAck: null, starting: false, heartbeat: null, commandSeq: 0, serverOffset: 0, gameRevision: 0, closed: false };
 
 function randomText(length, alphabet = roomAlphabet) {
   const bytes = new Uint8Array(length);
@@ -141,7 +141,7 @@ function observeCommands() {
       const slot = Number(slotText), seq = Number(command?.seq || 0);
       if (!seq || seq <= Number(state.commandSeq[slot] || 0)) return;
       state.commandSeq[slot] = seq;
-      window.dispatchEvent(new CustomEvent("aletheia:remote-command", { detail: { slot, type: command.type, value: command.value || "" } }));
+      window.dispatchEvent(new CustomEvent("aletheia:remote-command", { detail: { slot, seq, type: command.type, value: command.value || "" } }));
     });
   });
 }
@@ -292,11 +292,16 @@ function initHost() {
     if (state.active && state.roomId) update(ref(database, `rooms/${state.roomId}/meta`), { status: "playing" }).catch(() => {});
   });
   window.addEventListener("aletheia:game-state", event => { void publishGameState(event.detail); });
+  window.addEventListener("aletheia:remote-ack", event => {
+    const ack = event.detail || {};
+    if (!state.active || !state.roomId || ![1, 2, 3].includes(Number(ack.slot))) return;
+    set(ref(database, `rooms/${state.roomId}/acks/${ack.slot}`), { seq: Number(ack.seq || 0), accepted: Boolean(ack.accepted), message: String(ack.message || "").slice(0, 180), createdAt: serverTimestamp() }).catch(error => console.error("No se pudo confirmar la orden", error));
+  });
   window.addEventListener("aletheia:session-restart", async () => {
     if (!state.active || !state.roomId) { window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready")); return; }
     try {
       state.commandSeq = {}; state.publishedRevision = 0; state.publishQueue = Promise.resolve();
-      await update(ref(database, `rooms/${state.roomId}`), { "meta/status": "restarting", game: null, commands: null });
+      await update(ref(database, `rooms/${state.roomId}`), { "meta/status": "restarting", game: null, commands: null, acks: null });
       window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready"));
     } catch (error) { console.error("No se pudo preparar la revancha", error); }
   });
@@ -362,6 +367,7 @@ function observeControllerRoom() {
   controllerState.unsubscribeMeta?.();
   controllerState.unsubscribeSlots?.();
   controllerState.unsubscribeGame?.();
+  controllerState.unsubscribeAck?.();
   controllerState.unsubscribeMeta = onValue(ref(database, `rooms/${invitation.roomId}/meta`), snapshot => {
     const meta = snapshot.val();
     if (!meta) {
@@ -376,6 +382,7 @@ function observeControllerRoom() {
       controllerState.closed = true;
       clearInterval(controllerState.heartbeat); controllerState.heartbeat = null;
       controllerState.unsubscribeGame?.(); controllerState.unsubscribeGame = null;
+      controllerState.unsubscribeAck?.(); controllerState.unsubscribeAck = null;
     }
     window.dispatchEvent(new CustomEvent("aletheia:mando-room-state", { detail: { status: meta.status } }));
   }, error => {
@@ -398,6 +405,10 @@ function observeControllerRoom() {
     const seconds = Math.ceil(remaining / 1000);
     window.dispatchEvent(new CustomEvent("aletheia:mando-game-state", { detail: { ...game, slot: invitation.slot, player, clock: `${String(Math.floor(seconds / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}` } }));
   }, error => console.error("No se pudo leer la partida", error));
+  controllerState.unsubscribeAck = onValue(ref(database, `rooms/${invitation.roomId}/acks/${invitation.slot}`), snapshot => {
+    const ack = snapshot.val(); if (!ack) return;
+    window.dispatchEvent(new CustomEvent("aletheia:mando-ack", { detail: ack }));
+  }, error => console.error("No se pudo leer la confirmación", error));
 }
 
 async function connectController(player) {

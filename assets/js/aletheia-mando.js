@@ -14,6 +14,8 @@
   let selfieCaptureActive=false;
   const onlineController=new URLSearchParams(location.search).has("sala");
   let remoteGameState=null;
+  let pendingCommand=false;
+  let pendingCommandTimer=null;
 
   async function enterFullscreen(){
     const root=document.documentElement;
@@ -159,18 +161,25 @@
     letters:{kicker:"PREMIO: 75 POR COINCIDENCIA",title:"ELIGE CONSONANTE",copy:"Las vocales cuestan 50 créditos.",content:`<div class="letter-grid">${alphabet.map(letter=>`<button type="button" class="${vowels.has(letter)?"vowel":""}" ${vowels.has(letter)?"disabled":""}>${letter}</button>`).join("")}</div>`},
     wait:{kicker:"TURNO DE ROSE WHITMORE",title:"OBSERVA EL PLATÓ",copy:"Tu mando se activará cuando llegue tu turno.",content:'<div class="remote-wait-orb" aria-hidden="true"></div>'},
     speed:{kicker:"PANEL DE VELOCIDAD",title:"¿CONOCES LA SOLUCIÓN?",copy:"La primera pulsación detendrá el panel para todos.",content:'<button class="remote-button remote-danger" type="button" data-action="solve-now"><span>RESOLVER YA</span></button>'},
-    solve:{kicker:"HAS DETENIDO EL PANEL",title:"ESCRIBE LA SOLUCIÓN",copy:"Dispones de 10 segundos.",content:'<form class="solve-form"><input class="solve-input" maxlength="80" autocomplete="off" placeholder="Solución completa"><button class="remote-button solve-submit" type="submit">COMPROBAR RESPUESTA</button></form>'}
+    solve:{kicker:"HAS DETENIDO EL PANEL",title:"ESCRIBE LA SOLUCIÓN",copy:"Dispones de 10 segundos.",content:'<form class="solve-form"><input class="solve-input" maxlength="80" autocomplete="off" placeholder="Solución completa"><button class="remote-button solve-submit" type="submit">COMPROBAR RESPUESTA</button></form>'},
+    next:{kicker:"PANEL COMPLETADO",title:"HAS GANADO LA RONDA",copy:"Cuando estés preparado, continúa la partida.",content:'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>'}
   };
   function renderScene(name){
     const scene=scenes[name]||scenes.spin;$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
-    $("#action-content [data-action='spin']")?.addEventListener("click",()=>{if(onlineController)sendCommand("spin");else renderScene("letters")});
+    $("#action-content [data-action='spin']")?.addEventListener("click",event=>{if(onlineController){event.currentTarget.disabled=true;event.currentTarget.querySelector("span").textContent="ENVIADO";sendCommand("spin")}else renderScene("letters")});
+    $("#action-content [data-action='next']")?.addEventListener("click",event=>{event.currentTarget.disabled=true;sendCommand("next")});
     $("#action-content [data-action='solve-now']")?.addEventListener("click",()=>{renderScene("solve");setTimeout(()=>$(".solve-input")?.focus(),50)});
     $("#action-content .solve-form")?.addEventListener("submit",event=>{event.preventDefault();const value=event.currentTarget.querySelector("input").value.trim();if(onlineController&&value)sendCommand("solve",value);$("#action-kicker").textContent="RESPUESTA ENVIADA";$("#action-title").textContent="ESPERA AL PLATÓ";$("#action-copy").textContent="Prometeo está comprobando la solución.";$("#action-content").innerHTML='<div class="remote-wait-orb" aria-hidden="true"></div>'});
-    $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{button.disabled=true;if(onlineController)sendCommand("letter",button.textContent);$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="La pantalla principal mostrará el resultado."}));
+    $$("#action-content .letter-grid button").forEach(button=>button.addEventListener("click",()=>{$$("#action-content .letter-grid button").forEach(item=>item.disabled=true);if(onlineController)sendCommand("letter",button.textContent);$("#action-kicker").textContent=`LETRA ${button.textContent} ENVIADA`;$("#action-copy").textContent="Esperando confirmación del plató…"}));
   }
-  function sendCommand(type,value=""){window.dispatchEvent(new CustomEvent("aletheia:mando-command",{detail:{type,value}}))}
+  function sendCommand(type,value=""){
+    if(pendingCommand)return;
+    pendingCommand=true;clearTimeout(pendingCommandTimer);
+    pendingCommandTimer=setTimeout(()=>{pendingCommand=false;if(remoteGameState){renderRemoteGame(remoteGameState);$("#action-copy").textContent="No llegó la confirmación. Puedes intentarlo de nuevo."}},4500);
+    window.dispatchEvent(new CustomEvent("aletheia:mando-command",{detail:{type,value}}));
+  }
   function renderRemoteGame(detail){
-    remoteGameState=detail;showScreen("game");clearInterval(clockTimer);
+    remoteGameState=detail;pendingCommand=false;clearTimeout(pendingCommandTimer);showScreen("game");clearInterval(clockTimer);
     $("#game-name").textContent=detail.player?.name||$("#lobby-name").textContent;
     $("#round-score").textContent=detail.player?.round??0;$("#total-score").textContent=detail.player?.total??0;
     $("#game-clock").hidden=!detail.timed;$("#game-clock").textContent=detail.clock||"00:00";
@@ -178,9 +187,11 @@
     const mine=Number(detail.slot)===Number(detail.activeSlot);
     if(detail.paused){renderScene("wait");$("#action-kicker").textContent="PARTIDA EN PAUSA";$("#action-title").textContent="EL PLATÓ ESTÁ DETENIDO";$("#action-copy").textContent="Cualquier jugador puede reanudar la partida."}
     else if(!mine){renderScene("wait");$("#action-kicker").textContent=`TURNO DE ${String(detail.activeName||"OTRO JUGADOR").toUpperCase()}`;$("#action-copy").textContent="Tu mando se activará automáticamente cuando llegue tu turno."}
+    else if(Number(detail.interactionLockedMs||0)>0){renderScene("wait");$("#action-kicker").textContent="JUGADA EN CURSO";$("#action-title").textContent="ESPERA A LA RULETA";$("#action-copy").textContent="Tu control se activará al terminar la animación del plató."}
     else if(detail.phase==="AWAITING_SPIN")renderScene("spin");
     else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");$("#action-kicker").textContent=detail.pending?`PREMIO: ${detail.pending} POR COINCIDENCIA`:$("#action-kicker").textContent;const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
     else if(detail.phase==="SPEED_RUNNING")renderScene("speed");
+    else if(["ROUND_COMPLETE","FINAL_READY"].includes(detail.phase)&&Number(detail.roundWinnerSlot)===Number(detail.slot)){renderScene("next");$("#action-content [data-action='next']").textContent=detail.phase==="FINAL_READY"?"JUGAR RULETA FINAL":"SIGUIENTE RONDA"}
     else if(["ROUND_COMPLETE","FINAL_READY","GAME_COMPLETE","CATEGORY_CHOICE","CATEGORY_RESULT","QUESTION_BONUS","QUESTION_SELECTION","QUESTION_RESULT"].includes(detail.phase)){renderScene("wait");$("#action-kicker").textContent="EL PLATÓ PREPARA EL SIGUIENTE PASO";$("#action-title").textContent=detail.phase==="GAME_COMPLETE"?"PARTIDA TERMINADA":"ESPERA UN MOMENTO";$("#action-copy").textContent=detail.message||"La pantalla principal indicará cómo continuar."}
     else renderScene("solve");
     const pause=$("#pause-demo");pause.classList.toggle("is-active",Boolean(detail.paused));pause.querySelector("span").textContent=detail.paused?"REANUDAR":"PAUSA";
@@ -196,6 +207,7 @@
   });
   $$("[data-demo]").forEach(button=>button.addEventListener("click",()=>renderScene(button.dataset.demo)));
   window.addEventListener("aletheia:mando-game-state",event=>renderRemoteGame(event.detail||{}));
+  window.addEventListener("aletheia:mando-ack",event=>{const ack=event.detail||{};pendingCommand=false;clearTimeout(pendingCommandTimer);if(!ack.accepted&&remoteGameState)renderRemoteGame(remoteGameState);$("#action-copy").textContent=ack.message|| (ack.accepted?"Orden aceptada.":"Orden rechazada por el plató.")});
   $("#pause-demo").addEventListener("click",event=>{if(onlineController){sendCommand(remoteGameState?.paused?"resume":"pause");return}event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"REANUDAR":"PAUSA"});
   $("#sound-demo").addEventListener("click",event=>{event.currentTarget.classList.toggle("is-active");event.currentTarget.querySelector("span").textContent=event.currentTarget.classList.contains("is-active")?"SILENCIO":"SONIDO"});
 })();
