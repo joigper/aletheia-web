@@ -1,0 +1,20 @@
+ALÉTHEIA TV — AUDIOS RECORTADOS DE PROMETEO
+============================================
+
+Contenido total: 177 archivos MP3
+
+- 68 fragmentos procedentes de la primera generación.
+- 109 fragmentos expresivos procedentes de la segunda generación.
+- manifest.csv contiene el archivo de origen y los tiempos exactos de cada corte.
+
+La segunda generación no contenía las 54 variantes de letras ni la tercera
+bienvenida del guion expresivo. No se han creado archivos vacíos para esas frases.
+Las letras están disponibles en la primera generación con nombres letra-a.mp3,
+letra-b.mp3, etcétera.
+
+Carpeta recomendada en la web:
+assets/audio/ocio/prometeo/
+
+Los fragmentos se han exportado como MP3 mono, 44.100 Hz y 128 kb/s. Se conserva
+un pequeño margen natural alrededor de cada frase para evitar comienzos o finales
+cortados.

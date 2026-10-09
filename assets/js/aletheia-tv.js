@@ -2,6 +2,7 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const engine = new AletheiaGame.Engine();
+  const voice = window.AletheiaAudio;
   let state = null;
   let selectedRivals = [];
   const selectedBySlot = { 2: null, 3: null };
@@ -173,6 +174,7 @@
 
   function animatePanelReset() {
     const reel = [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789"];
+    voice?.playEffect("panel-reinicio", { maxDuration: 2200 });
     $("letter-board").querySelectorAll(".tile").forEach((tile, index) => {
       let slot = tile.querySelector("span");
       const temporarySlot = !slot;
@@ -204,7 +206,10 @@
     const roundComplete = state.phase === "ROUND_COMPLETE";
     const consonantsRemain = engine.hasAvailableConsonants(state);
     const humanTurn = !state.players[state.active].cpu;
-    if (roundComplete || gameComplete) clearTimeout(clockTimer);
+    if (roundComplete || gameComplete) {
+      clearTimeout(clockTimer);
+      voice?.stopLoop("reloj");
+    }
     $("game-clock").hidden = !timedGame || gameComplete;
     $("pause-game").disabled = gameComplete;
     $("puzzle-panel").hidden = gameComplete;
@@ -260,6 +265,100 @@
 
   function escapeHtml(value) { const node = document.createElement("span"); node.textContent = value; return node.innerHTML; }
   function escapeAttribute(value) { return escapeHtml(value).replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+
+  function finalVoiceIntent() {
+    if (state.phase !== "GAME_COMPLETE") return "ronda-ganada";
+    const highest = Math.max(...state.players.map(player => player.total));
+    return state.players.filter(player => player.total === highest).length > 1 ? "empate" : "ganador";
+  }
+
+  function announceLetterEvent(event, isVowel, roundWon) {
+    const letter = event.detail.match(/^([^:]+):/)?.[1]?.trim();
+    const count = Number(event.detail.match(/(\d+) coincidencia/)?.[1] || 0);
+    const sequence = letter ? [`letra:${letter}`] : [];
+    if (isVowel) {
+      voice?.playEffect("vocal-compra");
+      sequence.push("vocal-comprada");
+    }
+    if (roundWon) {
+      playRoundOutcomeEffects();
+      sequence.push("ultima-letra", finalVoiceIntent());
+    } else {
+      if (!count) voice?.playEffect("publico-decepcion");
+      else if (count >= 4) voice?.playEffect("muchas-coincidencias");
+      if (count && puzzleProgress() >= .78) voice?.playEffect("panel-casi-resuelto");
+      sequence.push(count ? `coincidencia:${Math.min(count, 6)}` : "sin-coincidencias");
+    }
+    voice?.play(sequence);
+  }
+
+  function playRoundOutcomeEffects() {
+    if (state.phase === "GAME_COMPLETE") {
+      voice?.pauseMusic();
+      const highest = Math.max(...state.players.map(player => player.total));
+      const tied = state.players.filter(player => player.total === highest).length > 1;
+      voice?.playEffect(tied ? "empate" : "ganador-fanfarria");
+      voice?.playEffect("publico-aplauso-final");
+      return;
+    }
+    voice?.playEffect("ronda-final");
+    voice?.playEffect("publico-aplauso-ronda");
+  }
+
+  function announceEvents(events) {
+    if (!voice || !events.length) return;
+    const letter = events.find(event => event.type === "LETRA");
+    const vowel = events.find(event => event.type === "VOCAL");
+    const resolution = events.find(event => event.type === "RESOLUCIÓN");
+    const roundWon = events.some(event => event.type === "RONDA GANADA");
+    const newRound = events.find(event => event.type === "NUEVA RONDA");
+    const wheel = events.find(event => event.type === "RULETA");
+    const turnChange = events.find(event => event.type === "CAMBIO DE TURNO");
+
+    if (letter || vowel) {
+      announceLetterEvent(letter || vowel, Boolean(vowel), roundWon);
+      return;
+    }
+    if (resolution) {
+      if (/Correcta/i.test(resolution.detail)) {
+        voice.playEffect("respuesta-correcta");
+        if (roundWon) playRoundOutcomeEffects();
+        voice.play(["solucion-correcta", roundWon ? finalVoiceIntent() : null]);
+      } else {
+        voice.playEffect("respuesta-incorrecta");
+        voice.playEffect("publico-decepcion");
+        voice.play("solucion-incorrecta");
+      }
+      return;
+    }
+    if (newRound) {
+      voice.playEffect("ronda-inicio");
+      voice.play(state.round === state.maxRounds ? "ultima-ronda" : "comienza-ronda");
+      return;
+    }
+    if (wheel) {
+      const result = wheel.detail.toUpperCase();
+      const intent = result.includes("QUIEBRA") || result.includes("BANCARROTA")
+        ? "quiebra"
+        : result.includes("PIERDE")
+          ? "pierde-turno"
+          : result.includes("PREMIO") || result.includes("COMODÍN")
+            ? "premio"
+            : "elige-consonante";
+      voice.play(intent, { delay: 1800 });
+      return;
+    }
+    if (roundWon) {
+      playRoundOutcomeEffects();
+      voice.play(finalVoiceIntent());
+      return;
+    }
+    if (turnChange) {
+      voice.playEffect("cambio-turno");
+      voice.play("cambio-turno");
+    }
+  }
+
   function act(operation) {
     if (gamePaused) return;
     try {
@@ -267,7 +366,12 @@
       state = operation();
       if ((state.events?.length || 0) > previousEvents) resetActionClock();
       render();
-    } catch (error) { render(error.message); }
+      announceEvents(state.events.slice(previousEvents));
+    } catch (error) {
+      render(error.message);
+      if (/saldo|necesitas/i.test(error.message)) voice?.play("saldo-insuficiente");
+      else if (/disponible|utilizada/i.test(error.message)) voice?.play("letra-repetida");
+    }
   }
 
   function formatClock(milliseconds) {
@@ -282,10 +386,15 @@
     if (!gamePaused) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
     $("game-clock").textContent = formatClock(actionTimeRemaining);
     $("game-clock").classList.toggle("is-urgent", actionTimeRemaining <= 10000);
+    if (!gamePaused && actionTimeRemaining > 0 && actionTimeRemaining <= 10000) voice?.startLoop("reloj");
+    else voice?.stopLoop("reloj");
     if (!gamePaused && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
+      voice?.stopLoop("reloj");
       state = engine.yieldTurn(state);
       resetActionClock();
       render("Tiempo agotado. El turno pasa al siguiente concursante.");
+      voice?.playEffect("respuesta-incorrecta");
+      voice?.play("tiempo-agotado");
       return;
     }
     clockTimer = setTimeout(updateClock, 200);
@@ -293,6 +402,7 @@
 
   function resetActionClock() {
     if (!timedGame) return;
+    voice?.stopLoop("reloj");
     actionTimeRemaining = 30000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
@@ -345,6 +455,10 @@
 
   function runCpuTurn() {
     if (gamePaused || !state || !state.players[state.active]?.cpu || state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") return;
+    if (voice?.isSpeaking()) {
+      cpuTimer = setTimeout(runCpuTurn, 250);
+      return;
+    }
     const player = state.players[state.active];
     const profile = player.cpuProfile || AletheiaGame.defaultCpuProfile;
     if (state.phase === "AWAITING_LETTER") {
@@ -477,22 +591,30 @@
     await Promise.all(reel.map(preloadPortrait));
     if (run !== selectionRun) return null;
     if (slotModes[slot] === "human") return { selected };
-    replaceSlot(slot, flipArchiveCard(slot, reel[0]));
-    const card = $("rival-preview").querySelector(`[data-slot="slot-${slot}"]`);
-    const inner = card.querySelector(".tv-flip-inner");
-    const frontImage = card.querySelector(".tv-flip-front img");
-    const backImage = card.querySelector(".tv-flip-back img");
-    let angle = 0;
-    for (let frame = 1; frame < reel.length; frame += 1) {
-      if (run !== selectionRun) return null;
-      const nextImage = angle % 360 === 0 ? backImage : frontImage;
-      nextImage.src = portraitPath(reel[frame], true);
-      await pause(24);
-      angle += 180;
-      inner.style.transform = `rotateY(${angle}deg)`;
-      await pause(270 + frame * 22);
+    let completed = false;
+    voice?.startLoop("archivador");
+    try {
+      replaceSlot(slot, flipArchiveCard(slot, reel[0]));
+      const card = $("rival-preview").querySelector(`[data-slot="slot-${slot}"]`);
+      const inner = card.querySelector(".tv-flip-inner");
+      const frontImage = card.querySelector(".tv-flip-front img");
+      const backImage = card.querySelector(".tv-flip-back img");
+      let angle = 0;
+      for (let frame = 1; frame < reel.length; frame += 1) {
+        if (run !== selectionRun) return null;
+        const nextImage = angle % 360 === 0 ? backImage : frontImage;
+        nextImage.src = portraitPath(reel[frame], true);
+        await pause(24);
+        angle += 180;
+        inner.style.transform = `rotateY(${angle}deg)`;
+        await pause(270 + frame * 22);
+      }
+      completed = true;
+      return { selected };
+    } finally {
+      voice?.stopLoop("archivador");
+      if (completed) voice?.playEffect("interfaz-confirmar", { volume: 0.22 });
     }
-    return { selected };
   }
 
   async function chooseRivals() {
@@ -533,6 +655,10 @@
     state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1));
     stopPrometeo();
     $("setup-panel").hidden = true; $("game-panel").hidden = false; render("Tres concursantes. Todo preparado. Comenzamos.");
+    voice?.startMusic();
+    voice?.playEffect("prometeo-aparece");
+    voice?.playEffect("ronda-inicio");
+    voice?.play(["comienza-partida", "panel-preparado"]);
     $("game-clock").hidden = !timedGame;
     resetActionClock();
   });
@@ -573,6 +699,7 @@
     act(() => engine.spin(state));
     if (state.events.length === previousEvents || !state.lastSpin) return;
     const { index, result } = state.lastSpin;
+    voice?.startLoop("ruleta");
     const target = -(index * 15 + 7.5);
     const currentPosition = ((wheelRotation % 360) + 360) % 360;
     const targetPosition = ((target % 360) + 360) % 360;
@@ -583,6 +710,16 @@
     $("wheel-hub").classList.add("has-result");
     const displayRun = ++wheelDisplayRun;
     $("spin").setAttribute("aria-label", `Resultado ${result}. ${state.phase === "AWAITING_SPIN" ? "Girar de nuevo" : "Elige una letra"}`);
+    const effectRun = wheelDisplayRun;
+    setTimeout(() => {
+      if (effectRun !== wheelDisplayRun) return;
+      voice?.stopLoop("ruleta");
+      const normalizedResult = String(result).toUpperCase();
+      if (normalizedResult.includes("QUIEBRA") || normalizedResult.includes("BANCARROTA")) voice?.playEffect("quiebra");
+      else if (normalizedResult.includes("PIERDE")) voice?.playEffect("pierde-turno");
+      else if (normalizedResult.includes("COMODÍN")) voice?.playEffect("comodin-conseguido");
+      else if (normalizedResult.includes("PREMIO")) voice?.playEffect("premio");
+    }, 1800);
     if (state.phase === "AWAITING_SPIN") setTimeout(() => {
       if (displayRun !== wheelDisplayRun || state.phase !== "AWAITING_SPIN") return;
       $("wheel-result").textContent = "PULSA";
@@ -594,6 +731,7 @@
   $("spin").addEventListener("click", performSpin);
   $("solve-form").addEventListener("submit", event => {
     event.preventDefault(); const answer = $("solution").value; $("solution").value = "";
+    voice?.playEffect("publico-expectacion");
     act(() => engine.solve(state, answer));
   });
   $("next-round").addEventListener("click", () => {
@@ -615,16 +753,23 @@
     $("game-panel").classList.toggle("is-paused", paused);
     clearTimeout(cpuTimer);
     clearTimeout(clockTimer);
+    voice?.stopEffects();
     if (paused) {
       if (timedGame) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
       $("message").textContent = "Partida en pausa.";
+      voice?.pauseMusic();
+      voice?.playEffect("partida-pausa");
+      voice?.play("partida-pausada");
       return;
     }
     if (timedGame) {
       actionDeadline = Date.now() + actionTimeRemaining;
       updateClock();
     }
+    voice?.resumeMusic();
+    voice?.playEffect("partida-reanudar");
     render();
+    voice?.play("partida-reanudada");
   }
   const mobilePortraitQuery = window.matchMedia("(max-width: 900px) and (orientation: portrait) and (pointer: coarse)");
   function enforceMobileLandscape(event) {
