@@ -5,7 +5,7 @@
   --tv-text: #f4f7ff;
 }
 
-html, body {
+html.aletheia-tv-root, html.aletheia-tv-root body {
   height: 100%;
   overflow: hidden;
 }

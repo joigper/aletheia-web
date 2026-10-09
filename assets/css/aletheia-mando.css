@@ -1,4 +1,4 @@
-:root {
+html.aletheia-mando-root {
   --cyan: #57e6ff;
   --violet: #9c6cff;
   --red: #ff405d;
@@ -8,18 +8,15 @@
   --text: #f2f7ff;
   --muted: #91a4c7;
   color-scheme: dark;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
   min-height: 100%;
   background: var(--ink);
 }
 
-body {
+.aletheia-mando-root * {
+  box-sizing: border-box;
+}
+
+html.aletheia-mando-root body {
   min-height: 100%;
   margin: 0;
   color: var(--text);
@@ -667,7 +664,7 @@ body {
 }
 
 @media (prefers-reduced-motion:reduce) {
-  * {
+  .aletheia-mando-root * {
     animation-duration: .01ms!important;
     animation-iteration-count: 1!important;
   }
