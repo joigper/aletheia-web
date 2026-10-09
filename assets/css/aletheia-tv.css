@@ -1882,6 +1882,65 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
   color: #cbd6ec;
 }
 
+.tv-session-overlay {
+  position: absolute;
+  z-index: 70;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #03060de8;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+
+.tv-session-overlay[hidden] {
+  display: none;
+}
+
+.tv-session-overlay > div {
+  width: min(650px,92vw);
+  padding: 30px;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  border: 1px solid #536889;
+  border-radius: 16px;
+  background: radial-gradient(circle at 50% 20%,#24365b,#090e1a 70%);
+  box-shadow: 0 0 48px #57e6ff26;
+  text-align: center;
+}
+
+.tv-session-overlay small {
+  color: #8fa4cd;
+  font: 600 10px "Tektur";
+  letter-spacing: .16em;
+}
+
+.tv-session-overlay strong {
+  color: var(--tv-cyan);
+  font: 700 clamp(24px,3vw,39px) "Tektur";
+}
+
+.tv-session-overlay p {
+  max-width: 540px;
+  margin: 0;
+  color: #cbd6ec;
+}
+
+.tv-session-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 9px;
+}
+
+.tv-button-danger {
+  border: 1px solid #a8435a;
+  background: #3a1421;
+  color: #ffdce4;
+}
+
 .tv-game {
   position: relative;
 }

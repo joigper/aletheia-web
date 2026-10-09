@@ -177,10 +177,11 @@
     if(detail.timed&&!detail.paused){let remaining=Number(detail.remainingMs||0);const paint=()=>{const seconds=Math.max(0,Math.ceil(remaining/1000));$("#game-clock").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;remaining=Math.max(0,remaining-1000)};paint();clockTimer=setInterval(paint,1000)}
     const mine=Number(detail.slot)===Number(detail.activeSlot);
     if(detail.paused){renderScene("wait");$("#action-kicker").textContent="PARTIDA EN PAUSA";$("#action-title").textContent="EL PLATÓ ESTÁ DETENIDO";$("#action-copy").textContent="Cualquier jugador puede reanudar la partida."}
-    else if(!mine)renderScene("wait");
+    else if(!mine){renderScene("wait");$("#action-kicker").textContent=`TURNO DE ${String(detail.activeName||"OTRO JUGADOR").toUpperCase()}`;$("#action-copy").textContent="Tu mando se activará automáticamente cuando llegue tu turno."}
     else if(detail.phase==="AWAITING_SPIN")renderScene("spin");
-    else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
+    else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");$("#action-kicker").textContent=detail.pending?`PREMIO: ${detail.pending} POR COINCIDENCIA`:$("#action-kicker").textContent;const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
     else if(detail.phase==="SPEED_RUNNING")renderScene("speed");
+    else if(["ROUND_COMPLETE","FINAL_READY","GAME_COMPLETE","CATEGORY_CHOICE","CATEGORY_RESULT","QUESTION_BONUS","QUESTION_SELECTION","QUESTION_RESULT"].includes(detail.phase)){renderScene("wait");$("#action-kicker").textContent="EL PLATÓ PREPARA EL SIGUIENTE PASO";$("#action-title").textContent=detail.phase==="GAME_COMPLETE"?"PARTIDA TERMINADA":"ESPERA UN MOMENTO";$("#action-copy").textContent=detail.message||"La pantalla principal indicará cómo continuar."}
     else renderScene("solve");
     const pause=$("#pause-demo");pause.classList.toggle("is-active",Boolean(detail.paused));pause.querySelector("span").textContent=detail.paused?"REANUDAR":"PAUSA";
   }
@@ -188,6 +189,8 @@
   window.addEventListener("aletheia:mando-room-state",event=>{
     const status=event.detail?.status;
     if(status==="playing"){showScreen("game");if(!onlineController){renderScene("spin");startClock()}}
+    else if(status==="restarting"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="Revancha solicitada. El plató está preparando una nueva partida…";$("#controller-start").hidden=true}
+    else if(status==="closed"){clearInterval(clockTimer);showScreen("lobby");$("#lobby-title").textContent="SALA CERRADA";$(".remote-notice strong").textContent="La partida ha sido cancelada desde el plató. Para volver a jugar necesitarás un nuevo código QR.";$("#controller-start").hidden=true;$("#demo-start").hidden=true}
     else if(status==="finished"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="La partida ha terminado. Consulta el resultado en el plató."}
     else if(status==="offline"){clearInterval(clockTimer);showScreen("lobby");$(".remote-notice strong").textContent="El plató se ha desconectado."}
   });

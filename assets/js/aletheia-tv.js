@@ -15,6 +15,7 @@
   let timedGame = false;
   let gamePaused = false;
   let pauseStartedAt = 0;
+  let remoteStateRevision = 0;
   let experienceStarted = false;
   let actionTimeRemaining = 25000;
   let actionDeadline = 0;
@@ -403,13 +404,14 @@
       return vowels.has(letter) ? state.phase === "AWAITING_SPIN" && current.round >= AletheiaGame.vowelPrice : state.phase === "AWAITING_LETTER";
     });
     window.dispatchEvent(new CustomEvent("aletheia:game-state", { detail: {
+      revision: ++remoteStateRevision,
       status: state.phase === "GAME_COMPLETE" ? "finished" : gamePaused ? "paused" : "playing",
       paused: gamePaused, phase: state.phase, round: state.round, maxRounds: state.maxRounds,
       activeSlot: state.active + 1, activeName: current.name, timed,
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       availableLetters,
-      players: state.players.map((player,index) => ({ slot:index+1,name:player.name,round:player.round,total:player.total,cpu:player.cpu }))
+      players: Object.fromEntries(state.players.map((player,index) => [String(index + 1), { slot:index+1,name:player.name,round:player.round,total:player.total,cpu:player.cpu }]))
     } }));
   }
 
@@ -925,7 +927,14 @@
     window.dispatchEvent(new CustomEvent("aletheia:setup-selection", { detail: { busy: false } }));
   }
 
-  $("start-game").addEventListener("click", () => {
+  function startConfiguredGame() {
+    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer);
+    clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
+    clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
+    gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0;
+    transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
+    $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
+    $("pause-game").textContent = "PAUSA"; $("pause-game").setAttribute("aria-pressed", "false");
     const alias = $("alias").value.trim().slice(0, 18) || "Invitado";
     const extraSlots = [2, 3].map(slot => slotModes[slot] === "human"
       ? { cpu: false, alias: (document.querySelector(`[data-human-alias="${slot}"]`)?.value || slotAliases[slot]).trim().slice(0, 18) || `Invitado ${slot}`, avatar: humanAvatarData(slot) }
@@ -944,7 +953,9 @@
     voice?.play(["comienza-partida", "panel-preparado"]);
     $("game-clock").hidden = !timedGame;
     resetActionClock();
-  });
+    window.dispatchEvent(new CustomEvent("aletheia:session-playing"));
+  }
+  $("start-game").addEventListener("click", startConfiguredGame);
   window.addEventListener("aletheia:remote-player", event => {
     const slot = Number(event.detail?.slot);
     const player = event.detail?.player;
@@ -1140,8 +1151,29 @@
     setGamePaused(true);
     $("message").textContent = `La plaza ${event.detail.slot} ha perdido la conexión. La partida queda en pausa.`;
   });
-  $("new-game").addEventListener("click", () => location.reload());
-  $("winner-new-game").addEventListener("click", () => location.reload());
+  function openSessionMenu() { $("session-overlay").hidden = false; }
+  function closeSessionMenu() { $("session-overlay").hidden = true; }
+  function returnToSetupAfterClose() {
+    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); voice?.stopEffects(); voice?.pauseMusic();
+    gamePaused = false; state = null; $("session-overlay").hidden = true; $("pause-overlay").hidden = true;
+    $("game-panel").hidden = true; $("setup-panel").hidden = false;
+    $("setup-message").textContent = "La sala anterior se ha cerrado. Puedes preparar una nueva partida.";
+  }
+  $("new-game").addEventListener("click", openSessionMenu);
+  $("winner-new-game").addEventListener("click", openSessionMenu);
+  $("session-cancel").addEventListener("click", closeSessionMenu);
+  $("session-replay").addEventListener("click", () => {
+    $("session-replay").disabled = true;
+    if (window.AletheiaPlayMode?.remoteActive) window.dispatchEvent(new CustomEvent("aletheia:session-restart"));
+    else { $("session-replay").disabled = false; startConfiguredGame(); }
+  });
+  $("session-close").addEventListener("click", () => {
+    $("session-close").disabled = true;
+    if (window.AletheiaPlayMode?.remoteActive) window.dispatchEvent(new CustomEvent("aletheia:session-close"));
+    else { $("session-close").disabled = false; returnToSetupAfterClose(); }
+  });
+  window.addEventListener("aletheia:session-restart-ready", () => { $("session-replay").disabled = false; startConfiguredGame(); });
+  window.addEventListener("aletheia:session-closed-host", () => { $("session-close").disabled = false; returnToSetupAfterClose(); });
   function updateSoundButtons() {
     const enabled = voice?.isEnabled() !== false;
     [$("setup-sound"), $("game-sound")].forEach(button => {

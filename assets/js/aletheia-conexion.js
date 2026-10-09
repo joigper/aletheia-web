@@ -23,8 +23,8 @@ const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 const roomAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, unsubscribeCommands: null, heartbeatWatch: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false, commandSeq: {} };
-const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, unsubscribeGame: null, starting: false, heartbeat: null, commandSeq: 0, serverOffset: 0 };
+const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, unsubscribeCommands: null, disconnectStatus: null, heartbeatWatch: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false, commandSeq: {}, publishQueue: Promise.resolve(), publishedRevision: 0 };
+const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, unsubscribeGame: null, starting: false, heartbeat: null, commandSeq: 0, serverOffset: 0, gameRevision: 0, closed: false };
 
 function randomText(length, alphabet = roomAlphabet) {
   const bytes = new Uint8Array(length);
@@ -148,7 +148,13 @@ function observeCommands() {
 
 async function publishGameState(publicState) {
   if (!state.active || !state.roomId || !publicState) return;
-  await set(ref(database, `rooms/${state.roomId}/game`), { ...publicState, publishedAt: serverTimestamp() }).catch(error => console.error("No se pudo sincronizar la partida", error));
+  const revision = Number(publicState.revision || 0);
+  state.publishQueue = state.publishQueue.then(async () => {
+    if (!state.active || revision <= state.publishedRevision) return;
+    await set(ref(database, `rooms/${state.roomId}/game`), { ...publicState, publishedAt: serverTimestamp() });
+    state.publishedRevision = revision;
+  }).catch(error => console.error("No se pudo sincronizar la partida", error));
+  await state.publishQueue;
 }
 
 async function reconcileHumanSlots() {
@@ -212,7 +218,8 @@ async function createRoom() {
   state.invitations = invitationTokens;
   state.active = true;
   if (window.AletheiaPlayMode) window.AletheiaPlayMode.remoteActive = true;
-  onDisconnect(ref(database, `rooms/${state.roomId}/meta/status`)).set("offline");
+  state.disconnectStatus = onDisconnect(ref(database, `rooms/${state.roomId}/meta/status`));
+  state.disconnectStatus.set("offline");
   state.humanSlots.forEach(slot => renderQr(slot));
   updateHostControls(0);
   observeSlots();
@@ -229,6 +236,7 @@ async function closeRoom() {
   state.unsubscribeStatus?.();
   state.unsubscribeStatus = null;
   state.unsubscribeCommands?.(); state.unsubscribeCommands = null;
+  await state.disconnectStatus?.cancel().catch(() => {}); state.disconnectStatus = null;
   if (state.roomId && auth.currentUser) await remove(ref(database, `rooms/${state.roomId}`)).catch(() => {});
   document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
   document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
@@ -238,6 +246,7 @@ async function closeRoom() {
   state.humanSlots = [];
   state.invitations = {};
   state.players = {};
+  state.publishedRevision = 0;
   updateHostControls();
   const start = document.getElementById("start-game");
   if (start) start.disabled = false;
@@ -283,6 +292,33 @@ function initHost() {
     if (state.active && state.roomId) update(ref(database, `rooms/${state.roomId}/meta`), { status: "playing" }).catch(() => {});
   });
   window.addEventListener("aletheia:game-state", event => { void publishGameState(event.detail); });
+  window.addEventListener("aletheia:session-restart", async () => {
+    if (!state.active || !state.roomId) { window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready")); return; }
+    try {
+      state.commandSeq = {}; state.publishedRevision = 0; state.publishQueue = Promise.resolve();
+      await update(ref(database, `rooms/${state.roomId}`), { "meta/status": "restarting", game: null, commands: null });
+      window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready"));
+    } catch (error) { console.error("No se pudo preparar la revancha", error); }
+  });
+  window.addEventListener("aletheia:session-playing", () => {
+    if (state.active && state.roomId) update(ref(database, `rooms/${state.roomId}/meta`), { status: "playing" }).catch(error => console.error("No se pudo reanudar la sala", error));
+  });
+  window.addEventListener("aletheia:session-close", async () => {
+    if (!state.active || !state.roomId) { window.dispatchEvent(new CustomEvent("aletheia:session-closed-host")); return; }
+    try {
+      const closedRoomId = state.roomId;
+      await update(ref(database, `rooms/${closedRoomId}/meta`), { status: "closed" });
+      await state.disconnectStatus?.cancel().catch(() => {}); state.disconnectStatus = null;
+      window.dispatchEvent(new CustomEvent("aletheia:session-closed-host"));
+      state.unsubscribe?.(); state.unsubscribe = null; state.unsubscribeStatus?.(); state.unsubscribeStatus = null; state.unsubscribeCommands?.(); state.unsubscribeCommands = null;
+      document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
+      document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
+      state.active = false; state.roomId = ""; state.humanSlots = []; state.invitations = {}; state.players = {};
+      if (window.AletheiaPlayMode) window.AletheiaPlayMode.remoteActive = false;
+      updateHostControls();
+      setTimeout(() => remove(ref(database, `rooms/${closedRoomId}`)).catch(() => {}), 5000);
+    } catch (error) { console.error("No se pudo cerrar la sala", error); }
+  });
   window.addEventListener("aletheia:setup-selection", event => {
     state.selectionBusy = Boolean(event.detail?.busy);
     updateHostControls(state.humanSlots.filter(slot => state.players[slot]?.connected).length);
@@ -329,12 +365,18 @@ function observeControllerRoom() {
   controllerState.unsubscribeMeta = onValue(ref(database, `rooms/${invitation.roomId}/meta`), snapshot => {
     const meta = snapshot.val();
     if (!meta) {
+      if (controllerState.closed) return;
       setRemoteStatus("SALA CERRADA", "error");
       window.dispatchEvent(new CustomEvent("aletheia:mando-room-state", { detail: { status: "offline" } }));
       return;
     }
     controllerState.expectedSlots = String(meta.humanSlots || "1").split("").map(Number).filter(slot => [1, 2, 3].includes(slot));
     updateControllerLobby();
+    if (meta.status === "closed") {
+      controllerState.closed = true;
+      clearInterval(controllerState.heartbeat); controllerState.heartbeat = null;
+      controllerState.unsubscribeGame?.(); controllerState.unsubscribeGame = null;
+    }
     window.dispatchEvent(new CustomEvent("aletheia:mando-room-state", { detail: { status: meta.status } }));
   }, error => {
     console.error("No se pudo leer el estado del plató", error);
@@ -346,7 +388,11 @@ function observeControllerRoom() {
   }, error => console.error("No se pudo leer el estado de los jugadores", error));
   controllerState.unsubscribeGame = onValue(ref(database, `rooms/${invitation.roomId}/game`), snapshot => {
     const game = snapshot.val(); if (!game) return;
-    const player = Array.isArray(game.players) ? game.players.find(item => Number(item.slot) === invitation.slot) : null;
+    const revision = Number(game.revision || 0);
+    if (revision && revision < controllerState.gameRevision) return;
+    controllerState.gameRevision = revision;
+    const playerCollection = game.players || {};
+    const player = playerCollection[String(invitation.slot)] || Object.values(playerCollection).find(item => Number(item?.slot) === invitation.slot) || null;
     const elapsed = Math.max(0, Date.now() + controllerState.serverOffset - Number(game.publishedAt || 0));
     const remaining = Math.max(0, Number(game.remainingMs || 0) - elapsed);
     const seconds = Math.ceil(remaining / 1000);
