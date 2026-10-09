@@ -626,6 +626,18 @@
     }
     render();
   }
+  const mobilePortraitQuery = window.matchMedia("(max-width: 900px) and (orientation: portrait) and (pointer: coarse)");
+  function enforceMobileLandscape(event) {
+    const portrait = typeof event?.matches === "boolean" ? event.matches : mobilePortraitQuery.matches;
+    document.documentElement.classList.toggle("tv-mobile-portrait", portrait);
+    if (portrait && state && !$("game-panel").hidden && !gamePaused) setGamePaused(true);
+  }
+  if (typeof mobilePortraitQuery.addEventListener === "function") {
+    mobilePortraitQuery.addEventListener("change", enforceMobileLandscape);
+  } else {
+    mobilePortraitQuery.addListener(enforceMobileLandscape);
+  }
+  enforceMobileLandscape();
   $("pause-game").addEventListener("click", () => setGamePaused(!gamePaused));
   $("resume-game").addEventListener("click", () => setGamePaused(false));
   $("new-game").addEventListener("click", () => location.reload());

@@ -3128,3 +3128,671 @@ html, body {
   }
 }
 
+/* Bloqueo de orientación: solo teléfonos y dispositivos táctiles estrechos. */
+
+.tv-orientation-lock {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  padding: 24px;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  color: #eef7ff;
+  background: radial-gradient(circle at 50% 38%,#182944,#03060d 68%);
+  text-align: center;
+}
+
+.tv-orientation-lock small {
+  color: #8fa6cf;
+  letter-spacing: .14em;
+}
+
+.tv-orientation-lock strong {
+  color: var(--tv-cyan);
+  font: 700 clamp(24px,7vw,38px) "Tektur",sans-serif;
+}
+
+.tv-orientation-lock p {
+  max-width: 420px;
+  margin: 0;
+  color: #cbd8ed;
+}
+
+.tv-orientation-device {
+  width: 48px;
+  height: 76px;
+  padding: 6px;
+  border: 3px solid #dff8ff;
+  border-radius: 9px;
+  animation: tvRotateDevice 1.8s ease-in-out infinite;
+}
+
+.tv-orientation-device span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #4f718d;
+  border-radius: 4px;
+  background: #0b1423;
+}
+
+.tv-mobile-portrait .tv-orientation-lock {
+  display: grid;
+}
+
+@keyframes tvRotateDevice {
+  0%, 20% {
+    transform: rotate(0);
+  }
+  70%, 100% {
+    transform: rotate(90deg);
+  }
+}
+
+/* Versión móvil apaisada. Escritorio, tableta y Smart TV conservan su composición. */
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .aletheia-tv-header, .aletheia-tv-divider {
+    display: none!important;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .aletheia-tv-page.container {
+    width: calc(100% - 8px);
+    max-width: none;
+    height: 100dvh;
+    padding: 0;
+    grid-template-rows: minmax(0,1fr);
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-app {
+    padding: 4px 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-setup {
+    grid-template-rows: 20px minmax(0,1fr) 48px;
+    gap: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-section-title {
+    gap: 7px;
+    padding: 0 2px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-section-title span {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-section-title h2 {
+    font-size: 14px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-participants-grid {
+    gap: 5px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-prometheus, .tv-contestant-card {
+    padding: 5px;
+    gap: 4px;
+    border-radius: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-prometheus-copy, .tv-card-copy {
+    gap: 1px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-prometheus-copy strong, .tv-card-copy > strong {
+    font-size: 12px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-card-copy small, .tv-prometheus-copy small {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .rival-card span, .tv-card-copy span {
+    font-size: 8px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-human-card input, .tv-extra-human input {
+    min-height: 24px;
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-mode-switch {
+    top: 4px;
+    right: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-row {
+    min-height: 48px;
+    padding: 4px 6px;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 6px;
+    border-radius: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-orb {
+    display: none;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-copy small {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-copy p {
+    margin-top: 1px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-actions {
+    gap: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-status-actions .tv-button {
+    min-height: 27px;
+    padding: 4px 7px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-timed-option {
+    min-height: 27px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-timed-option span {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-game {
+    grid-template-columns: minmax(205px,28%) minmax(0,1fr);
+    grid-template-rows: 36px minmax(150px,1fr) 122px 48px;
+    grid-template-areas: "message message" "wheel puzzle" "wheel controls" "contestants contestants";
+    gap: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-panel {
+    border-radius: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-message {
+    min-height: 36px;
+    padding: 3px 7px;
+    gap: 6px;
+    border-left: 3px solid #e8bb51;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-message::before {
+    content: "AHORA";
+    color: #e8bb51;
+    font: 700 7px "Tektur",sans-serif;
+    letter-spacing: .08em;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-message p {
+    min-width: 0;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-orb {
+    display: none;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-game-tools {
+    gap: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-clock {
+    min-width: 52px;
+    padding: 3px 5px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-pause-button, .tv-restart-button {
+    min-width: 64px;
+    min-height: 26px;
+    padding: 3px 6px!important;
+    font-size: 7px!important;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle {
+    padding: 4px 8px 5px;
+    border-color: #35738b;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle-meta {
+    font-size: 8px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle-context {
+    gap: 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle-context #clue {
+    max-width: 45vw;
+    font-size: 9px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle-meta #category {
+    font-size: 9px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .letter-board {
+    gap: 2px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .letter-row {
+    grid-template-columns: repeat(var(--columns),clamp(22px,3.05vw,30px));
+    gap: 3px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .letter-board .tile {
+    height: 25px;
+    font-size: 14px;
+    border-width: 1px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-wheel-panel {
+    padding: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .pointer {
+    top: 3px;
+    border-left-width: 8px;
+    border-right-width: 8px;
+    border-top-width: 16px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .wheel {
+    width: min(95%,68vh,270px);
+    border-width: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .wheel .wheel-sector-label {
+    font-size: clamp(5px,1.25vh,7px);
+    transform: rotate(var(--sector-angle)) translateY(calc(clamp(72px,25vh,112px) * -1)) rotate(90deg);
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .wheel-hub {
+    width: 28%!important;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .wheel-hub strong {
+    font-size: clamp(8px,2.2vh,12px);
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .wheel-hub small {
+    font-size: 5px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-controls {
+    padding: 4px 7px;
+    gap: 3px;
+    border-color: #7354a5;
+    grid-template-rows: 24px minmax(0,1fr) 28px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-control-heading {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    gap: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-control-heading > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-control-heading > div:first-child > small {
+    font-size: 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-control-heading > div:first-child > small::after {
+    content: "ACCIÓN CONTEXTUAL";
+    color: #aa87dc;
+    font: 700 7px "Tektur",sans-serif;
+    letter-spacing: .08em;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-turn-title {
+    min-height: 0;
+    gap: 5px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-turn-title h2 {
+    font-size: 12px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-turn-title #next-round {
+    min-width: 92px;
+    min-height: 22px;
+    padding: 2px 6px;
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-active-money {
+    min-width: 112px;
+    height: 24px;
+    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-active-money small {
+    display: none;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-active-money > strong {
+    font-size: 16px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-active-money span {
+    padding-left: 6px;
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-active-money b {
+    display: inline;
+    margin: 0 0 0 3px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .keyboard {
+    align-self: stretch;
+    gap: 2px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .keyboard button {
+    min-height: 17px;
+    padding: 0;
+    font-size: 9px;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  #solve-form {
+    grid-template-columns: minmax(0,1fr) auto auto;
+    gap: 3px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  #solve-form label {
+    display: block;
+    font-size: 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+    min-height: 26px;
+    height: 26px;
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  #solve-form .tv-button {
+    min-width: 68px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-contestants {
+    padding: 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .scoreboard {
+    height: 48px;
+    gap: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player {
+    min-height: 48px;
+    height: 48px;
+    padding: 3px 5px;
+    grid-template-columns: 34px minmax(0,1fr) auto;
+    gap: 5px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player img, .player-initials {
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-copy {
+    gap: 0;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-copy small, .player-copy em {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-copy strong {
+    font-size: 10px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-score {
+    min-width: 64px;
+    padding-left: 5px;
+    gap: 0 4px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-score small, .player-score span i {
+    font-size: 6px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-score strong {
+    font-size: 14px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .player-score span b {
+    font-size: 12px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-pause-overlay {
+    padding: 8px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-pause-overlay > div {
+    min-width: min(360px,86vw);
+    padding: 14px;
+    gap: 5px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-pause-overlay strong {
+    font-size: 22px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-pause-overlay p {
+    font-size: 10px;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-message {
+    box-shadow: inset 0 0 16px #e8bb5108;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-puzzle, .tv-contestants {
+    box-shadow: inset 0 0 18px #57e6ff0a;
+  }
+}
+
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-controls {
+    box-shadow: inset 0 0 18px #9c6cff0d;
+  }
+}
+
+@media (max-width:900px) and (orientation:portrait) and (pointer:coarse) {
+  .tv-orientation-lock {
+    display: grid;
+  }
+}
+
