@@ -3193,13 +3193,13 @@ html, body {
 
 /* Versión móvil apaisada. Escritorio, tableta y Smart TV conservan su composición. */
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .aletheia-tv-header, .aletheia-tv-divider {
     display: none!important;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .aletheia-tv-page.container {
     width: calc(100% - 8px);
     max-width: none;
@@ -3209,45 +3209,45 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-app {
     padding: 4px 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-setup {
     grid-template-rows: 20px minmax(0,1fr) 48px;
     gap: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-section-title {
     gap: 7px;
     padding: 0 2px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-section-title span {
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-section-title h2 {
     font-size: 14px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-participants-grid {
     gap: 5px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-prometheus, .tv-contestant-card {
     padding: 5px;
     gap: 4px;
@@ -3255,31 +3255,31 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-prometheus-copy, .tv-card-copy {
     gap: 1px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-prometheus-copy strong, .tv-card-copy > strong {
     font-size: 12px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-card-copy small, .tv-prometheus-copy small {
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .rival-card span, .tv-card-copy span {
     font-size: 8px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-human-card input, .tv-extra-human input {
     min-height: 24px;
     padding: 3px 6px;
@@ -3287,14 +3287,14 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-mode-switch {
     top: 4px;
     right: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-row {
     min-height: 48px;
     padding: 4px 6px;
@@ -3304,32 +3304,32 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-orb {
     display: none;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-copy small {
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-copy p {
     margin-top: 1px;
     font-size: 9px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-actions {
     gap: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-status-actions .tv-button {
     min-height: 27px;
     padding: 4px 7px;
@@ -3337,20 +3337,20 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-timed-option {
     min-height: 27px;
     padding: 3px 6px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-timed-option span {
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-game {
     grid-template-columns: minmax(205px,28%) minmax(0,1fr);
     grid-template-rows: 36px minmax(150px,1fr) 122px 48px;
@@ -3359,13 +3359,13 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-panel {
     border-radius: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message {
     min-height: 36px;
     padding: 3px 7px;
@@ -3374,7 +3374,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message::before {
     content: "AHORA";
     color: #e8bb51;
@@ -3383,7 +3383,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message p {
     min-width: 0;
     font-size: 10px;
@@ -3393,19 +3393,19 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-orb {
     display: none;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-game-tools {
     gap: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-clock {
     min-width: 52px;
     padding: 3px 5px;
@@ -3413,7 +3413,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-button, .tv-restart-button {
     min-width: 64px;
     min-height: 26px;
@@ -3422,52 +3422,52 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle {
     padding: 4px 8px 5px;
     border-color: #35738b;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-meta {
     font-size: 8px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-context {
     gap: 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-context #clue {
     max-width: 45vw;
     font-size: 9px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-meta #category {
     font-size: 9px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-board {
     gap: 2px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-row {
     grid-template-columns: repeat(var(--columns),clamp(22px,3.05vw,30px));
     gap: 3px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .letter-board .tile {
     height: 25px;
     font-size: 14px;
@@ -3475,13 +3475,13 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-wheel-panel {
     padding: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .pointer {
     top: 3px;
     border-left-width: 8px;
@@ -3490,39 +3490,39 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .wheel {
     width: min(95%,68vh,270px);
     border-width: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .wheel .wheel-sector-label {
     font-size: clamp(5px,1.25vh,7px);
     transform: rotate(var(--sector-angle)) translateY(calc(clamp(72px,25vh,112px) * -1)) rotate(90deg);
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .wheel-hub {
     width: 28%!important;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .wheel-hub strong {
     font-size: clamp(8px,2.2vh,12px);
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .wheel-hub small {
     font-size: 5px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-controls {
     padding: 4px 7px;
     gap: 3px;
@@ -3531,7 +3531,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-control-heading {
     min-height: 24px;
     padding: 0;
@@ -3540,7 +3540,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-control-heading > div:first-child {
     display: flex;
     align-items: center;
@@ -3548,13 +3548,13 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-control-heading > div:first-child > small {
     font-size: 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-control-heading > div:first-child > small::after {
     content: "ACCIÓN CONTEXTUAL";
     color: #aa87dc;
@@ -3563,20 +3563,20 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title {
     min-height: 0;
     gap: 5px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title h2 {
     font-size: 12px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-turn-title #next-round {
     min-width: 92px;
     min-height: 22px;
@@ -3585,7 +3585,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money {
     min-width: 112px;
     height: 24px;
@@ -3598,26 +3598,26 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money small {
     display: none;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money > strong {
     font-size: 16px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money span {
     padding-left: 6px;
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-active-money b {
     display: inline;
     margin: 0 0 0 3px;
@@ -3625,14 +3625,14 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .keyboard {
     align-self: stretch;
     gap: 2px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .keyboard button {
     min-height: 17px;
     padding: 0;
@@ -3641,21 +3641,21 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form {
     grid-template-columns: minmax(0,1fr) auto auto;
     gap: 3px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form label {
     display: block;
     font-size: 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
     min-height: 26px;
     height: 26px;
@@ -3664,26 +3664,26 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   #solve-form .tv-button {
     min-width: 68px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-contestants {
     padding: 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .scoreboard {
     height: 48px;
     gap: 4px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player {
     min-height: 48px;
     height: 48px;
@@ -3694,7 +3694,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player img, .player-initials {
     width: 34px;
     height: 34px;
@@ -3702,25 +3702,25 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-copy {
     gap: 0;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-copy small, .player-copy em {
     font-size: 7px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-copy strong {
     font-size: 10px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score {
     min-width: 64px;
     padding-left: 5px;
@@ -3728,31 +3728,31 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score small, .player-score span i {
     font-size: 6px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score strong {
     font-size: 14px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .player-score span b {
     font-size: 12px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-overlay {
     padding: 8px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-overlay > div {
     min-width: min(360px,86vw);
     padding: 14px;
@@ -3760,31 +3760,31 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-overlay strong {
     font-size: 22px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-pause-overlay p {
     font-size: 10px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-message {
     box-shadow: inset 0 0 16px #e8bb5108;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle, .tv-contestants {
     box-shadow: inset 0 0 18px #57e6ff0a;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-controls {
     box-shadow: inset 0 0 18px #9c6cff0d;
   }
@@ -3797,6 +3797,312 @@ html, body {
 }
 
 /* Entrada voluntaria: el primer gesto desbloquea el audio en navegador, móvil y Smart TV. */
+
+/* Cierre de partida: clasificación y estadísticas. */
+
+.tv-winner {
+  grid-column: 1/-1;
+  grid-row: 2/5;
+  align-content: center;
+  place-content: initial;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px 22px;
+  overflow: hidden;
+}
+
+.tv-winner-heading {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.tv-winner-heading h2 {
+  margin: 0;
+}
+
+.tv-winner-heading p {
+  margin: 0;
+}
+
+.tv-winner-highlights {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(230px,1fr));
+  gap: 10px;
+  width: min(760px,100%);
+}
+
+.tv-winner-highlights article {
+  display: grid;
+  gap: 2px;
+  padding: 8px 14px;
+  border: 1px solid #35506b;
+  border-radius: 9px;
+  background: #07101ed9;
+}
+
+.tv-winner-highlights small, .tv-winner-player > small {
+  color: #8fa6cf;
+  font: 600 9px "Tektur",sans-serif;
+  letter-spacing: .13em;
+}
+
+.tv-winner-highlights strong {
+  color: #eaf8ff;
+  font: 700 21px "Tektur",sans-serif;
+}
+
+.tv-winner-highlights span {
+  color: #8292ae;
+  font-size: 11px;
+}
+
+.tv-winner-stats {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.tv-winner-player {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 2px 10px;
+  padding: 10px 13px;
+  border: 1px solid #33405a;
+  border-radius: 10px;
+  background: #090f1de8;
+  text-align: left;
+}
+
+.tv-winner-player.is-winner {
+  border-color: var(--tv-cyan);
+  box-shadow: inset 0 0 22px #57e6ff12,0 0 17px #57e6ff22;
+}
+
+.tv-winner-player > small, .tv-winner-player > strong, .tv-winner-player > dl {
+  grid-column: 1;
+}
+
+.tv-winner-player > strong {
+  overflow: hidden;
+  color: #edf5ff;
+  font: 700 clamp(14px,1.2vw,19px) "Tektur",sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv-winner-player > b {
+  grid-column: 2;
+  grid-row: 1/3;
+  color: var(--tv-cyan);
+  font: 700 clamp(30px,3vw,46px)/1 "Tektur",sans-serif;
+}
+
+.tv-winner-player > span {
+  grid-column: 2;
+  color: #8395b5;
+  font: 600 8px "Tektur",sans-serif;
+  letter-spacing: .12em;
+  text-align: right;
+}
+
+.tv-winner-player dl {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 4px 12px;
+  margin: 6px 0 0;
+  padding-top: 7px;
+  border-top: 1px solid #25324a;
+}
+
+.tv-winner-player dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tv-winner-player dt {
+  color: #8090ad;
+  font-size: 10px;
+}
+
+.tv-winner-player dd {
+  margin: 0;
+  color: #d9e6f8;
+  font: 600 10px "Exo 2",sans-serif;
+  text-align: right;
+}
+
+.tv-winner-new-game {
+  min-width: 190px;
+}
+
+@media (max-height:760px) {
+  .tv-winner {
+    gap: 6px;
+    padding: 8px 14px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-heading h2 {
+    font-size: 25px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-heading p {
+    font-size: 13px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-highlights article {
+    padding: 5px 10px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-highlights strong {
+    font-size: 17px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-player {
+    padding: 7px 10px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-player dl {
+    gap: 2px 8px;
+    margin-top: 4px;
+    padding-top: 4px;
+  }
+}
+
+@media (max-height:760px) {
+  .tv-winner-new-game {
+    min-height: 32px;
+    padding: 5px 14px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner {
+    grid-row: 2/5;
+    gap: 4px;
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-heading small {
+    font-size: 6px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-heading h2 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-heading p {
+    font-size: 9px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-highlights {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 4px;
+    width: min(520px,100%);
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-highlights article {
+    padding: 3px 7px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-highlights small, .tv-winner-player > small {
+    font-size: 6px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-highlights strong {
+    font-size: 12px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-highlights span {
+    font-size: 7px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-stats {
+    gap: 4px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player {
+    gap: 1px 4px;
+    padding: 4px 6px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player > strong {
+    font-size: 9px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player > b {
+    font-size: 19px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player > span {
+    font-size: 5px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player dl {
+    gap: 1px 5px;
+    margin-top: 2px;
+    padding-top: 2px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-player dt, .tv-winner-player dd {
+    font-size: 6px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-winner-new-game {
+    min-width: 100px;
+    min-height: 24px;
+    padding: 3px 7px;
+    font-size: 7px;
+  }
+}
 
 .tv-entry {
   position: fixed;
@@ -3898,7 +4204,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-sound-button {
     min-width: 58px;
     min-height: 26px;
@@ -3907,7 +4213,7 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-card {
     width: min(540px,90vw);
     grid-template-columns: 90px 1fr;
@@ -3917,39 +4223,39 @@ html, body {
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-card img {
     grid-row: 1/5;
     width: 90px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-card h1, .tv-entry-card p, .tv-entry-card small {
     justify-self: start;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-card h1 {
     font-size: 28px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-card p {
     font-size: 11px;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-actions {
     grid-column: 2;
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse) {
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-actions .tv-button {
     min-height: 34px;
     padding: 5px 8px;

@@ -102,9 +102,16 @@
                     </div>
                     <div id="letter-board" class="letter-board" aria-label="Panel de letras"></div>
                 </section>
-                <section id="winner-panel" class="tv-winner tv-panel" hidden=""><small>PARTIDA FINALIZADA</small>
-                    <h2 id="winner-name"></h2>
-                    <p id="winner-score"></p>
+                <section id="winner-panel" class="tv-winner tv-panel" hidden="">
+                    <header class="tv-winner-heading"><small>PARTIDA FINALIZADA</small>
+                        <h2 id="winner-name"></h2>
+                        <p id="winner-score"></p>
+                    </header>
+                    <div class="tv-winner-highlights">
+                        <article><small>TIEMPO DE JUEGO</small><strong id="winner-duration">00:00</strong><span id="winner-pause-time">Sin pausas</span></article>
+                        <article><small>MEJOR JUGADA</small><strong id="winner-best-play">—</strong><span>Premio obtenido con una letra</span></article>
+                    </div>
+                    <div id="winner-stats" class="tv-winner-stats"></div><button class="tv-button tv-button-primary tv-winner-new-game" id="winner-new-game" type="button">NUEVA PARTIDA</button>
                 </section>
                 <div id="play-area" class="tv-play-area">
                     <section class="tv-wheel-panel tv-panel">
@@ -123,7 +130,7 @@
                         <form id="solve-form"><label>Resolver panel<input autocomplete="off" id="solution" placeholder="Escribe la solución"></label><button class="tv-button tv-button-secondary" type="submit">RESOLVER</button><button class="tv-button tv-pass-button" id="pass-turn" type="button" hidden="">PASAR TURNO</button></form>
                     </section>
                 </div>
-                <section class="tv-contestants">
+                <section id="contestants-panel" class="tv-contestants">
                     <div id="scoreboard" class="scoreboard"></div>
                 </section>
                 <ol id="event-log" hidden=""></ol>
