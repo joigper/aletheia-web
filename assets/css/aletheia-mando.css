@@ -38,42 +38,16 @@ html.aletheia-mando-root body {
   height: var(--remote-visible-height,100dvh);
   min-height: 0;
   margin: auto;
-  padding: max(12px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  padding: max(7px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
   display: grid;
-  grid-template-rows: auto minmax(0,1fr);
-  gap: 14px;
+  grid-template-rows: minmax(0,1fr);
   overflow: hidden;
 }
 
-.remote-header {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 44px minmax(0,1fr) auto;
-  gap: 10px;
-  align-items: center;
-  padding-bottom: 11px;
-  border-bottom: 1px solid #334057;
-}
-
-.remote-header img {
-  width: 42px;
-  height: 49px;
-}
-
-.remote-header div {
-  min-width: 0;
-  display: grid;
-}
-
-.remote-header small, .screen-heading > span, .action-card > small, .game-status small, .score-strip small, .remote-notice small, .demo-nav > small {
+.screen-heading > span, .action-card > small, .game-status small, .score-strip small, .remote-notice small, .demo-nav > small {
   color: #8fa4ca;
   font: 600 10px "Tektur",sans-serif;
   letter-spacing: .12em;
-}
-
-.remote-header strong {
-  font: 700 16px "Tektur",sans-serif;
-  white-space: nowrap;
 }
 
 .connection-pill {
@@ -556,12 +530,6 @@ html.aletheia-mando-root body {
 }
 
 @media (max-width:380px) {
-  .remote-header strong {
-    font-size: 13px;
-  }
-}
-
-@media (max-width:380px) {
   .connection-pill {
     padding-inline: 6px;
   }
@@ -928,9 +896,44 @@ html.aletheia-mando-root body {
   text-align: center;
 }
 
-.config-confirm > div:nth-child(2) {
+.config-title-row {
+  display: grid;
+  grid-template-columns: 46px minmax(0,1fr);
+  align-items: center;
+  gap: 7px 10px;
+}
+
+.config-title-row > img {
+  width: 43px;
+  height: auto;
+  grid-row: 1/3;
+}
+
+.config-title-row .connection-pill {
+  grid-column: 2;
+  justify-self: start;
+  padding: 4px 7px;
+  font-size: 7px;
+}
+
+.config-selected-avatar {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.config-selected-avatar > div:last-child {
+  min-width: 0;
   display: grid;
   gap: 2px;
+}
+
+.config-confirm-actions {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 7px;
 }
 
 .config-confirm small {
@@ -1025,29 +1028,6 @@ html.aletheia-mando-root body {
   .remote-shell {
     width: min(100%,1100px);
     max-width: none;
-    padding-top: max(7px,env(safe-area-inset-top));
-    padding-bottom: max(7px,env(safe-area-inset-bottom));
-    gap: 7px;
-  }
-}
-
-@media (orientation:landscape) {
-  .remote-header {
-    grid-template-columns: 36px minmax(0,1fr) auto;
-    padding-bottom: 5px;
-  }
-}
-
-@media (orientation:landscape) {
-  .remote-header img {
-    width: 31px;
-    height: 37px;
-  }
-}
-
-@media (orientation:landscape) {
-  .remote-header strong {
-    font-size: 13px;
   }
 }
 
@@ -1060,7 +1040,7 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) {
   .remote-config-landscape {
-    grid-template-columns: minmax(190px,.9fr) minmax(370px,2fr) minmax(170px,.8fr);
+    grid-template-columns: minmax(180px,.85fr) minmax(330px,1.8fr) minmax(210px,1fr);
     align-items: stretch;
     gap: 12px;
   }
@@ -1100,8 +1080,10 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) {
   .config-confirm {
+    grid-template-columns: 76px minmax(0,1fr);
     border-left: 1px solid #303e57;
     padding-left: 12px;
+    text-align: center;
   }
 }
 
@@ -1138,40 +1120,8 @@ html.aletheia-mando-root body {
 }
 
 @media (orientation:landscape) and (max-height:430px) {
-  .remote-header {
-    grid-template-columns: 27px minmax(0,1fr) auto;
-    padding-bottom: 3px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .remote-header img {
-    width: 24px;
-    height: 29px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .remote-header small {
-    display: none;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .remote-header strong {
-    font-size: 11px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
-  .connection-pill {
-    padding-block: 4px;
-  }
-}
-
-@media (orientation:landscape) and (max-height:430px) {
   .remote-config-landscape {
-    grid-template-columns: minmax(140px,.8fr) minmax(300px,2fr) minmax(125px,.65fr);
+    grid-template-columns: minmax(135px,.75fr) minmax(275px,1.75fr) minmax(175px,.9fr);
     gap: 8px;
   }
 }
@@ -1179,6 +1129,26 @@ html.aletheia-mando-root body {
 @media (orientation:landscape) and (max-height:430px) {
   .config-identity {
     gap: 8px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-title-row {
+    grid-template-columns: 35px minmax(0,1fr);
+    gap: 4px 7px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-title-row > img {
+    width: 34px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .config-title-row .connection-pill {
+    padding: 3px 5px;
+    font-size: 6px;
   }
 }
 
@@ -1197,6 +1167,7 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .config-confirm {
+    grid-template-columns: 62px minmax(0,1fr);
     gap: 5px;
     padding-left: 8px;
   }
@@ -1204,13 +1175,21 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .config-confirm .privacy-note {
-    font-size: 8px;
+    font-size: 7px;
   }
 }
 
 @media (orientation:landscape) and (max-height:430px) {
   .config-confirm .remote-button {
-    min-height: 46px;
+    min-height: 42px;
+    font-size: 10px;
+  }
+}
+
+@media (orientation:landscape) and (max-height:430px) {
+  .selected-avatar-mini {
+    width: 58px;
+    height: 58px;
   }
 }
 

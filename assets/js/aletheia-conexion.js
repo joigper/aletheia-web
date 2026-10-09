@@ -350,7 +350,7 @@ async function connectController(player) {
 function initController() {
   const invitation = invitationFromUrl();
   if (!invitation.roomId) { setRemoteStatus("DEMO LOCAL", "demo"); return; }
-  setRemoteStatus(`SALA ${invitation.roomId}`, "pending");
+  setRemoteStatus("ENLACE PREPARADO", "pending");
   const demoButton = document.getElementById("demo-start");
   if (demoButton) demoButton.hidden = true;
   document.getElementById("controller-start")?.addEventListener("click", async event => {
