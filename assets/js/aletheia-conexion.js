@@ -137,27 +137,15 @@ async function createRoom() {
   const user = await authenticatedUser();
   state.humanSlots = currentHumanSlots();
   if (!state.humanSlots.length) throw new Error("No hay plazas humanas disponibles.");
-  let reservation = null;
-  let lastError = null;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const roomId = randomText(6);
-    const invitationTokens = Object.fromEntries(state.humanSlots.map(slot => [slot, randomText(32)]));
-    const invitations = Object.fromEntries(state.humanSlots.map(slot => [slot, { token: invitationTokens[slot] }]));
-    try {
-      await set(ref(database, `rooms/${roomId}`), {
-        meta: { hostUid: user.uid, createdAt: serverTimestamp(), expiresAt: Date.now() + connectionSettings.roomLifetimeMs, status: "waiting" },
-        invitations
-      });
-      reservation = { roomId, invitationTokens };
-      break;
-    } catch (error) {
-      lastError = error;
-      if (!String(error?.code || error?.message || "").toLowerCase().includes("permission")) throw error;
-    }
-  }
-  if (!reservation) throw lastError || new Error("No se pudo reservar un código de sala.");
-  state.roomId = reservation.roomId;
-  state.invitations = reservation.invitationTokens;
+  const roomId = randomText(6);
+  const invitationTokens = Object.fromEntries(state.humanSlots.map(slot => [slot, randomText(32)]));
+  const invitations = Object.fromEntries(state.humanSlots.map(slot => [slot, { token: invitationTokens[slot] }]));
+  await set(ref(database, `rooms/${roomId}`), {
+    meta: { hostUid: user.uid, createdAt: serverTimestamp(), status: "waiting" },
+    invitations
+  });
+  state.roomId = roomId;
+  state.invitations = invitationTokens;
   state.active = true;
   onDisconnect(ref(database, `rooms/${state.roomId}/meta/status`)).set("offline");
   state.humanSlots.forEach(slot => renderQr(slot));
