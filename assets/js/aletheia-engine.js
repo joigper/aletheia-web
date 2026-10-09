@@ -114,7 +114,7 @@
       }
       return { text: selected.pregunta, options: paired.map(item => item.option), correct: paired.findIndex(item => item.correct) };
     }
-    create(alias, selectedRivals, extraSlots, primaryAvatar = null) {
+    create(alias, selectedRivals, extraSlots, primaryAvatar = null, options = {}) {
       const cpu = Array.isArray(selectedRivals) && selectedRivals.length === 2
         ? selectedRivals
         : this.pickRivals(2);
@@ -122,9 +122,12 @@
         ? extraSlots
         : cpu.map(person => ({ cpu: true, person }));
       const selectedPuzzle = this.pickPuzzle();
+      const requestedModes = Array.isArray(options.roundModes) && options.roundModes.length === 5 ? options.roundModes : ROUND_MODES;
+      const roundModes = requestedModes.map(mode => ["NORMAL", "CHOOSE", "SPECIAL", "QUESTION"].includes(mode) ? mode : "NORMAL");
       return {
         phase: "AWAITING_SPIN", active: 0, round: 1, maxRounds: 5, pending: null, lastSpin: null,
-        roundMode: ROUND_MODES[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
+        roundModes, roundMode: roundModes[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
+        playMode: String(options.playMode || "desktop-local"),
         players: [
           { id: "human", name: alias || "Invitado", cpu: false, image: primaryAvatar?.image || null, role: primaryAvatar?.name ? `Avatar · ${primaryAvatar.name}` : "Concursante" },
           ...configuredSlots.map((slot, index) => {
@@ -273,12 +276,12 @@
       state.roundWinner = state.active;
       state.events.push({ type: "RONDA GANADA", detail: `${winner.name}: +${consolidated} al total · ${reason}` });
       state.players.forEach(player => { player.round = 0; });
-      if (state.round >= state.maxRounds && state.roundMode === "QUESTION") {
-        state.question = this.pickQuestion();
-        state.phase = "QUESTION_BONUS";
-      } else {
-        state.phase = "ROUND_COMPLETE";
-      }
+      if (state.round >= state.maxRounds) {
+        if (state.roundMode === "QUESTION") {
+          state.question = this.pickQuestion();
+          state.phase = "QUESTION_BONUS";
+        } else state.phase = "FINAL_READY";
+      } else state.phase = "ROUND_COMPLETE";
       state.pending = null; return state;
     }
     nextRound(state) {
@@ -292,7 +295,7 @@
       state.roundWinner = null;
       state.pending = null;
       state.lastSpin = null;
-      state.roundMode = ROUND_MODES[state.round - 1];
+      state.roundMode = state.roundModes[state.round - 1];
       if (state.roundMode === "CHOOSE") {
         state.categoryChoices = this.categoryChoices(state);
         state.phase = "CATEGORY_CHOICE";

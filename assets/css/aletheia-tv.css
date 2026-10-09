@@ -4248,6 +4248,38 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
   font-size: clamp(14px,1.4vw,18px);
 }
 
+.tv-entry-mode-info {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 11px 14px;
+  border: 1px solid #3e587a;
+  border-radius: 10px;
+  color: #bfcee5;
+  background: #091321;
+  text-align: left;
+}
+
+.tv-entry-mode-info strong {
+  color: var(--tv-cyan);
+  font: 700 11px "Tektur",sans-serif;
+  letter-spacing: .08em;
+}
+
+.tv-entry-mode-info span {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.tv-entry-mode-info.is-mobile {
+  border-color: #665286;
+  background: #171126;
+}
+
+.tv-entry-mode-info.is-mobile strong {
+  color: #c8a8ff;
+}
+
 .tv-entry-actions {
   width: 100%;
   display: grid;
@@ -4340,6 +4372,27 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-mode-info {
+    grid-column: 2;
+    padding: 7px 9px;
+    gap: 2px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-mode-info strong {
+    font-size: 8px;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
+  .tv-entry-mode-info span {
+    font-size: 9px;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-entry-actions {
     grid-column: 2;
     grid-template-columns: 1fr 1fr;
@@ -4352,6 +4405,10 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
     padding: 5px 8px;
     font-size: 8px;
   }
+}
+
+html.aletheia-tv-phone #enable-remotes {
+  display: none!important;
 }
 
 /* Pruebas intermedias: elección de categoría y pregunta de bonificación. */

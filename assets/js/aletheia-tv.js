@@ -39,6 +39,15 @@
   let questionSelectionTimer = null;
   let questionResultTimer = null;
   const missingThumbnails = new Set(["OSCAR2"]);
+  const phoneStandalone = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent) && Math.min(screen.width, screen.height) <= 600;
+  window.AletheiaPlayMode = { phoneStandalone, remoteActive: false };
+
+  function roundConfiguration(humanCount) {
+    if (phoneStandalone) return { playMode: "mobile-standalone", roundModes: ["NORMAL", "NORMAL", "NORMAL", "NORMAL", "NORMAL"] };
+    if (window.AletheiaPlayMode.remoteActive) return { playMode: "studio-remotes", roundModes: [...AletheiaGame.roundModes] };
+    if (humanCount > 1) return { playMode: "desktop-shared", roundModes: ["NORMAL", "CHOOSE", "NORMAL", "NORMAL", "QUESTION"] };
+    return { playMode: "desktop-solo", roundModes: [...AletheiaGame.roundModes] };
+  }
 
   const alphabet = [..."ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"];
   const vowels = new Set(["A", "E", "I", "O", "U"]);
@@ -862,6 +871,8 @@
 
   async function chooseRivals() {
     const run = ++selectionRun;
+    window.AletheiaTVSetupState = { ...(window.AletheiaTVSetupState || {}), selectionBusy: true };
+    window.dispatchEvent(new CustomEvent("aletheia:setup-selection", { detail: { busy: true } }));
     selectedRivals = [];
     selectedBySlot[2] = null; selectedBySlot[3] = null;
     $("reroll-rivals").disabled = true;
@@ -887,6 +898,8 @@
     $("setup-message").textContent = `Partida preparada: ${first.nombre} y ${second.nombre} serán los rivales. Escribe tu alias y comienza cuando quieras.`;
     $("reroll-rivals").disabled = false;
     $("start-game").disabled = false;
+    window.AletheiaTVSetupState.selectionBusy = false;
+    window.dispatchEvent(new CustomEvent("aletheia:setup-selection", { detail: { busy: false } }));
   }
 
   $("start-game").addEventListener("click", () => {
@@ -895,7 +908,9 @@
       ? { cpu: false, alias: (document.querySelector(`[data-human-alias="${slot}"]`)?.value || slotAliases[slot]).trim().slice(0, 18) || `Invitado ${slot}`, avatar: humanAvatarData(slot) }
       : { cpu: true, person: selectedBySlot[slot] });
     timedGame = $("timed-game").checked;
-    state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1));
+    const humanCount = 1 + extraSlots.filter(slot => !slot.cpu).length;
+    const mode = roundConfiguration(humanCount);
+    state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1), mode);
     state.statistics.startedAt = Date.now();
     pauseStartedAt = 0;
     stopPrometeo();
@@ -1119,6 +1134,13 @@
   $("game-sound").addEventListener("click", toggleSound);
 
   function initializeSetup() {
+    document.documentElement.classList.toggle("aletheia-tv-phone", phoneStandalone);
+    $("entry-desktop-info").hidden = phoneStandalone;
+    $("entry-mobile-info").hidden = !phoneStandalone;
+    if (phoneStandalone) {
+      $("entry-mode-summary").textContent = "Esta versión está adaptada para jugar directamente en el teléfono.";
+      $("enable-remotes").hidden = true;
+    }
     chooseHumanAvatar(1);
     $("human-avatar-slot-1").outerHTML = humanAvatarMarkup(1);
     $("reroll-rivals").disabled = true;

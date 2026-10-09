@@ -40,7 +40,9 @@
     <div id="tv-entry" class="tv-entry" role="dialog" aria-modal="true" aria-labelledby="tv-entry-title">
         <div class="tv-entry-card"><img src="assets/img/ocio/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true"><small>ALÉTHEIA-TV · EMISIÓN INTERACTIVA</small>
             <h1 id="tv-entry-title">BIENVENIDOS</h1>
-            <p>Elige cómo quieres entrar. Podrás activar o silenciar el sonido más adelante.</p>
+            <p id="entry-mode-summary">Elige cómo quieres entrar. Podrás activar o silenciar el sonido más adelante.</p>
+            <div id="entry-desktop-info" class="tv-entry-mode-info"><strong>PC O SMART TV · PLATÓ</strong><span>La experiencia completa utiliza esta pantalla como plató y los móviles como mandos. Sin mandos, algunas pruebas se adaptarán cuando haya varios jugadores humanos.</span></div>
+            <div id="entry-mobile-info" class="tv-entry-mode-info is-mobile" hidden=""><strong>VERSIÓN MÓVIL AUTÓNOMA</strong><span>Incluye la ruleta y los paneles normales. Algunas pruebas especiales solo están disponibles usando un PC o Smart TV como plató y los móviles como mandos.</span></div>
             <div class="tv-entry-actions"><button class="tv-button tv-button-primary" id="enter-with-sound" type="button">ENTRAR CON SONIDO</button><button class="tv-button tv-button-secondary" id="enter-without-sound" type="button">ENTRAR SIN SONIDO</button></div>
         </div>
     </div>
@@ -179,7 +181,6 @@
     <script src="assets/js/bs-init.js"></script>
     <script src="assets/js/base-aletheia-001.js"></script>
     <script src="assets/js/base-ciencia-001.js"></script>
-    <script src="assets/js/aletheia-engine.js"></script>
     <script src="assets/js/base-cotidiano-001.js"></script>
     <script src="assets/js/base-cultura-001.js"></script>
     <script src="assets/js/aletheia-audio.js"></script>
@@ -190,10 +191,11 @@
     <script src="assets/js/personajes.js"></script>
     <script src="assets/js/aletheia-firebase-config.js"></script>
     <script src="assets/js/aletheia-pruebas.js"></script>
-    <script src="assets/js/aletheia-tv.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="assets/js/aletheia-conexion.js"></script>
     <script src="assets/js/aletheia-mando.js"></script>
+    <script src="assets/js/aletheia-conexion.js"></script>
+    <script src="assets/js/aletheia-engine.js"></script>
+    <script src="assets/js/aletheia-tv.js"></script>
 </body>
 
 </html>

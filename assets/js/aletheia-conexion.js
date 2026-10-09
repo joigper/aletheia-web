@@ -23,7 +23,7 @@ const app = getApps()[0] || initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 const roomAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy) };
+const state = { roomId: "", humanSlots: [], invitations: {}, players: {}, unsubscribe: null, unsubscribeStatus: null, active: false, selectionBusy: Boolean(window.AletheiaTVSetupState?.selectionBusy), syncingSlots: false };
 const controllerState = { invitation: null, expectedSlots: [], players: {}, unsubscribeMeta: null, unsubscribeSlots: null, starting: false };
 
 function randomText(length, alphabet = roomAlphabet) {
@@ -87,11 +87,11 @@ function setSetupMessage(text) {
 function updateHostControls(connectedCount = 0) {
   const button = document.getElementById("enable-remotes");
   const start = document.getElementById("start-game");
-  document.querySelectorAll("[data-toggle-slot]").forEach(toggle => { toggle.disabled = state.active || state.selectionBusy; });
+  document.querySelectorAll("[data-toggle-slot]").forEach(toggle => { toggle.disabled = state.selectionBusy || state.syncingSlots; });
   if (button) {
     button.textContent = state.active ? "CANCELAR MANDOS" : state.selectionBusy ? "SELECCIONANDO TRIPULACIÓN…" : "USAR MÓVILES COMO MANDO";
     button.classList.toggle("is-active", state.active);
-    button.disabled = state.selectionBusy;
+    button.disabled = state.selectionBusy || state.syncingSlots;
   }
   if (start && state.active) start.disabled = connectedCount !== state.humanSlots.length;
 }
@@ -121,12 +121,52 @@ function observeSlots() {
     });
     updateHostControls(connected);
     setSetupMessage(connected === state.humanSlots.length
-      ? `Configuración cerrada. Los ${connected} mandos están conectados y ya puedes comenzar. Cancela los mandos si necesitas cambiar las plazas.`
-      : `Configuración cerrada · Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados. Cancela los mandos para cambiar las plazas.`);
+      ? `Los ${connected} mandos están conectados. Ya puedes comenzar o seguir cambiando las plazas HUMANO/CPU.`
+      : `Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados. Puedes seguir cambiando las plazas HUMANO/CPU.`);
   }, error => {
     console.error("No se pudo observar la sala", error);
     setSetupMessage("No se pudo leer la sala. Comprueba las reglas de Firebase.");
   });
+}
+
+async function reconcileHumanSlots() {
+  if (!state.active || state.syncingSlots) return;
+  const nextSlots = currentHumanSlots();
+  const previousKey = state.humanSlots.join("");
+  const nextKey = nextSlots.join("");
+  if (previousKey === nextKey) return;
+  state.syncingSlots = true;
+  updateHostControls(state.humanSlots.filter(slot => state.players[slot]?.connected).length);
+  setSetupMessage("Actualizando las plazas y preparando sus códigos QR…");
+  try {
+    const removed = state.humanSlots.filter(slot => !nextSlots.includes(slot));
+    const added = nextSlots.filter(slot => !state.humanSlots.includes(slot));
+    const changes = { "meta/humanSlots": nextKey };
+    removed.forEach(slot => {
+      changes[`invitations/${slot}`] = null;
+      changes[`slots/${slot}`] = null;
+      delete state.invitations[slot];
+      delete state.players[slot];
+    });
+    added.forEach(slot => {
+      const token = randomText(32);
+      state.invitations[slot] = token;
+      changes[`invitations/${slot}`] = { token };
+    });
+    await update(ref(database, `rooms/${state.roomId}`), changes);
+    state.humanSlots = nextSlots;
+    document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
+    document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
+    state.humanSlots.forEach(slot => renderQr(slot, state.players[slot] || null));
+    const connected = state.humanSlots.filter(slot => state.players[slot]?.connected).length;
+    setSetupMessage(`Sala ${state.roomId}: ${connected} de ${state.humanSlots.length} mandos conectados. Puedes seguir cambiando las plazas HUMANO/CPU.`);
+  } catch (error) {
+    console.error("No se pudieron actualizar las plazas", error);
+    setSetupMessage("No se pudieron actualizar las plazas. Vuelve a intentarlo.");
+  } finally {
+    state.syncingSlots = false;
+    updateHostControls(state.humanSlots.filter(slot => state.players[slot]?.connected).length);
+  }
 }
 
 async function authenticatedUser() {
@@ -149,6 +189,7 @@ async function createRoom() {
   state.roomId = roomId;
   state.invitations = invitationTokens;
   state.active = true;
+  if (window.AletheiaPlayMode) window.AletheiaPlayMode.remoteActive = true;
   onDisconnect(ref(database, `rooms/${state.roomId}/meta/status`)).set("offline");
   state.humanSlots.forEach(slot => renderQr(slot));
   updateHostControls(0);
@@ -168,6 +209,7 @@ async function closeRoom() {
   document.querySelectorAll(".tv-remote-slot-layer").forEach(layer => layer.remove());
   document.querySelectorAll(".tv-remote-host").forEach(target => target.classList.remove("tv-remote-host"));
   state.active = false;
+  if (window.AletheiaPlayMode) window.AletheiaPlayMode.remoteActive = false;
   state.roomId = "";
   state.humanSlots = [];
   state.invitations = {};
@@ -197,12 +239,19 @@ async function toggleHostRoom() {
 }
 
 function initHost() {
+  if (window.AletheiaPlayMode?.phoneStandalone) {
+    const button = document.getElementById("enable-remotes");
+    if (button) button.hidden = true;
+    return;
+  }
   document.getElementById("enable-remotes")?.addEventListener("click", toggleHostRoom);
+  let reconcileQueued = false;
   const observer = new MutationObserver(() => {
-    if (!state.active) return;
-    state.humanSlots.forEach(slot => renderQr(slot, state.players[slot] || null));
-    const connected = state.humanSlots.filter(slot => state.players[slot]?.connected).length;
-    updateHostControls(connected);
+    if (!state.active || reconcileQueued) return;
+    const nextKey = currentHumanSlots().join("");
+    if (nextKey === state.humanSlots.join("")) return;
+    reconcileQueued = true;
+    queueMicrotask(() => { reconcileQueued = false; void reconcileHumanSlots(); });
   });
   const preview = document.getElementById("rival-preview");
   if (preview) observer.observe(preview, { childList: true });
