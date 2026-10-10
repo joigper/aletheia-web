@@ -7,12 +7,11 @@
   const effectsPath = basePath;
   const musicFile = "maksymmalko-roblox-minecraft-fortnite-video-game-music-564544.mp3";
   const library = Object.freeze({
-    "saludo-prometeo": ["saludo.mp3", "v4-bienvenida-01.mp3", "v4-bienvenida-02.mp3"],
     bienvenida: ["v4-bienvenida-01.mp3", "v4-bienvenida-02.mp3", "bienvenida.mp3", "bienvenida-01.mp3", "bienvenida-02.mp3"],
     "comienza-partida": ["v4-todos-listos-01.mp3", "v4-preparados-01.mp3", "comienza-partida.mp3", "comienza-partida-01.mp3", "comienza-partida-02.mp3", "comienza-partida-03.mp3"],
     "comienza-ronda": ["comienza-ronda.mp3", "comienza-ronda-01.mp3", "comienza-ronda-02.mp3", "comienza-ronda-03.mp3"],
-    "ultima-ronda": ["v4-ultima-ronda-01.mp3", "v4-ultima-ronda-02.mp3", "v4-ultimo-panel-01.mp3", "ultima-ronda.mp3", "ultima-ronda-01.mp3", "ultima-ronda-02.mp3", "ultima-ronda-03.mp3"],
-    "panel-preparado": ["v4-panel-preparado-01.mp3", "panel-preparado.mp3", "panel-preparado-01.mp3", "panel-preparado-02.mp3"],
+    "ultima-ronda": ["v4-ultima-ronda-01.mp3", "v4-ultima-ronda-02.mp3", "v4-ultimo-panel-01.mp3"],
+    "panel-preparado": ["v4-panel-preparado-01.mp3"],
     "gira-ruleta": ["v4-gira-ruleta-01.mp3", "v4-gira-ruleta-02.mp3", "v4-gira-ruleta-03.mp3", "gira-ruleta.mp3", "gira-ruleta-01.mp3", "gira-ruleta-02.mp3", "gira-ruleta-03.mp3"],
     "elige-consonante": ["v4-elige-consonante-01.mp3", "v4-elige-consonante-02.mp3", "v4-elige-consonante-03.mp3", "elige-consonante.mp3", "elige-consonante-01.mp3", "elige-consonante-02.mp3", "elige-consonante-03.mp3"],
     "compra-vocal-disponible": ["v4-vocal-disponible-01.mp3", "v4-vocal-disponible-02.mp3", "puedes-comprar-vocal.mp3", "compra-vocal-disponible-01.mp3", "compra-vocal-disponible-02.mp3", "compra-vocal-disponible-03.mp3"],
@@ -97,6 +96,7 @@
   let playbackRun = 0;
   let delayedStart = null;
   let speaking = false;
+  let voicePlaybackId = 0;
   const music = new Audio();
   music.preload = "none";
   music.loop = true;
@@ -284,15 +284,20 @@
       : "";
     player.src = basePath + encodeURIComponent(file) + cacheVersion;
     player.currentTime = 0;
+    const voiceId = ++voicePlaybackId;
+    player.addEventListener("playing", () => {
+      if (voiceId !== voicePlaybackId || run !== playbackRun) return;
+      global.dispatchEvent(new CustomEvent("aletheia-voice-start", {
+        detail: { id: voiceId, intent, file, audio: player }
+      }));
+    }, { once: true });
     const playback = player.play();
-    global.dispatchEvent(new CustomEvent("aletheia-voice-start", {
-      detail: { intent, file, audio: player }
-    }));
     if (playback !== undefined) playback.catch(() => finishCurrent());
   }
 
   function stop() {
     playbackRun += 1;
+    voicePlaybackId += 1;
     clearTimeout(delayedStart);
     delayedStart = null;
     queue = [];

@@ -10,6 +10,12 @@
   const SPECIAL_PRIZE = 300;
   const QUESTION_BONUS = 100;
   const FINAL_PRIZE = 500;
+  const NON_SIGNIFICANT_WORDS = new Set([
+    "EL", "LA", "LOS", "LAS", "UN", "UNA", "UNOS", "UNAS",
+    "AL", "DEL", "DE", "EN", "A", "ANTE", "BAJO", "CON", "CONTRA",
+    "DESDE", "DURANTE", "ENTRE", "HACIA", "HASTA", "PARA", "POR",
+    "SEGUN", "SIN", "SOBRE", "TRAS", "Y", "E", "O", "U", "NI", "QUE"
+  ]);
   // Provisional hasta trasladar esta decisión a personaje.juego.seleccionable.
   const excludedCpuIds = new Set(["oscar"]);
   const DEFAULT_CPU_PROFILE = Object.freeze({
@@ -46,6 +52,10 @@
       .replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
   }
 
+  function significantWordCount(value) {
+    return normalize(value).split(" ").filter(word => word && !NON_SIGNIFICANT_WORDS.has(word)).length;
+  }
+
   class Engine {
     constructor(random = Math.random) { this.random = random; }
     getRoster() {
@@ -75,7 +85,7 @@
       while (cpu.length < count) cpu.push(fallback[cpu.length]);
       return cpu;
     }
-    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = []) {
+    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "") {
       const library = Array.isArray(global.aletheiaPaneles)
         ? global.aletheiaPaneles.filter(panel => panel.id && panel.categoria && panel.solucion)
         : [];
@@ -93,10 +103,16 @@
         ? unused.filter(panel => panel.categoria === requiredCategory)
         : unused.filter(panel => !excludedCategorySet.has(panel.categoria));
       const eligible = requested.length ? requested : unused;
+      const varied = significantWordCount(previousSolution) <= 1
+        ? eligible.filter(panel => significantWordCount(panel.solucion) >= 2)
+        : eligible;
+      // La variedad nunca debe bloquear una partida ni contradecir una categoría
+      // elegida. Solo se recupera el conjunto original si no existe alternativa.
+      const selectionPool = varied.length ? varied : eligible;
       // Una misma solución puede existir en varios lotes. Para que no tenga más
       // probabilidades por estar duplicada, solo participa una vez en el sorteo.
       const uniqueSolutions = new Map();
-      eligible.forEach(panel => {
+      selectionPool.forEach(panel => {
         const solution = normalize(panel.solucion);
         if (!uniqueSolutions.has(solution)) uniqueSolutions.set(solution, panel);
       });
@@ -106,8 +122,10 @@
     }
     categoryChoices(state, count = 2) {
       const used = new Set(state.usedPuzzleCategories || []);
+      const previousWasShort = significantWordCount(state.puzzle?.solution || "") <= 1;
       const categories = [...new Set((global.aletheiaPaneles || [])
         .filter(panel => panel && panel.categoria && panel.solucion)
+        .filter(panel => !previousWasShort || significantWordCount(panel.solucion) >= 2)
         .map(panel => panel.categoria))]
         .filter(category => !used.has(category));
       const shuffled = [...categories];
@@ -190,7 +208,7 @@
       else if (count) player.stats.correctConsonants += 1;
       else player.stats.incorrectConsonants += 1;
       state.events.push({ type: "LETRA RÁPIDA", detail: `${letter}: ${count} coincidencia(s)` });
-      if (this.isPuzzleComplete(state)) { player.round += SPECIAL_PRIZE; return this.completeRound(state, "Panel con crono completado"); }
+      if (this.isPuzzleComplete(state)) { player.round += SPECIAL_PRIZE; return this.completeRound(state, "Panel con crono completado", "ultima-letra"); }
       state.active = (state.active + 1) % 3;
       return state;
     }
@@ -205,6 +223,31 @@
       state.active = (state.active + 1) % 3;
       state.events.push({ type: "VELOCIDAD", detail: `${letter} revelada · premio ${state.special.prize}` });
       if (this.isPuzzleComplete(state)) state.phase = "SPEED_SOLVE";
+      return state;
+    }
+    canStopSpeed(state, playerIndex) {
+      if (state.phase !== "SPEED_RUNNING" || !state.players[playerIndex] || state.players[playerIndex].cpu) return false;
+      const lockedAt = Number(state.special?.lockedPlayers?.[playerIndex]);
+      return !Number.isFinite(lockedAt) || state.special.reveals > lockedAt;
+    }
+    stopSpeed(state, playerIndex) {
+      if (!this.canStopSpeed(state, playerIndex)) throw new Error("Ese pulsador todavía no está disponible.");
+      state.active = playerIndex;
+      state.special.buzzerPlayer = playerIndex;
+      state.special.stoppedPrize = state.special.prize;
+      state.phase = "SPEED_SOLVE";
+      state.events.push({ type: "PULSADOR", detail: `${state.players[playerIndex].name} detiene el panel` });
+      return state;
+    }
+    resumeSpeed(state, playerIndex = state.active, reason = "Intento fallido") {
+      if (state.phase !== "SPEED_SOLVE") return state;
+      state.special.lockedPlayers ||= {};
+      state.special.lockedPlayers[playerIndex] = state.special.reveals;
+      state.special.buzzerPlayer = null;
+      state.special.stoppedPrize = null;
+      state.phase = "SPEED_RUNNING";
+      state.active = (playerIndex + 1) % state.players.length;
+      state.events.push({ type: "VELOCIDAD", detail: `${reason}. El panel continúa` });
       return state;
     }
     letter(state, raw) {
@@ -225,7 +268,7 @@
       state.events.push({ type: "LETRA", detail: isWildcard && count ? `${letter}: ${count} coincidencia(s), comodín conseguido` : `${letter}: ${count} coincidencia(s), +${award}` });
       state.pending = null;
       if (!count) return this.pass(state, "La letra no aparece");
-      if (this.isPuzzleComplete(state)) return this.completeRound(state, "Última letra descubierta");
+      if (this.isPuzzleComplete(state)) return this.completeRound(state, "Última letra descubierta", "ultima-letra");
       state.phase = "AWAITING_SPIN"; return state;
     }
     buyVowel(state, raw) {
@@ -240,7 +283,7 @@
       state.puzzle.revealed.push(vowel);
       state.events.push({ type: "VOCAL", detail: `${vowel}: coste ${VOWEL_PRICE}, ${count} coincidencia(s)` });
       if (!count) return this.pass(state, "La vocal no aparece");
-      if (this.isPuzzleComplete(state)) return this.completeRound(state, "Última letra descubierta");
+      if (this.isPuzzleComplete(state)) return this.completeRound(state, "Última letra descubierta", "ultima-letra");
       return state;
     }
     isPuzzleComplete(state) {
@@ -271,6 +314,7 @@
       if (state.phase === "FINAL_SOLVE") return this.finishFinal(state, correct);
       if (!correct) {
         state.players[validSolver].stats.wrongSolutions += 1;
+        if (state.phase === "SPEED_SOLVE") return this.resumeSpeed(state, validSolver, "Respuesta incorrecta");
         if (state.phase === "SPECIAL_LETTER" || speedRound) {
           if (!outOfTurnSpeedAttempt) state.active = (state.active + 1) % 3;
           return state;
@@ -281,15 +325,31 @@
       state.players[state.active].stats.solvedPanels += 1;
       if (state.phase === "SPECIAL_LETTER") state.players[state.active].round += SPECIAL_PRIZE;
       if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
-      return this.completeRound(state, "Panel resuelto");
+      return this.completeRound(state, "Panel resuelto", "resolucion-correcta");
     }
-    completeRound(state, reason) {
+    completeRound(state, reason, trigger = "desconocido") {
+      if (state.phase === "ROUND_COMPLETE" || state.phase === "FINAL_READY" || state.phase === "GAME_COMPLETE") return state;
+      const solvedExplicitly = trigger === "resolucion-correcta";
+      const completedByLetters = this.isPuzzleComplete(state);
+      if (!solvedExplicitly && !completedByLetters) {
+        const diagnostic = `${reason} · origen ${trigger} · letras ${state.puzzle.revealed.join("") || "ninguna"}`;
+        state.events.push({ type: "CIERRE RECHAZADO", detail: diagnostic });
+        throw new Error("Se evitó cerrar la ronda porque todavía quedan letras ocultas.");
+      }
       const winner = state.players[state.active];
       const consolidated = winner.round;
       winner.total += consolidated;
       winner.stats.roundsWon += 1;
       state.roundWinner = state.active;
-      state.events.push({ type: "RONDA GANADA", detail: `${winner.name}: +${consolidated} al total · ${reason}` });
+      state.lastRoundClosure = {
+        round: state.round,
+        winner: state.active,
+        trigger,
+        reason,
+        solution: state.puzzle.solution,
+        revealed: [...state.puzzle.revealed]
+      };
+      state.events.push({ type: "RONDA GANADA", detail: `${winner.name}: +${consolidated} al total · ${reason} · origen ${trigger}` });
       state.players.forEach(player => { player.round = 0; });
       if (state.round >= state.maxRounds) {
         if (state.roundMode === "QUESTION") {
@@ -331,7 +391,7 @@
       return this.startRound(state, state.usedPuzzleCategories, state.selectedCategory);
     }
     startRound(state, usedCategories, category = null) {
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions);
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution);
       state.puzzle = {
         id: selectedPuzzle.id,
         category: selectedPuzzle.categoria,
@@ -346,7 +406,7 @@
       state.selectedCategory = null;
       state.special = null;
       if (state.roundMode === "SPECIAL") {
-        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0 };
+        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0, buzzerPlayer: null, stoppedPrize: null, lockedPlayers: {} };
         state.phase = state.specialRotation === "SPEED" ? "SPEED_RUNNING" : "SPECIAL_LETTER";
       } else state.phase = "AWAITING_SPIN";
       state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds} · ${state.roundMode}` });
@@ -378,7 +438,7 @@
       const finalists = state.players.map((player, index) => ({ player, index })).filter(entry => entry.player.total === highest)
         .sort((a, b) => b.player.stats.roundsWon - a.player.stats.roundsWon || b.player.stats.solvedPanels - a.player.stats.solvedPanels || b.player.stats.correctConsonants - a.player.stats.correctConsonants || a.index - b.index);
       state.active = finalists[0].index;
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories, null, state.usedPuzzleSolutions);
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories, null, state.usedPuzzleSolutions, state.puzzle.solution);
       state.puzzle = { id: selectedPuzzle.id, category: selectedPuzzle.categoria, clue: selectedPuzzle.pista || "", solution: selectedPuzzle.solucion, revealed: ["R", "S", "F", "Y", "O"] };
       state.final = { picks: [], consonants: 0, vowels: 0, prize: FINAL_PRIZE, correct: null };
       state.phase = "FINAL_PICK";
