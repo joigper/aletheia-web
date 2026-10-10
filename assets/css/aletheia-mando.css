@@ -1812,11 +1812,19 @@ html.aletheia-mando-root body {
   }
 }
 
+/* fieldset no resuelve de forma fiable la altura usando solo inset en algunos
+     navegadores móviles. La altura explícita mantiene visible el carrusel. */
+
 @media (orientation:landscape) {
   .remote-config-landscape .avatar-carousel {
     position: absolute;
     z-index: 2;
-    inset: 10px 12px 94px;
+    top: 10px;
+    right: 12px;
+    bottom: auto;
+    left: 12px;
+    width: auto;
+    height: calc(100% - 104px);
     display: block;
   }
 }
@@ -1837,8 +1845,12 @@ html.aletheia-mando-root body {
 @media (orientation:landscape) {
   .remote-config-landscape .carousel-stage {
     position: absolute;
-    inset: 27px 0 17px;
-    height: auto;
+    top: 27px;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: auto;
+    height: calc(100% - 44px);
     overflow: hidden;
   }
 }
@@ -2009,7 +2021,12 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .remote-config-landscape .avatar-carousel {
-    inset: 5px 9px 70px;
+    top: 5px;
+    right: 9px;
+    bottom: auto;
+    left: 9px;
+    width: auto;
+    height: calc(100% - 75px);
   }
 }
 
@@ -2021,8 +2038,12 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .remote-config-landscape .carousel-stage {
-    inset: 20px 0 13px;
-    height: auto;
+    top: 20px;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: auto;
+    height: calc(100% - 33px);
   }
 }
 
