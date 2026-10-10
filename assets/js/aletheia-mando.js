@@ -151,8 +151,8 @@
   $("#selfie-repeat").addEventListener("click",()=>void openSelfieCamera());
   $("#selfie-use").addEventListener("click",()=>{if(!pendingSelfie)return;selfieImage=pendingSelfie;selfieCaptureActive=false;pendingSelfie=null;setSelfieButtons("closed");renderCarousel()});
   window.addEventListener("pagehide",stopSelfieCamera);
-  if(document.readyState==="complete")initializeAvatars();
-  else window.addEventListener("load",initializeAvatars,{once:true});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initializeAvatars,{once:true});
+  else initializeAvatars();
   $("#confirm-player").addEventListener("click",()=>{
     const name=$("#remote-alias").value.trim().slice(0,18)||"Invitado";
     $("#lobby-name").textContent=name;$("#lobby-avatar").textContent=selectedAvatar.name;$("#game-name").textContent=name;$("#lobby-portrait").innerHTML=portraitMarkup();showScreen("lobby");
