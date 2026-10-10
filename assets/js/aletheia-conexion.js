@@ -71,7 +71,7 @@ function renderQr(slot, player = null) {
   if (!player?.connected) {
     const qrBox = layer.querySelector(".tv-remote-qr-image");
     if (window.QRCode) {
-      new window.QRCode(qrBox, { text: controllerUrl(slot), width: 132, height: 132, colorDark: "#02050b", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+      new window.QRCode(qrBox, { text: controllerUrl(slot), width: 320, height: 320, colorDark: "#000000", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
     } else {
       qrBox.classList.add("is-fallback");
       qrBox.textContent = state.roomId;

@@ -895,15 +895,15 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
   display: grid!important;
   grid-template-rows: auto minmax(0,1fr) auto;
   place-items: center;
-  gap: 5px;
-  padding: 10px;
+  gap: 6px;
+  padding: 8px;
   color: #eaf8ff;
   background: radial-gradient(circle at 50% 45%,#163b50,#070c17 72%);
   text-align: center;
 }
 
 .tv-remote-slot-layer > b, .tv-remote-slot-layer > small {
-  font: 600 8px "Tektur",sans-serif;
+  font: 600 clamp(9px,.72vw,12px) "Tektur",sans-serif;
   letter-spacing: .09em;
 }
 
@@ -912,13 +912,16 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 }
 
 .tv-remote-qr-image {
-  width: min(132px,72%);
+  height: 100%;
+  width: auto;
+  max-width: 96%;
+  max-height: 230px;
   aspect-ratio: 1;
   display: grid!important;
   place-items: center;
-  padding: 5px;
-  border-radius: 7px;
-  background: white;
+  padding: 10px;
+  border-radius: 9px;
+  background: #fff;
   box-shadow: 0 0 22px #57e6ff55;
 }
 
