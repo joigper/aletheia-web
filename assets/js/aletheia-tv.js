@@ -56,6 +56,17 @@
   let categoryResultTimer = null;
   let questionSelectionTimer = null;
   let questionResultTimer = null;
+  const explainedVoiceModes = new Set();
+  let announcedCategoryRound = 0;
+  let announcedQuestionRound = 0;
+  let announcedFinal = false;
+  let introVoicePending = false;
+  let introVoiceLockUntil = 0;
+  let challengeVoicePending = false;
+  let finalVoicePending = false;
+  let finalVoiceLockUntil = 0;
+  let chronoWarningRound = 0;
+  let chronoTenSecondRound = 0;
   const missingThumbnails = new Set(["OSCAR2"]);
   const phoneStandalone = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent) && Math.min(screen.width, screen.height) <= 600;
   window.AletheiaPlayMode = { phoneStandalone, remoteActive: false };
@@ -295,20 +306,68 @@
     });
   }
 
+  function roundVoiceMode() {
+    if (state.roundMode !== "SPECIAL") return "normal";
+    return state.special?.type === "SPEED" ? "velocidad" : "crono";
+  }
+
+  function announceRoundIntroduction() {
+    const mode = roundVoiceMode();
+    const firstExplanation = !explainedVoiceModes.has(mode);
+    explainedVoiceModes.add(mode);
+    const sequence = [];
+    let duration = firstExplanation ? 10500 : 6500;
+    if (state.round === 1) sequence.push("primer-panel");
+    if (state.round === state.maxRounds) sequence.push("ultima-ronda");
+    if (mode === "normal") sequence.push(firstExplanation ? "normal-explicacion" : "normal-breve", "panel-preparado");
+    if (mode === "crono") sequence.push("crono-presentacion", firstExplanation ? "crono-explicacion" : "crono-breve", "crono-inicio");
+    if (mode === "velocidad") sequence.push("velocidad-presentacion", firstExplanation ? "velocidad-explicacion" : "velocidad-breve", "velocidad-inicio");
+    voice?.play(sequence);
+    if (voice?.isEnabled() !== false) {
+      introVoicePending = true;
+      duration = 30000;
+    } else duration = 2500;
+    return duration;
+  }
+
+  window.addEventListener("aletheia-voice-idle", () => {
+    const now = Date.now();
+    if (introVoicePending) {
+      introVoicePending = false;
+      roundIntroUntil = now;
+      if (state?.phase === "SPEED_RUNNING" && state.special?.reveals === 0) speedIntroUntil = now;
+      if (interactionLockedUntil === introVoiceLockUntil) interactionLockedUntil = now;
+      introVoiceLockUntil = 0;
+      if (state) render();
+    }
+    if (challengeVoicePending) {
+      challengeVoicePending = false;
+      challengeReadyAt = now;
+      if (state) render();
+    }
+    if (finalVoicePending) {
+      finalVoicePending = false;
+      if (interactionLockedUntil === finalVoiceLockUntil) interactionLockedUntil = now;
+      finalVoiceLockUntil = 0;
+      if (state) render();
+    }
+  });
+
   function render(message) {
     const phaseChanged = renderedPhase !== state.phase;
-    if (phaseChanged && state.phase === "SPEED_RUNNING" && state.special?.reveals === 0) {
-      speedIntroStartedAt = Date.now();
-      speedIntroUntil = speedIntroStartedAt + 7000;
-      speedInputFocused = false;
-    }
-    const regularRoundOpening = introducedRound !== state.round
-      && (state.roundMode === "NORMAL" || state.roundMode === "QUESTION")
-      && ["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase);
-    if (regularRoundOpening) {
+    const roundOpening = introducedRound !== state.round
+      && ["AWAITING_SPIN", "AWAITING_LETTER", "SPECIAL_LETTER", "SPEED_RUNNING"].includes(state.phase);
+    if (roundOpening) {
       introducedRound = state.round;
-      roundIntroUntil = Date.now() + 3000;
+      const introDuration = announceRoundIntroduction();
+      roundIntroUntil = Date.now() + introDuration;
       interactionLockedUntil = Math.max(interactionLockedUntil, roundIntroUntil);
+      introVoiceLockUntil = roundIntroUntil;
+      if (state.phase === "SPEED_RUNNING") {
+        speedIntroStartedAt = Date.now();
+        speedIntroUntil = roundIntroUntil;
+        speedInputFocused = false;
+      }
     }
     const gameComplete = state.phase === "GAME_COMPLETE";
     const roundComplete = state.phase === "ROUND_COMPLETE";
@@ -450,6 +509,29 @@
     return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}` : `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
   }
 
+  function setAnimatedChallengeTitle(value) {
+    const title = $("challenge-title");
+    const text = String(value || "");
+    if (title.dataset.value === text) return;
+    title.dataset.value = text;
+    title.setAttribute("aria-label", text);
+    title.replaceChildren();
+    let letterIndex = 0;
+    text.split(/\s+/).filter(Boolean).forEach(word => {
+      const wordNode = document.createElement("span");
+      wordNode.className = "tv-title-word";
+      wordNode.setAttribute("aria-hidden", "true");
+      [...word].forEach(letter => {
+        const letterNode = document.createElement("i");
+        letterNode.className = "tv-title-letter";
+        letterNode.style.setProperty("--letter-index", letterIndex++);
+        letterNode.textContent = letter;
+        wordNode.append(letterNode);
+      });
+      title.append(wordNode);
+    });
+  }
+
   function renderChallenge() {
     const overlay = $("challenge-overlay");
     const categoryChoice = state.phase === "CATEGORY_CHOICE" || state.phase === "CATEGORY_RESULT";
@@ -457,29 +539,43 @@
     const speedIntro = state.phase === "SPEED_RUNNING" && Date.now() < speedIntroUntil;
     const roundIntro = Date.now() < roundIntroUntil;
     overlay.hidden = !categoryChoice && !question && !speedIntro && !roundIntro;
-    if (overlay.hidden) { challengeKey = ""; return; }
+    if (overlay.hidden) {
+      challengeKey = "";
+      delete $("challenge-title").dataset.value;
+      $("challenge-title").replaceChildren();
+      return;
+    }
     if (roundIntro) {
       clearTimeout(roundIntroTimer);
-      $("challenge-kicker").textContent = state.round === state.maxRounds ? "ÚLTIMA RONDA" : "NUEVO PANEL";
-      $("challenge-title").textContent = `RONDA ${state.round} DE ${state.maxRounds}`;
-      $("challenge-text").textContent = `Comienza ${state.players[state.active].name}.`;
-      $("challenge-options").innerHTML = '<strong class="tv-round-intro-rule">PREPARANDO EL PANEL…</strong>';
+      const mode = roundVoiceMode();
+      overlay.dataset.scene = mode === "velocidad" ? "speed" : mode;
+      const titles = { normal: "PANEL NORMAL", crono: "PANEL CONTRARRELOJ", velocidad: "PANEL DE VELOCIDAD" };
+      const instructions = {
+        normal: "Gira la ruleta, elige consonantes y resuelve el panel.",
+        crono: "Sin ruleta: una letra por jugador antes de que termine el tiempo.",
+        velocidad: "Las letras aparecerán de una en una. Resuelve antes que tus rivales."
+      };
+      $("challenge-kicker").textContent = `${state.round === state.maxRounds ? "ÚLTIMA RONDA" : "NUEVO PANEL"} · RONDA ${state.round} DE ${state.maxRounds}`;
+      setAnimatedChallengeTitle(titles[mode]);
+      $("challenge-text").textContent = instructions[mode];
+      $("challenge-options").innerHTML = `<strong class="tv-round-intro-rule">${mode === "normal" ? "PREPARANDO EL PANEL…" : "ESCUCHA A PROMETEO…"}</strong>`;
       roundIntroTimer = setTimeout(() => render(), Math.max(40, roundIntroUntil - Date.now()));
       return;
     }
     if (speedIntro) {
+      overlay.dataset.scene = "speed";
       clearTimeout(speedIntroTimer);
       const now = Date.now();
       const instructionEndsAt = speedIntroStartedAt + 4000;
       $("challenge-kicker").textContent = "RONDA 3 · PRUEBA ESPECIAL";
       if (now < instructionEndsAt) {
-        $("challenge-title").textContent = "PANEL DE VELOCIDAD";
+        setAnimatedChallengeTitle("PANEL DE VELOCIDAD");
         $("challenge-text").textContent = "Las letras aparecerán automáticamente. Resuelve antes que tus rivales: el premio disminuye con cada letra.";
         $("challenge-options").innerHTML = '<strong class="tv-speed-rule">OBSERVA EL PANEL · ESCRIBE LA SOLUCIÓN EN CUANTO LA SEPAS</strong>';
         speedIntroTimer = setTimeout(() => render(), Math.max(40, instructionEndsAt - now));
       } else {
         const count = Math.max(1, Math.ceil((speedIntroUntil - now) / 1000));
-        $("challenge-title").textContent = String(count);
+        setAnimatedChallengeTitle(String(count));
         $("challenge-text").textContent = "Prepárate…";
         $("challenge-options").innerHTML = '<strong class="tv-speed-rule">EL PREMIO EMPIEZA EN 500 CRÉDITOS</strong>';
         speedIntroTimer = setTimeout(() => render(), Math.max(40, Math.min(1000, speedIntroUntil - now)));
@@ -489,15 +585,30 @@
     const nextKey = categoryChoice ? `category:${state.round}:${state.categoryChoices.join("|")}` : `question:${state.round}:${state.question.text}`;
     if (challengeKey !== nextKey) {
       challengeKey = nextKey;
-      challengeReadyAt = Date.now() + 2000;
+      const firstExplanation = categoryChoice ? !explainedVoiceModes.has("categoria") : !explainedVoiceModes.has("bonus");
+      const duration = firstExplanation ? 8500 : 5000;
+      if (categoryChoice && state.phase === "CATEGORY_CHOICE" && announcedCategoryRound !== state.round) {
+        announcedCategoryRound = state.round;
+        explainedVoiceModes.add("categoria");
+        voice?.play(firstExplanation ? ["categoria-explicacion", "categoria-elige"] : "categoria-elige");
+        challengeVoicePending = voice?.isEnabled() !== false;
+      }
+      if (question && state.phase === "QUESTION_BONUS" && announcedQuestionRound !== state.round) {
+        announcedQuestionRound = state.round;
+        explainedVoiceModes.add("bonus");
+        voice?.play(firstExplanation ? ["bonus-presentacion", "bonus-explicacion"] : "bonus-breve");
+        challengeVoicePending = voice?.isEnabled() !== false;
+      }
+      challengeReadyAt = Date.now() + (challengeVoicePending ? 30000 : duration);
       clearTimeout(challengeUnlockTimer);
       challengeUnlockTimer = setTimeout(() => { if (state && (state.phase === "CATEGORY_CHOICE" || state.phase === "QUESTION_BONUS")) render(); }, 2050);
     }
     const locked = Date.now() < challengeReadyAt;
     if (categoryChoice) {
+      overlay.dataset.scene = "category";
       $("challenge-kicker").textContent = "RONDA 2 · TÚ ELIGES";
       const decided = state.phase === "CATEGORY_RESULT";
-      $("challenge-title").textContent = decided ? `${state.players[state.active].name} ELIGE ${state.selectedCategory}` : `${state.players[state.active].name}, elige categoría`;
+      setAnimatedChallengeTitle(decided ? `${state.players[state.active].name} ELIGE ${state.selectedCategory}` : `${state.players[state.active].name}, elige categoría`);
       $("challenge-text").textContent = decided ? "Preparando el panel seleccionado…" : "La categoría elegida determinará el siguiente panel.";
       $("challenge-options").innerHTML = state.categoryChoices.map(category => `<button class="tv-button tv-button-secondary tv-category-option${decided && category === state.selectedCategory ? " is-selected" : decided ? " is-dimmed" : ""}" type="button" data-category-choice="${escapeAttribute(category)}" ${locked || decided ? "disabled" : ""}>${escapeHtml(category)}</button>`).join("");
       if (decided && !categoryResultTimer) categoryResultTimer = setTimeout(() => {
@@ -506,8 +617,9 @@
       }, 1900);
       return;
     }
+    overlay.dataset.scene = "question";
     $("challenge-kicker").textContent = "PREGUNTA DE BONIFICACIÓN";
-    $("challenge-title").textContent = state.phase === "QUESTION_RESULT" ? (state.question.wasCorrect ? `RESPUESTA CORRECTA · +${AletheiaGame.questionBonus}` : "RESPUESTA INCORRECTA") : state.phase === "QUESTION_SELECTION" ? `${state.players[state.roundWinner].name} ELIGE…` : `RESPONDE Y GANA ${AletheiaGame.questionBonus} CRÉDITOS ADICIONALES`;
+    setAnimatedChallengeTitle(state.phase === "QUESTION_RESULT" ? (state.question.wasCorrect ? `RESPUESTA CORRECTA · +${AletheiaGame.questionBonus}` : "RESPUESTA INCORRECTA") : state.phase === "QUESTION_SELECTION" ? `${state.players[state.roundWinner].name} ELIGE…` : `RESPONDE Y GANA ${AletheiaGame.questionBonus} CRÉDITOS ADICIONALES`);
     $("challenge-text").textContent = state.question.text;
     if (state.phase === "QUESTION_RESULT") {
       $("challenge-options").innerHTML = `<strong class="tv-question-result ${state.question.wasCorrect ? "is-correct" : "is-wrong"}">${state.question.wasCorrect ? `+${AletheiaGame.questionBonus} CRÉDITOS` : `LA RESPUESTA ERA: ${escapeHtml(state.question.options[state.question.correct])}`}</strong>`;
@@ -521,7 +633,10 @@
     $("challenge-options").innerHTML = state.question.options.map((option, index) => `<button class="tv-button tv-button-secondary tv-question-option${selected && index === state.question.selected ? " is-selected" : selected ? " is-dimmed" : ""}" type="button" data-question-choice="${index}" ${locked || selected ? "disabled" : ""}>${escapeHtml(option)}</button>`).join("");
     if (selected && !questionSelectionTimer) questionSelectionTimer = setTimeout(() => {
       questionSelectionTimer = null;
-      if (state?.phase === "QUESTION_SELECTION") act(() => engine.revealQuestionResult(state));
+      if (state?.phase === "QUESTION_SELECTION") {
+        act(() => engine.revealQuestionResult(state));
+        voice?.play(state.question.wasCorrect ? "bonus-correcta" : "bonus-incorrecta");
+      }
     }, 1400);
   }
 
@@ -552,7 +667,8 @@
       if (!count) voice?.playEffect("publico-decepcion");
       else if (count >= 4) voice?.playEffect("muchas-coincidencias");
       if (count && puzzleProgress() >= .78) voice?.playEffect("panel-casi-resuelto");
-      sequence.push(count ? `coincidencia:${Math.min(count, 6)}` : "sin-coincidencias");
+      sequence.push(count ? `coincidencia:${Math.min(count, 6)}` : isVowel ? "vocal-sin-coincidencias" : "sin-coincidencias");
+      if (/comodín conseguido/i.test(event.detail)) sequence.push("comodin-conseguido");
     }
     voice?.play(sequence);
   }
@@ -572,13 +688,20 @@
 
   function announceEvents(events) {
     if (!voice || !events.length) return;
-    const letter = events.find(event => event.type === "LETRA");
+    const letter = events.find(event => event.type === "LETRA" || event.type === "LETRA RÁPIDA");
     const vowel = events.find(event => event.type === "VOCAL");
     const resolution = events.find(event => event.type === "RESOLUCIÓN");
     const roundWon = events.some(event => event.type === "RONDA GANADA");
     const newRound = events.find(event => event.type === "NUEVA RONDA");
     const wheel = events.find(event => event.type === "RULETA");
     const turnChange = events.find(event => event.type === "CAMBIO DE TURNO");
+    const category = events.find(event => event.type === "CATEGORÍA ELEGIDA");
+    const question = events.find(event => event.type === "PREGUNTA");
+    const final = events.find(event => event.type === "RULETA FINAL" || event.type === "FINAL");
+    const speedLetter = events.find(event => event.type === "VELOCIDAD");
+    const finalLetter = events.find(event => event.type === "LETRA FINAL");
+    const chrono = events.find(event => event.type === "CRONO");
+    const speedResolution = state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE" || state.special?.type === "SPEED";
 
     if (letter || vowel) {
       announceLetterEvent(letter || vowel, Boolean(vowel), roundWon);
@@ -588,34 +711,63 @@
       if (/Correcta/i.test(resolution.detail)) {
         voice.playEffect("respuesta-correcta");
         if (roundWon) playRoundOutcomeEffects();
-        voice.play(["solucion-correcta", roundWon ? finalVoiceIntent() : null]);
+        voice.play([speedResolution ? "velocidad-correcta" : "solucion-correcta", roundWon && state.special?.type === "CRONO" ? "crono-ganado" : roundWon ? finalVoiceIntent() : null]);
       } else {
         voice.playEffect("respuesta-incorrecta");
         voice.playEffect("publico-decepcion");
-        voice.play("solucion-incorrecta");
+        voice.play(speedResolution ? "velocidad-error" : "solucion-incorrecta");
       }
       return;
     }
-    if (newRound) {
-      voice.playEffect("ronda-inicio");
-      voice.play(state.round === state.maxRounds ? "ultima-ronda" : "comienza-ronda");
+    if (category) {
+      voice.play("categoria-confirmada");
       return;
     }
+    if (question) {
+      voice.play("bonus-confirmada");
+      return;
+    }
+    if (final) {
+      if (final.type === "RULETA FINAL") {
+        announcedFinal = true;
+        finalVoicePending = voice?.isEnabled() !== false;
+        finalVoiceLockUntil = Date.now() + (finalVoicePending ? 30000 : 2500);
+        interactionLockedUntil = Math.max(interactionLockedUntil, finalVoiceLockUntil);
+        render();
+        voice.play(["final-presentacion", "final-explicacion", "final-letras"]);
+      } else voice.play(/Correcta/i.test(final.detail) ? "final-correcta" : "final-incorrecta");
+      return;
+    }
+    if (finalLetter) {
+      voice.play(state.phase === "FINAL_SOLVE" ? [`letra:${finalLetter.detail}`, "final-letras-elegidas", "final-resolver"] : `letra:${finalLetter.detail}`);
+      return;
+    }
+    if (speedLetter) {
+      voice.play("velocidad-nueva-letra");
+      return;
+    }
+    if (chrono) {
+      voice.play("crono-agotado");
+      return;
+    }
+    if (newRound) { voice.playEffect("ronda-inicio"); return; }
     if (wheel) {
       const result = wheel.detail.toUpperCase();
       const intent = result.includes("QUIEBRA") || result.includes("BANCARROTA")
         ? "quiebra"
         : result.includes("PIERDE")
           ? "pierde-turno"
-          : result.includes("PREMIO") || result.includes("COMODÍN")
-            ? "premio"
+          : result.includes("COMODÍN")
+            ? "comodin-sale"
+            : result.includes("PREMIO")
+              ? "premio"
             : "elige-consonante";
       voice.play(intent, { delay: 1800 });
       return;
     }
     if (roundWon) {
       playRoundOutcomeEffects();
-      voice.play(finalVoiceIntent());
+      voice.play(state.phase === "FINAL_READY" ? [finalVoiceIntent(), "final-clasificacion"] : finalVoiceIntent());
       return;
     }
     if (turnChange) {
@@ -648,12 +800,21 @@
     clearTimeout(clockTimer);
     if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "FINAL_SOLVE")) return;
     if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "CATEGORY_RESULT", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase)) return;
-    if (!gamePaused) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    if (!gamePaused && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    else if (!gamePaused && Date.now() < interactionLockedUntil) actionDeadline = interactionLockedUntil + actionTimeRemaining;
     $("game-clock").textContent = formatClock(actionTimeRemaining);
     $("game-clock").classList.toggle("is-urgent", actionTimeRemaining <= 10000);
+    if (!gamePaused && state.phase === "SPECIAL_LETTER" && actionTimeRemaining <= 20000 && actionTimeRemaining > 10000 && chronoWarningRound !== state.round) {
+      chronoWarningRound = state.round;
+      voice?.play("crono-poco-tiempo");
+    }
+    if (!gamePaused && state.phase === "SPECIAL_LETTER" && actionTimeRemaining <= 10000 && chronoTenSecondRound !== state.round) {
+      chronoTenSecondRound = state.round;
+      voice?.play("crono-diez-segundos");
+    }
     if (!gamePaused && actionTimeRemaining > 0 && actionTimeRemaining <= 10000) voice?.startLoop("reloj");
     else voice?.stopLoop("reloj");
-    if (!gamePaused && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
+    if (!gamePaused && Date.now() >= interactionLockedUntil && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
       voice?.stopLoop("reloj");
       if (state.phase === "FINAL_SOLVE") state = engine.failFinal(state);
       else if (state.phase === "SPECIAL_LETTER") state = engine.expireSpecial(state);
@@ -957,6 +1118,9 @@
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
     gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
+    explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
+    chronoWarningRound = 0; chronoTenSecondRound = 0;
+    introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0;
     transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
     $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
     $("pause-game").textContent = "PAUSA"; $("pause-game").setAttribute("aria-pressed", "false");
@@ -975,7 +1139,6 @@
     voice?.startMusic();
     voice?.playEffect("prometeo-aparece");
     voice?.playEffect("ronda-inicio");
-    voice?.play(["comienza-partida", "panel-preparado"]);
     $("game-clock").hidden = !timedGame;
     resetActionClock();
     window.dispatchEvent(new CustomEvent("aletheia:session-playing"));
@@ -1189,6 +1352,7 @@
       state.phase = "SPEED_SOLVE";
       state.events.push({ type: "PULSADOR", detail: `${state.players[playerIndex].name} detiene el panel` });
       render(`${state.players[playerIndex].name} ha pulsado. Debe resolver el panel.`);
+      voice?.play(["velocidad-detenido", "velocidad-escribe"]);
       remoteAck(slot, seq, true, "Has detenido el panel. Escribe la solución.");
       return;
     }
@@ -1219,6 +1383,7 @@
     if (!state || $("game-panel").hidden || state.phase === "GAME_COMPLETE" || event.detail?.connected !== false || gamePaused) return;
     setGamePaused(true);
     $("message").textContent = `La plaza ${event.detail.slot} ha perdido la conexión. La partida queda en pausa.`;
+    voice?.play("mando-desconectado");
   });
   function openSessionMenu() { $("session-overlay").hidden = false; }
   function closeSessionMenu() { $("session-overlay").hidden = true; }
