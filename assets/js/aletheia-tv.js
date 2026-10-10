@@ -1,6 +1,21 @@
 (function () {
   "use strict";
   const $ = id => document.getElementById(id);
+  const AletheiaGame = window.AletheiaGame;
+  if (!AletheiaGame || typeof AletheiaGame.Engine !== "function") {
+    const showLoadError = () => {
+      const summary = $("entry-mode-summary");
+      if (summary) summary.textContent = "No se ha podido cargar el motor del juego. Recarga la página para intentarlo de nuevo.";
+      [$("enter-with-sound"), $("enter-without-sound")].forEach(button => {
+        if (!button) return;
+        button.disabled = false;
+        button.addEventListener("click", () => window.location.reload());
+      });
+    };
+    if (document.readyState === "loading") window.addEventListener("DOMContentLoaded", showLoadError, { once: true });
+    else showLoadError();
+    return;
+  }
   const engine = new AletheiaGame.Engine();
   const voice = window.AletheiaAudio;
   let state = null;

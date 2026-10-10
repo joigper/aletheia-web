@@ -50,7 +50,8 @@
 
   function readPanelHistory() {
     try {
-      const stored = JSON.parse(global.localStorage?.getItem(PANEL_HISTORY_KEY) || "[]");
+      const storage = global && global.localStorage ? global.localStorage : null;
+      const stored = JSON.parse(storage ? (storage.getItem(PANEL_HISTORY_KEY) || "[]") : "[]");
       return Array.isArray(stored)
         ? stored.filter(item => item && typeof item.id === "string" && typeof item.solution === "string").slice(-PANEL_HISTORY_LIMIT)
         : [];
@@ -59,7 +60,7 @@
 
   function rememberPuzzle(panel) {
     try {
-      if (!global.localStorage || !panel?.id) return;
+      if (!global || !global.localStorage || !panel || !panel.id) return;
       const solution = normalize(panel.solucion);
       const history = readPanelHistory().filter(item => item.id !== panel.id && item.solution !== solution);
       history.push({ id: panel.id, solution });
