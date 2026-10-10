@@ -208,8 +208,32 @@
       else if (count) player.stats.correctConsonants += 1;
       else player.stats.incorrectConsonants += 1;
       state.events.push({ type: "LETRA RÁPIDA", detail: `${letter}: ${count} coincidencia(s)` });
+      state.special.reveals = Number(state.special.reveals || 0) + 1;
       if (this.isPuzzleComplete(state)) { player.round += SPECIAL_PRIZE; return this.completeRound(state, "Panel con crono completado", "ultima-letra"); }
       state.active = (state.active + 1) % 3;
+      return state;
+    }
+    canStopChrono(state, playerIndex) {
+      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "CRONO" || !state.players[playerIndex] || state.players[playerIndex].cpu) return false;
+      const lockedAt = Number(state.special?.lockedPlayers?.[playerIndex]);
+      return !Number.isFinite(lockedAt) || state.special.reveals > lockedAt;
+    }
+    stopChrono(state, playerIndex) {
+      if (!this.canStopChrono(state, playerIndex)) throw new Error("Ese pulsador todavía no está disponible.");
+      state.active = playerIndex;
+      state.special.buzzerPlayer = playerIndex;
+      state.phase = "SPECIAL_SOLVE";
+      state.events.push({ type: "PULSADOR CRONO", detail: `${state.players[playerIndex].name} detiene el cronómetro` });
+      return state;
+    }
+    resumeChrono(state, playerIndex = state.active, reason = "Intento fallido") {
+      if (state.phase !== "SPECIAL_SOLVE") return state;
+      state.special.lockedPlayers ||= {};
+      state.special.lockedPlayers[playerIndex] = state.special.reveals;
+      state.special.buzzerPlayer = null;
+      state.phase = "SPECIAL_LETTER";
+      state.active = (playerIndex + 1) % state.players.length;
+      state.events.push({ type: "CRONO", detail: `${reason}. El cronómetro continúa` });
       return state;
     }
     revealSpeedLetter(state) {
@@ -307,6 +331,7 @@
     solve(state, answer, solverIndex = state.active) {
       if (state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") throw new Error("La ronda ya ha terminado.");
       const speedRound = state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
+      const chronoSolve = state.phase === "SPECIAL_SOLVE";
       const validSolver = Number.isInteger(solverIndex) && solverIndex >= 0 && solverIndex < state.players.length ? solverIndex : state.active;
       const outOfTurnSpeedAttempt = speedRound && validSolver !== state.active;
       const correct = normalize(answer) === normalize(state.puzzle.solution);
@@ -315,6 +340,7 @@
       if (!correct) {
         state.players[validSolver].stats.wrongSolutions += 1;
         if (state.phase === "SPEED_SOLVE") return this.resumeSpeed(state, validSolver, "Respuesta incorrecta");
+        if (chronoSolve) return this.resumeChrono(state, validSolver, "Respuesta incorrecta");
         if (state.phase === "SPECIAL_LETTER" || speedRound) {
           if (!outOfTurnSpeedAttempt) state.active = (state.active + 1) % 3;
           return state;
@@ -323,7 +349,7 @@
       }
       if (speedRound) state.active = validSolver;
       state.players[state.active].stats.solvedPanels += 1;
-      if (state.phase === "SPECIAL_LETTER") state.players[state.active].round += SPECIAL_PRIZE;
+      if (state.phase === "SPECIAL_LETTER" || chronoSolve) state.players[state.active].round += SPECIAL_PRIZE;
       if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
       return this.completeRound(state, "Panel resuelto", "resolucion-correcta");
     }
@@ -474,7 +500,7 @@
       return this.finishFinal(state, false);
     }
     expireSpecial(state) {
-      if (state.phase !== "SPECIAL_LETTER") return state;
+      if (state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE") return state;
       state.roundWinner = state.active;
       state.players.forEach(player => { player.round = 0; });
       state.phase = "ROUND_COMPLETE";

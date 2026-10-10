@@ -72,6 +72,7 @@
   let narrationLockUntil = 0;
   let chronoWarningRound = 0;
   let chronoTenSecondRound = 0;
+  let chronoHeldRemaining = 0;
   const missingThumbnails = new Set(["OSCAR2"]);
   const phoneStandalone = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent) && Math.min(screen.width, screen.height) <= 600;
   window.AletheiaPlayMode = { phoneStandalone, remoteActive: false };
@@ -450,8 +451,8 @@
     const visibleRoundComplete = viewState.phase === "ROUND_COMPLETE";
     const visibleFinalReady = viewState.phase === "FINAL_READY";
     const finalRound = state.phase === "FINAL_PICK" || state.phase === "FINAL_SOLVE";
-    const specialRound = state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
-    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
+    const specialRound = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
+    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
     const consonantsRemain = engine.hasAvailableConsonants(state);
     const humanTurn = !state.players[state.active].cpu;
     const interactionLocked = Date.now() < interactionLockedUntil;
@@ -488,7 +489,7 @@
     $("active-round-score").textContent = viewPlayer.round;
     $("active-total-score").textContent = viewPlayer.total;
     const visibleTransientMessage = Date.now() < transientMessageUntil ? transientMessage : "";
-    $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? `Panel con crono: letras libres por turnos. Premio provisional: ${AletheiaGame.specialPrize}.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
+    $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? `Panel con crono: elige una letra o pulsa RESOLVER YA. Premio: ${AletheiaGame.specialPrize}.` : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el crono. Tiene 30 segundos para resolver.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
     $("spin").disabled = narrationBarrier || gamePaused || interactionLocked || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
     if (specialRound || finalRound) {
       $("wheel-result").textContent = finalRound ? "FINAL" : state.special.type === "SPEED" ? state.special.prize : "CRONO";
@@ -501,15 +502,20 @@
       $("wheel-hub").classList.remove("has-result");
     }
     $("pass-turn").hidden = interactionLocked || !humanTurn || roundComplete || gameComplete || state.phase !== "AWAITING_SPIN" || consonantsRemain || state.players[state.active].round >= AletheiaGame.vowelPrice;
+    const chronoHumanCanSolve = state.phase === "SPECIAL_SOLVE" && !state.players[state.active]?.cpu;
     const speedInputBlocked = speedRound && !speedHumanCanSolve;
     const finalWaitingToSolve = state.phase === "FINAL_SOLVE" && !finalSolveArmed && humanTurn;
     const solveButton = $("solve-form").querySelector("button");
-    $("solution").disabled = narrationBarrier || gamePaused || interactionLocked || finalWaitingToSolve || speedInputBlocked || (!humanTurn && !speedHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK";
-    solveButton.disabled = narrationBarrier || gamePaused || interactionLocked || speedInputBlocked || (!humanTurn && !speedHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK";
+    $("solution").disabled = narrationBarrier || gamePaused || interactionLocked || finalWaitingToSolve || speedInputBlocked || (!humanTurn && !speedHumanCanSolve && !chronoHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK" || state.phase === "SPECIAL_LETTER";
+    solveButton.disabled = narrationBarrier || gamePaused || interactionLocked || speedInputBlocked || (!humanTurn && !speedHumanCanSolve && !chronoHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK" || state.phase === "SPECIAL_LETTER";
     solveButton.textContent = finalWaitingToSolve ? "RESOLVER AHORA" : "RESOLVER";
-    $("solution").placeholder = state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución: 30 segundos" : "Pulsa RESOLVER AHORA") : state.phase === "SPEED_SOLVE" ? "Escribe la solución: 30 segundos" : speedRound ? "Pulsa ¡LA SÉ! antes de responder" : "Escribe la solución";
-    if (state.phase !== "SPEED_SOLVE") speedInputFocused = false;
+    $("solution").placeholder = state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución: 30 segundos" : "Pulsa RESOLVER AHORA") : state.phase === "SPECIAL_SOLVE" ? "Escribe la solución: 30 segundos" : state.phase === "SPEED_SOLVE" ? "Escribe la solución: 30 segundos" : speedRound ? "Pulsa ¡LA SÉ! antes de responder" : "Escribe la solución";
+    if (state.phase !== "SPEED_SOLVE" && state.phase !== "SPECIAL_SOLVE") speedInputFocused = false;
     if (speedHumanCanSolve && !speedInputFocused) {
+      speedInputFocused = true;
+      requestAnimationFrame(() => $("solution").focus());
+    }
+    if (chronoHumanCanSolve && !speedInputFocused) {
       speedInputFocused = true;
       requestAnimationFrame(() => $("solution").focus());
     }
@@ -538,9 +544,11 @@
       const portrait = player.image
         ? `<img src="${encodeURI(player.image)}" alt="Retrato de ${escapeHtml(player.name)}">`
         : `<span class="player-initials" aria-hidden="true">${escapeHtml(player.name.slice(0, 2).toUpperCase())}</span>`;
-      const showBuzzer = state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil && !player.cpu;
-      const buzzerLocked = showBuzzer && !engine.canStopSpeed(state, i);
-      const buzzer = showBuzzer ? `<button type="button" class="tv-speed-buzzer" data-speed-buzz-index="${i}" ${buzzerLocked ? "disabled" : ""}><b>¡LA SÉ!</b><small>${buzzerLocked ? "ESPERA UNA LETRA" : escapeHtml(player.name)}</small></button>` : "";
+      const speedBuzzer = state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil && !player.cpu;
+      const chronoBuzzer = state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO" && !player.cpu;
+      const showBuzzer = speedBuzzer || chronoBuzzer;
+      const buzzerLocked = showBuzzer && (speedBuzzer ? !engine.canStopSpeed(state, i) : !engine.canStopChrono(state, i));
+      const buzzer = showBuzzer ? `<button type="button" class="tv-speed-buzzer${chronoBuzzer ? " is-chrono" : ""}" data-${chronoBuzzer ? "chrono" : "speed"}-buzz-index="${i}" ${buzzerLocked ? "disabled" : ""}><b>${chronoBuzzer ? "RESOLVER YA" : "¡LA SÉ!"}</b><small>${buzzerLocked ? "ESPERA UNA LETRA" : escapeHtml(player.name)}</small></button>` : "";
       const viewPlayerCard = viewState.players[i] || player;
       return `<article class="player ${i === viewState.active && !visibleRoundComplete && !visibleGameComplete ? "active" : ""}${showBuzzer ? " has-speed-buzzer" : ""}">${portrait}<div class="player-copy"><small>PLAZA ${i + 1} · ${player.cpu ? "TRIPULACIÓN" : "HUMANO"}</small><strong>${escapeHtml(player.name)}</strong><em>${escapeHtml(player.role || "Concursante")}</em>${viewPlayerCard.wildcards ? `<span>COMODÍN ${viewPlayerCard.wildcards}</span>` : ""}</div>${buzzer}<aside class="player-score"><small>RONDA</small><strong>${viewPlayerCard.round}</strong><span><i>TOTAL</i><b>${viewPlayerCard.total}</b></span></aside></article>`;
     }).join("");
@@ -562,7 +570,7 @@
   function publishPublicGameState() {
     if (!state || !window.AletheiaPlayMode?.remoteActive) return;
     const viewState = presentationState();
-    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
+    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
     const timed = Boolean(timedGame || forcedClock);
     const current = viewState.players[viewState.active];
     const availableLetters = alphabet.filter(letter => {
@@ -579,6 +587,9 @@
       interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
       speedReady: state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil,
       speedBuzzerSlot: state.phase === "SPEED_SOLVE" ? state.active + 1 : 0,
+      chronoReady: state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO",
+      chronoBuzzerSlot: state.phase === "SPECIAL_SOLVE" ? state.active + 1 : 0,
+      chronoBuzzLockedSlots: state.special?.type === "CRONO" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
       finalSolveArmed: state.phase === "FINAL_SOLVE" ? finalSolveArmed : false,
       speedBuzzLockedSlots: state.special?.type === "SPEED" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
@@ -905,6 +916,10 @@
       const previousPhase = state?.phase;
       state = operation();
       const newEvents = state.events.slice(previousEvents);
+      if (previousPhase === "SPECIAL_SOLVE" && state.phase === "SPECIAL_LETTER") {
+        actionTimeRemaining = Math.max(1000, chronoHeldRemaining);
+        actionDeadline = Date.now() + actionTimeRemaining;
+      }
       if (newEvents.length && voice?.isEnabled() !== false) beginNarrationBarrier(presentationBefore);
       const roundJustClosed = previousPhase !== state.phase && ["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase);
       if (roundJustClosed) {
@@ -936,7 +951,7 @@
 
   function updateClock() {
     clearTimeout(clockTimer);
-    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
+    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "CATEGORY_RESULT", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase)) return;
     if (!gamePaused && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
     else if (!gamePaused && Date.now() < interactionLockedUntil) actionDeadline = interactionLockedUntil + actionTimeRemaining;
@@ -958,13 +973,19 @@
     else voice?.stopLoop("reloj");
     if (!gamePaused && Date.now() >= interactionLockedUntil && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
       const presentationBefore = capturePresentationState();
+      const chronoSolveExpired = state.phase === "SPECIAL_SOLVE";
       voice?.stopLoop("reloj");
       if (state.phase === "FINAL_SOLVE") state = engine.failFinal(state);
+      else if (state.phase === "SPECIAL_SOLVE") {
+        state = engine.resumeChrono(state, state.active, "Tiempo de respuesta agotado");
+        actionTimeRemaining = Math.max(1000, chronoHeldRemaining);
+        actionDeadline = Date.now() + actionTimeRemaining;
+      }
       else if (state.phase === "SPECIAL_LETTER") state = engine.expireSpecial(state);
       else if (state.phase === "SPEED_SOLVE") state = engine.resumeSpeed(state, state.active, "Tiempo agotado");
       else state = engine.yieldTurn(state);
       beginNarrationBarrier(presentationBefore);
-      if (state.phase !== "GAME_COMPLETE" && state.phase !== "ROUND_COMPLETE") resetActionClock();
+      if (!chronoSolveExpired && state.phase !== "GAME_COMPLETE" && state.phase !== "ROUND_COMPLETE") resetActionClock();
       render(state.phase === "GAME_COMPLETE" ? "Tiempo agotado en la Ruleta Final." : state.phase === "ROUND_COMPLETE" ? "Tiempo agotado. La prueba termina sin premio." : state.phase === "SPEED_RUNNING" ? "Tiempo agotado. El panel de velocidad continúa." : "Tiempo agotado. El turno pasa al siguiente concursante.");
       voice?.playEffect("respuesta-incorrecta");
       voice?.play("tiempo-agotado");
@@ -975,9 +996,9 @@
   }
 
   function resetActionClock() {
-    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
+    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     voice?.stopLoop("reloj");
-    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPEED_SOLVE" ? 30000 : state.phase === "SPECIAL_LETTER" ? 60000 : 25000;
+    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPEED_SOLVE" || state.phase === "SPECIAL_SOLVE" ? 30000 : state.phase === "SPECIAL_LETTER" ? 60000 : 25000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
   }
@@ -1265,7 +1286,7 @@
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
     gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
     explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
-    chronoWarningRound = 0; chronoTenSecondRound = 0;
+    chronoWarningRound = 0; chronoTenSecondRound = 0; chronoHeldRemaining = 0;
     introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0;
     transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
     $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
@@ -1406,6 +1427,23 @@
       return false;
     }
   }
+  function stopChronoForPlayer(playerIndex) {
+    if (!state || gamePaused || narrationBarrier || state.phase !== "SPECIAL_LETTER") return false;
+    try {
+      const presentationBefore = capturePresentationState();
+      chronoHeldRemaining = Math.max(1000, actionDeadline - Date.now());
+      state = engine.stopChrono(state, playerIndex);
+      beginNarrationBarrier(presentationBefore);
+      resetActionClock();
+      render(`${state.players[playerIndex].name} ha detenido el crono. Tiene 30 segundos para resolver.`);
+      voice?.play(["velocidad-detenido", "velocidad-escribe"]);
+      if (narrationBarrier && !voice?.isSpeaking()) releaseNarrationBarrier();
+      return true;
+    } catch (error) {
+      render(error.message);
+      return false;
+    }
+  }
   function armFinalSolve() {
     if (!state || state.phase !== "FINAL_SOLVE" || finalSolveArmed || state.players[state.active]?.cpu || gamePaused || Date.now() < interactionLockedUntil) return false;
     finalSolveArmed = true;
@@ -1420,10 +1458,11 @@
   }
   $("spin").addEventListener("click", performSpin);
   $("scoreboard").addEventListener("click", event => {
-    const button = event.target.closest("[data-speed-buzz-index]");
+    const button = event.target.closest("[data-speed-buzz-index],[data-chrono-buzz-index]");
     if (!button) return;
     button.disabled = true;
-    stopSpeedForPlayer(Number(button.dataset.speedBuzzIndex));
+    if (button.dataset.chronoBuzzIndex !== undefined) stopChronoForPlayer(Number(button.dataset.chronoBuzzIndex));
+    else stopSpeedForPlayer(Number(button.dataset.speedBuzzIndex));
   });
   $("solve-form").addEventListener("submit", event => {
     event.preventDefault();
@@ -1536,6 +1575,12 @@
       if (!engine.canStopSpeed(state, playerIndex) || Date.now() < speedIntroUntil) { remoteAck(slot, seq, false, "El pulsador no está disponible ahora."); return; }
       const accepted = stopSpeedForPlayer(playerIndex);
       remoteAck(slot, seq, accepted, accepted ? "Has detenido el panel. Tienes 30 segundos para escribir la solución." : "Otro jugador se ha adelantado.");
+      return;
+    }
+    if (type === "chrono-buzz") {
+      const playerIndex = slot - 1;
+      const accepted = engine.canStopChrono(state, playerIndex) && stopChronoForPlayer(playerIndex);
+      remoteAck(slot, seq, accepted, accepted ? "Has detenido el crono. Tienes 30 segundos para escribir la solución." : "El pulsador todavía no está disponible.");
       return;
     }
     if (type === "final-buzz") {
