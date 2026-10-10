@@ -1,6 +1,8 @@
 (function (global) {
   "use strict";
 
+  if (!global.document || !global.document.getElementById("aletheia-tv-app")) return;
+
   const basePath = "assets/img/ocio/audio/";
   const effectsPath = basePath;
   const musicFile = "maksymmalko-roblox-minecraft-fortnite-video-game-music-564544.mp3";
@@ -50,8 +52,8 @@
   let playbackRun = 0;
   let delayedStart = null;
   let speaking = false;
-  const music = new Audio(effectsPath + musicFile);
-  music.preload = "auto";
+  const music = new Audio();
+  music.preload = "none";
   music.loop = true;
   music.volume = 0;
   const musicVolume = 0.16;
@@ -113,6 +115,7 @@
     musicRequested = true;
     musicSuspended = false;
     if (!enabled) return;
+    if (!music.src) music.src = effectsPath + musicFile;
     const begin = () => {
       if (!musicRequested) return;
       if (music.currentTime === 0 && Number.isFinite(music.duration) && music.duration > 40) {

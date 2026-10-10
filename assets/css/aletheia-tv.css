@@ -3,11 +3,50 @@
   --tv-violet: #9c6cff;
   --tv-line: #354059;
   --tv-text: #f4f7ff;
+  --bs-light: #f8f9fa;
+  --bs-border-color-translucent: rgba(255,255,255,.18);
 }
 
 html.aletheia-tv-root, html.aletheia-tv-root body {
+  width: 100%;
   height: 100%;
+  margin: 0;
   overflow: hidden;
+  background: #000;
+}
+
+.aletheia-tv-root * {
+  box-sizing: border-box;
+}
+
+.aletheia-tv-page {
+  margin: 0 auto;
+}
+
+.aletheia-tv-header {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  align-items: center;
+}
+
+.aletheia-tv-header > .col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.visually-hidden {
+  position: absolute!important;
+  width: 1px!important;
+  height: 1px!important;
+  padding: 0!important;
+  margin: -1px!important;
+  overflow: hidden!important;
+  clip: rect(0,0,0,0)!important;
+  white-space: nowrap!important;
+  border: 0!important;
 }
 
 [hidden] {

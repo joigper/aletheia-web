@@ -1,5 +1,6 @@
 (function () {
   "use strict";
+  if (!document.getElementById("aletheia-tv-app")) return;
   const $ = id => document.getElementById(id);
   const AletheiaGame = window.AletheiaGame;
   if (!AletheiaGame || typeof AletheiaGame.Engine !== "function") {
