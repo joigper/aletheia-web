@@ -19,6 +19,14 @@ html.aletheia-mando-root {
   box-sizing: border-box;
 }
 
+.aletheia-mando-root button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 html.aletheia-mando-root body {
   position: fixed;
   inset: 0;
@@ -1055,14 +1063,15 @@ html.aletheia-mando-root body {
 }
 
 .selfie-inline-actions button {
-  min-height: 30px;
-  padding: 3px;
+  min-height: 50px;
+  padding: 7px 5px;
   border: 1px solid #47607f;
-  border-radius: 7px;
+  border-radius: 9px;
   color: #dceaff;
   background: #0a1425;
-  font: 600 8px "Tektur";
+  font: 600 clamp(10px,1.25vw,13px) "Tektur";
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .selfie-inline-actions button:last-child, .selfie-inline-actions button:nth-child(2) {
@@ -1276,7 +1285,8 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .selfie-inline-actions button {
-    min-height: 25px;
+    min-height: 42px;
+    font-size: 10px;
   }
 }
 
@@ -1501,6 +1511,59 @@ html.aletheia-mando-root body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+.action-card.is-wheel-outcome {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.action-card.is-wheel-outcome > h1 {
+  z-index: 2;
+  color: #fff;
+  font-size: clamp(36px,7vw,84px);
+  text-shadow: 0 0 24px #57e6ff66;
+}
+
+.action-card.is-wheel-outcome > small, .action-card.is-wheel-outcome > p, .action-card.is-wheel-outcome > .action-content {
+  z-index: 2;
+}
+
+.action-card.is-wheel-outcome.is-bankrupt > h1, .action-card.is-wheel-outcome.is-lost-turn > h1 {
+  color: #ff7184;
+  text-shadow: 0 0 28px #ff405d80;
+}
+
+.action-card.is-wheel-outcome.is-wildcard > h1 {
+  color: #ffe36b;
+  text-shadow: 0 0 28px #ffd23f75;
+}
+
+.wheel-outcome-pulse {
+  width: min(20vh,120px);
+  aspect-ratio: 1;
+  margin: auto;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  color: var(--cyan);
+  box-shadow: 0 0 20px currentColor,inset 0 0 24px currentColor;
+  animation: wheelOutcomePulse .7s ease-in-out infinite alternate;
+}
+
+.is-bankrupt .wheel-outcome-pulse, .is-lost-turn .wheel-outcome-pulse {
+  color: #ff405d;
+}
+
+.is-wildcard .wheel-outcome-pulse {
+  color: #ffd23f;
+}
+
+@keyframes wheelOutcomePulse {
+  to {
+    transform: scale(1.13);
+    opacity: .58;
   }
 }
 

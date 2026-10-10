@@ -16,6 +16,7 @@
   let remoteGameState=null;
   let pendingCommand=false;
   let pendingCommandTimer=null;
+  let screenWakeLock=null;
   const appleTouch=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 
   function animateConfigurationTitle(){
@@ -29,9 +30,16 @@
   async function enterFullscreen(){
     const root=document.documentElement;
     try{if(root.requestFullscreen)await root.requestFullscreen({navigationUI:"hide"});else if(root.webkitRequestFullscreen)root.webkitRequestFullscreen()}catch(error){console.info("El navegador mantiene sus barras",error)}
-    $("#remote-fullscreen-entry").hidden=true;updateVisibleHeight();
+    $("#remote-fullscreen-entry").hidden=true;updateVisibleHeight();void keepScreenAwake();
   }
   $("#open-remote-fullscreen").addEventListener("click",enterFullscreen);
+
+  async function keepScreenAwake(){
+    if(!navigator.wakeLock||document.visibilityState!=="visible"||(screenWakeLock&&!screenWakeLock.released))return;
+    try{screenWakeLock=await navigator.wakeLock.request("screen");document.documentElement.dataset.wakeLock="active";screenWakeLock.addEventListener("release",()=>{document.documentElement.dataset.wakeLock="released"},{once:true})}
+    catch(error){document.documentElement.dataset.wakeLock="unavailable";console.info("El dispositivo no permite mantener la pantalla encendida",error)}
+  }
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")void keepScreenAwake()});
 
   function updateVisibleHeight(){
     const height=Math.round(window.visualViewport?.height||window.innerHeight);
@@ -160,6 +168,7 @@
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initializeAvatars,{once:true});
   else initializeAvatars();
   $("#confirm-player").addEventListener("click",()=>{
+    void keepScreenAwake();
     const name=$("#remote-alias").value.trim().slice(0,18)||"Invitado";
     $("#lobby-name").textContent=name;$("#lobby-avatar").textContent=selectedAvatar.name;$("#game-name").textContent=name;$("#lobby-portrait").innerHTML=portraitMarkup();showScreen("lobby");
     window.dispatchEvent(new CustomEvent("aletheia:mando-confirm",{detail:{alias:name,avatarId:selectedAvatar.id,avatarName:selectedAvatar.name,avatarImage:selectedAvatar.image||""}}));
@@ -181,8 +190,18 @@
     category:{kicker:"RONDA 2 · TÚ ELIGES",title:"ELIGE CATEGORÍA",copy:"La categoría determinará el siguiente panel.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'},
     question:{kicker:"PREGUNTA DE BONIFICACIÓN",title:"RESPONDE Y GANA 100 CRÉDITOS",copy:"Selecciona una respuesta.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'}
   };
+  function renderWheelOutcome(outcome){
+    const result=String(outcome?.result||"").toUpperCase();
+    const bankrupt=result.includes("QUIEBRA")||result.includes("BANCARROTA"),lost=result.includes("PIERDE"),wild=result.includes("COMODÍN");
+    renderScene("wait");
+    $("#action-card").classList.add("is-wheel-outcome",bankrupt?"is-bankrupt":lost?"is-lost-turn":wild?"is-wildcard":"is-prize");
+    $("#action-kicker").textContent=`RESULTADO DE ${String(outcome?.playerName||"LA RULETA").toUpperCase()}`;
+    $("#action-title").textContent=bankrupt?"QUIEBRA":lost?"PIERDES EL TURNO":wild?"COMODÍN":result;
+    $("#action-copy").textContent=bankrupt?"Pierdes el saldo acumulado en esta ronda.":lost?"La partida pasa al siguiente jugador.":wild?"Conserva esta ventaja y elige consonante.":"Premio por cada coincidencia.";
+    $("#action-content").innerHTML='<div class="wheel-outcome-pulse" aria-hidden="true"></div>';
+  }
   function renderScene(name){
-    const scene=scenes[name]||scenes.spin;$("#action-card").classList.remove("is-turn-waiting");$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
+    const scene=scenes[name]||scenes.spin;$("#action-card").classList.remove("is-turn-waiting","is-wheel-outcome","is-bankrupt","is-lost-turn","is-wildcard","is-prize");$("#action-kicker").textContent=scene.kicker;$("#action-title").textContent=scene.title;$("#action-copy").textContent=scene.copy;$("#action-content").innerHTML=scene.content;
     $("#action-content [data-action='spin']")?.addEventListener("click",event=>{if(onlineController){event.currentTarget.disabled=true;event.currentTarget.querySelector("span").textContent="ENVIADO";sendCommand("spin")}else renderScene("letters")});
     $("#action-content [data-action='next']")?.addEventListener("click",event=>{event.currentTarget.disabled=true;sendCommand("next")});
     $("#action-content [data-action='solve-open']")?.addEventListener("click",()=>{renderScene("solve");setTimeout(()=>$(".solve-input")?.focus(),50)});
@@ -227,11 +246,12 @@
     if(detail.timed&&!detail.paused){let remaining=Number(detail.remainingMs||0);const paint=()=>{const seconds=Math.max(0,Math.ceil(remaining/1000));$("#game-clock").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;remaining=Math.max(0,remaining-1000)};paint();clockTimer=setInterval(paint,1000)}
     const mine=Number(detail.slot)===Number(detail.activeSlot);
     if(detail.paused){renderScene("wait");$("#action-kicker").textContent="PARTIDA EN PAUSA";$("#action-title").textContent="EL PLATÓ ESTÁ DETENIDO";$("#action-copy").textContent="Cualquier jugador puede reanudar la partida."}
+    else if(detail.wheelOutcome){renderWheelOutcome(detail.wheelOutcome)}
     else if(detail.phase==="SPEED_RUNNING"&&!detail.speedReady){renderScene("wait");$("#action-kicker").textContent="PANEL DE VELOCIDAD";$("#action-title").textContent="PREPÁRATE";$("#action-copy").textContent="El pulsador se activará para todos los jugadores."}
     else if(detail.phase==="SPEED_RUNNING"){renderScene("speed");$("#action-copy").textContent="Pulsa en cuanto conozcas la solución."}
     else if(["ROUND_COMPLETE","FINAL_READY"].includes(detail.phase)&&(Number(detail.roundWinnerSlot)===Number(detail.slot)||detail.players?.[String(detail.roundWinnerSlot)]?.cpu)){renderScene("next");$("#action-content [data-action='next']").textContent=detail.phase==="FINAL_READY"?"JUGAR RULETA FINAL":"SIGUIENTE RONDA"}
+    else if(detail.phase==="CATEGORY_CHOICE"){const choices=Array.isArray(detail.categoryChoices)?detail.categoryChoices:Object.values(detail.categoryChoices||{});renderScene("category");$("#action-kicker").textContent=mine?"RONDA 2 · TÚ ELIGES":`${String(detail.activeName||"OTRO JUGADOR").toUpperCase()} ELIGE`;$("#action-title").textContent=mine?"ELIGE CATEGORÍA":"CATEGORÍAS DISPONIBLES";$("#remote-choice-grid").innerHTML=choices.map(category=>`<button class="remote-button remote-secondary" type="button" data-category="${String(category).replace(/&/g,"&amp;").replace(/\"/g,"&quot;")}" ${mine?"":"disabled"}>${category}</button>`).join("");if(mine)$$("#action-content [data-category]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-category]").forEach(item=>item.disabled=true);sendCommand("category",button.dataset.category)}))}
     else if(!mine){renderScene("wait");$("#action-kicker").textContent=`TURNO DE ${String(detail.activeName||"OTRO JUGADOR").toUpperCase()}`;$("#action-copy").textContent="Sigue el panel en la pantalla principal.";renderWaitingPlayer(detail)}
-    else if(detail.phase==="CATEGORY_CHOICE"){const choices=Array.isArray(detail.categoryChoices)?detail.categoryChoices:Object.values(detail.categoryChoices||{});renderScene("category");$("#remote-choice-grid").innerHTML=choices.map(category=>`<button class="remote-button remote-secondary" type="button" data-category="${String(category).replace(/&/g,"&amp;").replace(/\"/g,"&quot;")}">${category}</button>`).join("");$$("#action-content [data-category]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-category]").forEach(item=>item.disabled=true);sendCommand("category",button.dataset.category)}))}
     else if(Number(detail.interactionLockedMs||0)>0){renderScene("wait");$("#action-kicker").textContent="JUGADA EN CURSO";$("#action-title").textContent="ESPERA A LA RULETA";$("#action-copy").textContent="Tu control se activará al terminar la animación del plató."}
     else if(detail.phase==="AWAITING_SPIN"&&!detail.consonantsRemain){renderScene("vowels");const available=new Set(detail.availableLetters||[]);$$("#action-content .vowel-only button").forEach(button=>button.disabled=!detail.canBuyVowel||!available.has(button.textContent))}
     else if(detail.phase==="AWAITING_SPIN")renderScene("spin");

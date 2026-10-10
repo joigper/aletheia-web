@@ -47,6 +47,7 @@
   let interactionUnlockTimer = null;
   let transientMessage = "";
   let transientMessageUntil = 0;
+  let transientWheelOutcome = null;
   let speedInputFocused = false;
   let renderedPhase = null;
   let challengeKey = "";
@@ -428,6 +429,7 @@
       speedReady: state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil,
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
+      wheelOutcome: transientWheelOutcome && Date.now() < transientMessageUntil ? { ...transientWheelOutcome, remainingMs: Math.max(0, transientMessageUntil - Date.now()) } : null,
       consonantsRemain: engine.hasAvailableConsonants(state),
       canBuyVowel: state.phase === "AWAITING_SPIN" && current.round >= AletheiaGame.vowelPrice,
       availableLetters,
@@ -954,7 +956,7 @@
     clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer);
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
-    gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0;
+    gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
     transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
     $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
     $("pause-game").textContent = "PAUSA"; $("pause-game").setAttribute("aria-pressed", "false");
@@ -1030,6 +1032,7 @@
   function performSpin() {
     const previousEvents = state.events.length;
     const spinningPlayer = state.players[state.active].name;
+    const spinningSlot = state.active + 1;
     interactionLockedUntil = Date.now() + 2300;
     cpuNotBefore = interactionLockedUntil;
     act(() => engine.spin(state));
@@ -1037,6 +1040,7 @@
     const { index, result } = state.lastSpin;
     const normalizedResult = String(result).toUpperCase();
     const nextPlayer = state.players[state.active].name;
+    transientWheelOutcome = { result: String(result), playerName: spinningPlayer, playerSlot: spinningSlot };
     transientMessage = normalizedResult.includes("PIERDE")
       ? `${spinningPlayer} pierde el turno. Ahora juega ${nextPlayer}.`
       : normalizedResult.includes("QUIEBRA") || normalizedResult.includes("BANCARROTA")
@@ -1046,7 +1050,7 @@
           : `${spinningPlayer} obtiene ${result}. Debe elegir una consonante.`;
     transientMessageUntil = interactionLockedUntil;
     clearTimeout(interactionUnlockTimer);
-    interactionUnlockTimer = setTimeout(() => render(), 2320);
+    interactionUnlockTimer = setTimeout(() => { transientWheelOutcome = null; render(); }, 2320);
     render();
     voice?.startLoop("ruleta");
     const target = -(index * 15 + 7.5);
