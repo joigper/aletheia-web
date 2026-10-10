@@ -251,6 +251,7 @@
     const mine=Number(detail.slot)===Number(detail.activeSlot);
     if(detail.initialDrawPhase==="running"){renderScene("wait");$("#action-kicker").textContent="SORTEO INICIAL";$("#action-title").textContent="¿QUIÉN COMIENZA?";$("#action-copy").textContent="El azar está eligiendo quién abrirá el primer panel."}
     else if(detail.initialDrawPhase==="result"){renderScene("wait");$("#action-kicker").textContent="EL AZAR HA DECIDIDO";$("#action-title").textContent=`COMIENZA ${String(detail.initialDrawWinnerName||"UN CONCURSANTE").toUpperCase()}`;$("#action-copy").textContent="Abrirá el primer panel."}
+    else if(detail.finalRevealHolding){renderScene("wait");$("#action-kicker").textContent="SOLUCIÓN FINAL";$("#action-title").textContent="MIRA EL PANEL";$("#action-copy").textContent="La solución completa se muestra ahora en la pantalla principal."}
     else if(detail.paused){renderScene("wait");$("#action-kicker").textContent="PARTIDA EN PAUSA";$("#action-title").textContent="EL PLATÓ ESTÁ DETENIDO";$("#action-copy").textContent="Cualquier jugador puede reanudar la partida."}
     else if(detail.wheelOutcome){renderWheelOutcome(detail.wheelOutcome)}
     else if(detail.resolutionPending){renderScene("wait");$("#action-kicker").textContent="RESOLUCIÓN EN CURSO";$("#action-title").textContent=`${String(detail.resolutionPlayerName||"UN CONCURSANTE").toUpperCase()} RESUELVE`;$("#action-copy").textContent="Prometeo anunciará ahora si la respuesta es correcta."}

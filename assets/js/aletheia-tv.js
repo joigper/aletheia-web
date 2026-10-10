@@ -67,6 +67,8 @@
   let finalVoiceLockUntil = 0;
   let finalSolveArmed = false;
   let finalSolveInputFocused = false;
+  let finalResultHoldUntil = 0;
+  let finalResultHoldTimer = null;
   let narrationSnapshot = null;
   let narrationBarrier = false;
   let narrationLockUntil = 0;
@@ -433,8 +435,12 @@
       finalVoicePending = false;
       if (interactionLockedUntil === finalVoiceLockUntil) interactionLockedUntil = now;
       finalVoiceLockUntil = 0;
-      if (state?.phase === "FINAL_SOLVE" && !finalSolveArmed) {
-        actionDeadline = now + actionTimeRemaining;
+      if (state?.phase === "FINAL_SOLVE") {
+        if (state.players[state.active]?.cpu) {
+          actionTimeRemaining = 15000;
+          actionDeadline = now + actionTimeRemaining;
+          cpuNotBefore = now + 6000;
+        } else if (!finalSolveArmed) actionDeadline = now + actionTimeRemaining;
         updateClock();
       }
       if (state) render();
@@ -445,6 +451,9 @@
       releaseNarrationBarrier(false);
       act(() => engine.solve(state, attempt.answer, attempt.playerIndex));
       return;
+    }
+    if (state?.phase === "GAME_COMPLETE" && finalResultHoldUntil) {
+      finalResultHoldUntil = Math.max(finalResultHoldUntil, now + 4000);
     }
     releaseNarrationBarrier();
   });
@@ -474,7 +483,8 @@
     const gameComplete = state.phase === "GAME_COMPLETE";
     const roundComplete = state.phase === "ROUND_COMPLETE";
     const finalReady = state.phase === "FINAL_READY";
-    const visibleGameComplete = viewState.phase === "GAME_COMPLETE";
+    const finalResultHolding = state.phase === "GAME_COMPLETE" && Date.now() < finalResultHoldUntil;
+    const visibleGameComplete = viewState.phase === "GAME_COMPLETE" && !finalResultHolding;
     const visibleRoundComplete = viewState.phase === "ROUND_COMPLETE";
     const visibleFinalReady = viewState.phase === "FINAL_READY";
     const finalRound = state.phase === "FINAL_PICK" || state.phase === "FINAL_SOLVE";
@@ -494,9 +504,13 @@
     $("game-clock").hidden = (!timedGame && !forcedClock) || gameComplete;
     $("pause-game").disabled = gameComplete;
     $("puzzle-panel").hidden = visibleGameComplete;
-    $("play-area").hidden = visibleGameComplete;
+    $("play-area").hidden = visibleGameComplete || finalResultHolding;
     $("winner-panel").hidden = !visibleGameComplete;
     $("contestants-panel").hidden = visibleGameComplete;
+    clearTimeout(finalResultHoldTimer);
+    if (finalResultHolding) {
+      finalResultHoldTimer = setTimeout(() => render(), Math.max(50, finalResultHoldUntil - Date.now()));
+    }
     $("next-round").hidden = !visibleRoundComplete && !visibleFinalReady;
     $("next-round").disabled = narrationBarrier;
     $("next-round").textContent = finalReady ? "JUGAR RULETA FINAL" : "SIGUIENTE RONDA";
@@ -625,6 +639,7 @@
       initialDrawPhase, initialDrawHighlightSlot: initialDrawHighlight + 1,
       initialDrawWinnerSlot: state.startingPlayer + 1,
       initialDrawWinnerName: state.players[state.startingPlayer]?.name || "",
+      finalRevealHolding: state.phase === "GAME_COMPLETE" && Date.now() < finalResultHoldUntil,
       remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       wheelOutcome: transientWheelOutcome && Date.now() < transientMessageUntil ? { ...transientWheelOutcome, remainingMs: Math.max(0, transientMessageUntil - Date.now()) } : null,
@@ -994,6 +1009,11 @@
       const previousPhase = state?.phase;
       state = operation();
       const newEvents = state.events.slice(previousEvents);
+      const finalLetterChosen = newEvents.some(event => event.type === "LETRA FINAL");
+      if (finalLetterChosen) cpuNotBefore = Date.now() + (state.phase === "FINAL_SOLVE" ? 6000 : 3000);
+      if (previousPhase === "FINAL_SOLVE" && state.phase === "GAME_COMPLETE") {
+        finalResultHoldUntil = Date.now() + 5000;
+      }
       if (previousPhase === "SPECIAL_SOLVE" && state.phase === "SPECIAL_LETTER") {
         actionTimeRemaining = Math.max(1000, chronoHeldRemaining);
         actionDeadline = Date.now() + actionTimeRemaining;
@@ -1115,6 +1135,17 @@
     return Math.random() * 100 < profile.variabilidad ? available[Math.floor(Math.random() * available.length)] : ordered[0];
   }
 
+  function pickCpuFinalLetter(player, wantVowel) {
+    const profile = player.cpuProfile || AletheiaGame.defaultCpuProfile;
+    const available = availableLetters(letter => vowels.has(letter) === wantVowel);
+    if (!available.length) return null;
+    const frequency = wantVowel ? [..."EAOIU"] : [..."NRTLCDPMSBGVFYQHJÑZXKW"];
+    const ordered = frequency.filter(letter => available.includes(letter));
+    return Math.random() * 100 < profile.variabilidad
+      ? available[Math.floor(Math.random() * available.length)]
+      : ordered[0] || available[0];
+  }
+
   function playerIdentityVoice(player, playerIndex) {
     return player.cpu
       ? `resolucion-nombre:${cpuResolutionVoiceById[player.id] || player.id}`
@@ -1233,7 +1264,7 @@
     }
     if (state.phase === "FINAL_PICK") {
       const wantVowel = state.final.consonants >= 3;
-      const letter = pickCpuLetter(player, wantVowel);
+      const letter = pickCpuFinalLetter(player, wantVowel);
       if (letter) act(() => engine.finalLetter(state, letter));
       return;
     }
@@ -1445,14 +1476,14 @@
   }
 
   function startConfiguredGame() {
-    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer);
+    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer); clearTimeout(finalResultHoldTimer);
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
     clearInitialDrawTimers(); initialDrawPhase = "idle"; initialDrawHighlight = 0;
     gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
     explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
     chronoWarningRound = 0; chronoTenSecondRound = 0; chronoHeldRemaining = 0;
-    introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0; pendingResolutionAttempt = null;
+    introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; finalResultHoldUntil = 0; finalResultHoldTimer = null; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0; pendingResolutionAttempt = null;
     transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
     $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
     $("pause-game").textContent = "PAUSA"; $("pause-game").setAttribute("aria-pressed", "false");
