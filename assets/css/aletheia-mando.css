@@ -1013,6 +1013,39 @@ html.aletheia-mando-root body {
   pointer-events: none;
 }
 
+.selfie-camera-status {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  color: #061018;
+  background: #57e6ffdb;
+  font: 700 7px "Tektur",sans-serif;
+  letter-spacing: .08em;
+}
+
+.selfie-camera-error {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 7px;
+  padding: 10px;
+  color: #ffb7c2;
+  text-align: center;
+}
+
+.selfie-camera-error b {
+  font: 700 35px "Tektur";
+}
+
+.selfie-camera-error small {
+  font: 600 clamp(7px,1vw,10px) "Tektur";
+  line-height: 1.25;
+}
+
 .selfie-inline-actions {
   width: min(100%,340px);
   margin: 3px auto 0;
@@ -1570,10 +1603,13 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) {
   .action-card.is-turn-waiting > h1 {
+    width: 100%;
+    max-width: 100%;
     align-self: center;
-    font-size: clamp(44px,7.2vw,94px);
+    overflow: visible;
+    font-size: clamp(36px,6.4vw,82px);
     line-height: 1;
-    letter-spacing: .02em;
+    letter-spacing: .005em;
     white-space: nowrap;
     text-align: center;
   }
@@ -1702,7 +1738,7 @@ html.aletheia-mando-root body {
 
 @media (orientation:landscape) and (max-height:430px) {
   .action-card.is-turn-waiting > h1 {
-    font-size: clamp(39px,6.6vw,68px);
+    font-size: clamp(31px,5.8vw,59px);
   }
 }
 

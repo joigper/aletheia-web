@@ -16,6 +16,7 @@
   let remoteGameState=null;
   let pendingCommand=false;
   let pendingCommandTimer=null;
+  const appleTouch=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 
   function animateConfigurationTitle(){
     const title=$("#config-title");
@@ -35,6 +36,7 @@
   function updateVisibleHeight(){
     const height=Math.round(window.visualViewport?.height||window.innerHeight);
     document.documentElement.style.setProperty("--remote-visible-height",`${height}px`);
+    if($("#action-card")?.classList.contains("is-turn-waiting"))requestAnimationFrame(fitWaitingTitle);
   }
   updateVisibleHeight();
   window.visualViewport?.addEventListener("resize",updateVisibleHeight);
@@ -121,7 +123,7 @@
     $("#selfie-use").hidden=mode!=="captured";
   }
   async function requestFrontCamera(){
-    const preferred={audio:false,video:{facingMode:{exact:"user"},width:{ideal:1280},height:{ideal:720}}};
+    const preferred={audio:false,video:{facingMode:appleTouch?{ideal:"user"}:{exact:"user"},width:{ideal:1280},height:{ideal:720}}};
     try{return await navigator.mediaDevices.getUserMedia(preferred)}
     catch(error){
       if(error?.name!=="OverconstrainedError"&&error?.name!=="NotFoundError")throw error;
@@ -131,11 +133,15 @@
   async function openSelfieCamera(){
     stopSelfieCamera();pendingSelfie=null;selfieCaptureActive=true;setSelfieButtons("live");
     const visual=selfieVisual();if(!visual)return;
-    visual.innerHTML='<video class="selfie-inline-preview" autoplay muted playsinline></video><span class="selfie-inline-guide" aria-hidden="true"></span>';
+    if(appleTouch&&(document.fullscreenElement||document.webkitFullscreenElement)){
+      try{if(document.exitFullscreen)await document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen()}catch(error){console.info("iPad mantiene el modo de visualización",error)}
+      await new Promise(resolve=>setTimeout(resolve,120));updateVisibleHeight();
+    }
+    visual.innerHTML='<video class="selfie-inline-preview" autoplay muted playsinline></video><span class="selfie-inline-guide" aria-hidden="true"></span><small class="selfie-camera-status">CÁMARA FRONTAL</small>';
     $("#avatar-name").textContent="Cámara frontal";$("#avatar-role").textContent="Centra tu rostro y pulsa FOTO";
-    if(!navigator.mediaDevices?.getUserMedia){visual.innerHTML='<b class="camera-mark">!</b>';$("#avatar-role").textContent="Este navegador no permite utilizar la cámara";setSelfieButtons("error");return}
-    try{cameraStream=await requestFrontCamera();const preview=visual.querySelector("video");preview.srcObject=cameraStream;await preview.play()}
-    catch(error){console.warn("No se pudo abrir la cámara frontal",error);visual.innerHTML='<b class="camera-mark">!</b>';$("#avatar-role").textContent="Autoriza la cámara y pulsa REPETIR";setSelfieButtons("error")}
+    if(!navigator.mediaDevices?.getUserMedia){visual.innerHTML='<span class="selfie-camera-error"><b>!</b><small>CAMARA NO DISPONIBLE</small></span>';$("#avatar-role").textContent="Este navegador no permite utilizar la cámara";setSelfieButtons("error");return}
+    try{cameraStream=await requestFrontCamera();const preview=visual.querySelector("video");preview.srcObject=cameraStream;preview.setAttribute("playsinline","");preview.muted=true;await preview.play();updateVisibleHeight()}
+    catch(error){console.warn("No se pudo abrir la cámara frontal",error);const denied=error?.name==="NotAllowedError"||error?.name==="SecurityError";visual.innerHTML=`<span class="selfie-camera-error"><b>!</b><small>${denied?"PERMITE LA CAMARA EN CHROME":"CAMARA FRONTAL NO DISPONIBLE"}</small></span>`;$("#avatar-role").textContent=denied?"Activa Cámara para Chrome en los ajustes del iPad y pulsa REPETIR":"No se pudo iniciar la cámara frontal";setSelfieButtons("error");updateVisibleHeight()}
   }
   function captureSelfie(){
     const video=selfieVisual()?.querySelector("video");if(!video)return;
@@ -190,12 +196,22 @@
     const titleNode=$("#action-title");
     titleNode.setAttribute("aria-label",title);
     titleNode.innerHTML=[...title].map((letter,index)=>letter===" "?' <span class="wait-letter-space" aria-hidden="true"> </span>':`<span class="wait-letter" style="--i:${index}" aria-hidden="true">${letter}</span>`).join("");
+    requestAnimationFrame(fitWaitingTitle);
     const name=String(detail.activeName||"OTRO JUGADOR").toUpperCase();
     $("#active-player-name").textContent=name;
     $("#active-player-role").textContent=detail.activeRole||"Concursante";
     const photo=$("#active-player-photo");
     if(detail.activeImage){photo.innerHTML='<img alt="">';photo.querySelector("img").src=detail.activeImage}
     else photo.innerHTML=`<span>${name.split(/\s+/).slice(0,2).map(part=>part[0]||"").join("")}</span>`;
+  }
+  function fitWaitingTitle(){
+    const title=$("#action-card.is-turn-waiting #action-title");
+    if(!title)return;
+    title.style.fontSize="";
+    const available=Math.max(0,title.clientWidth-8),needed=title.scrollWidth;
+    if(!available||!needed||needed<=available)return;
+    const current=parseFloat(getComputedStyle(title).fontSize)||44;
+    title.style.fontSize=`${Math.max(27,Math.floor(current*available/needed))}px`;
   }
   function sendCommand(type,value=""){
     if(pendingCommand)return;
@@ -215,11 +231,11 @@
     else if(detail.phase==="SPEED_RUNNING"){renderScene("speed");$("#action-copy").textContent="Pulsa en cuanto conozcas la solución."}
     else if(["ROUND_COMPLETE","FINAL_READY"].includes(detail.phase)&&(Number(detail.roundWinnerSlot)===Number(detail.slot)||detail.players?.[String(detail.roundWinnerSlot)]?.cpu)){renderScene("next");$("#action-content [data-action='next']").textContent=detail.phase==="FINAL_READY"?"JUGAR RULETA FINAL":"SIGUIENTE RONDA"}
     else if(!mine){renderScene("wait");$("#action-kicker").textContent=`TURNO DE ${String(detail.activeName||"OTRO JUGADOR").toUpperCase()}`;$("#action-copy").textContent="Sigue el panel en la pantalla principal.";renderWaitingPlayer(detail)}
+    else if(detail.phase==="CATEGORY_CHOICE"){const choices=Array.isArray(detail.categoryChoices)?detail.categoryChoices:Object.values(detail.categoryChoices||{});renderScene("category");$("#remote-choice-grid").innerHTML=choices.map(category=>`<button class="remote-button remote-secondary" type="button" data-category="${String(category).replace(/&/g,"&amp;").replace(/\"/g,"&quot;")}">${category}</button>`).join("");$$("#action-content [data-category]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-category]").forEach(item=>item.disabled=true);sendCommand("category",button.dataset.category)}))}
     else if(Number(detail.interactionLockedMs||0)>0){renderScene("wait");$("#action-kicker").textContent="JUGADA EN CURSO";$("#action-title").textContent="ESPERA A LA RULETA";$("#action-copy").textContent="Tu control se activará al terminar la animación del plató."}
     else if(detail.phase==="AWAITING_SPIN"&&!detail.consonantsRemain){renderScene("vowels");const available=new Set(detail.availableLetters||[]);$$("#action-content .vowel-only button").forEach(button=>button.disabled=!detail.canBuyVowel||!available.has(button.textContent))}
     else if(detail.phase==="AWAITING_SPIN")renderScene("spin");
     else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");$("#action-kicker").textContent=detail.pending?`PREMIO: ${detail.pending} POR COINCIDENCIA`:$("#action-kicker").textContent;const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
-    else if(detail.phase==="CATEGORY_CHOICE"){renderScene("category");$("#remote-choice-grid").innerHTML=(detail.categoryChoices||[]).map(category=>`<button class="remote-button remote-secondary" type="button" data-category="${String(category).replace(/&/g,"&amp;").replace(/\"/g,"&quot;")}">${category}</button>`).join("");$$("#action-content [data-category]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-category]").forEach(item=>item.disabled=true);sendCommand("category",button.dataset.category)}))}
     else if(detail.phase==="CATEGORY_RESULT"){renderScene("wait");$("#action-title").textContent=detail.selectedCategory||"CATEGORÍA ELEGIDA";$("#action-copy").textContent="El plató está preparando el panel."}
     else if(detail.phase==="QUESTION_BONUS"&&Number(detail.roundWinnerSlot)===Number(detail.slot)){renderScene("question");$("#action-copy").textContent=detail.question?.text||"Selecciona una respuesta.";$("#remote-choice-grid").innerHTML=(detail.question?.options||[]).map((option,index)=>`<button class="remote-button remote-secondary" type="button" data-question="${index}">${option}</button>`).join("");$$("#action-content [data-question]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-question]").forEach(item=>item.disabled=true);sendCommand("question",button.dataset.question)}))}
     else if(["QUESTION_SELECTION","QUESTION_RESULT"].includes(detail.phase)){renderScene("wait");$("#action-title").textContent=detail.phase==="QUESTION_RESULT"?(detail.question?.wasCorrect?"RESPUESTA CORRECTA":"RESPUESTA INCORRECTA"):"RESPUESTA REGISTRADA";$("#action-copy").textContent="Consulta el resultado en el plató."}
