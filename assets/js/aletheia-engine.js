@@ -156,8 +156,9 @@
       const selectedPuzzle = this.pickPuzzle();
       const requestedModes = Array.isArray(options.roundModes) && options.roundModes.length === 5 ? options.roundModes : ROUND_MODES;
       const roundModes = requestedModes.map(mode => ["NORMAL", "CHOOSE", "SPECIAL", "QUESTION"].includes(mode) ? mode : "NORMAL");
+      const startingPlayer = Math.floor(this.random() * 3);
       return {
-        phase: "AWAITING_SPIN", active: 0, round: 1, maxRounds: 5, pending: null, lastSpin: null,
+        phase: "AWAITING_SPIN", active: startingPlayer, startingPlayer, round: 1, maxRounds: 5, pending: null, lastSpin: null,
         roundModes, roundMode: roundModes[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
         playMode: String(options.playMode || "desktop-local"),
         players: [

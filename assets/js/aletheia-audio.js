@@ -9,6 +9,9 @@
   const library = Object.freeze({
     bienvenida: ["v4-bienvenida-01.mp3", "v4-bienvenida-02.mp3", "bienvenida.mp3", "bienvenida-01.mp3", "bienvenida-02.mp3"],
     "comienza-partida": ["v4-todos-listos-01.mp3", "v4-preparados-01.mp3", "comienza-partida.mp3", "comienza-partida-01.mp3", "comienza-partida-02.mp3", "comienza-partida-03.mp3"],
+    "sorteo-intro": ["v4-sorteo-intro-todo-preparado-01.mp3", "v4-sorteo-intro-quien-primer-turno-01.mp3", "v4-sorteo-intro-tres-concursantes-01.mp3", "v4-sorteo-intro-suerte-elegir-01.mp3", "v4-sorteo-intro-atencion-01.mp3"],
+    "sorteo-prefijo": ["v4-sorteo-prefijo-primer-turno-01.mp3", "v4-sorteo-prefijo-comienza-jugando-01.mp3", "v4-sorteo-prefijo-suerte-elige-01.mp3", "v4-sorteo-prefijo-abre-panel-01.mp3", "v4-sorteo-prefijo-quien-comienza-01.mp3"],
+    "sorteo-sufijo": ["v4-sorteo-sufijo-comienza-partida-01.mp3", "v4-sorteo-sufijo-primer-turno-01.mp3", "v4-sorteo-sufijo-abre-panel-01.mp3", "v4-sorteo-sufijo-en-sus-manos-01.mp3"],
     "comienza-ronda": ["comienza-ronda.mp3", "comienza-ronda-01.mp3", "comienza-ronda-02.mp3", "comienza-ronda-03.mp3"],
     "ultima-ronda": ["v4-ultima-ronda-01.mp3", "v4-ultima-ronda-02.mp3", "v4-ultimo-panel-01.mp3"],
     "panel-preparado": ["v4-panel-preparado-01.mp3"],
@@ -27,8 +30,32 @@
     "saldo-insuficiente": ["v4-saldo-insuficiente-01.mp3", "saldo-insuficiente.mp3", "saldo-insuficiente-01.mp3", "saldo-insuficiente-02.mp3", "saldo-insuficiente-03.mp3"],
     "vocal-comprada": ["v4-vocal-comprada-01.mp3", "vocal-comprada.mp3", "vocal-comprada-01.mp3", "vocal-comprada-02.mp3", "vocal-comprada-03.mp3"],
     "cambio-turno": ["turno-siguiente.mp3", "cambio-turno-01.mp3", "cambio-turno-02.mp3", "cambio-turno-03.mp3"],
+    "turno-prefijo": ["v4-turno-le-toca-a-01.mp3", "v4-turno-es-el-turno-de-01.mp3", "v4-turno-continua-con-01.mp3", "v4-turno-adelante-01.mp3", "v4-turno-veamos-01.mp3", "v4-turno-recibimos-01.mp3", "v4-turno-atencion-a-01.mp3", "v4-turno-partida-continua-con-01.mp3"],
+    "turno-sufijo": ["v4-evento-es-tu-turno-01.mp3", "v4-evento-continua-jugando-01.mp3"],
+    "evento-gana-ronda": ["v4-evento-gana-ronda-01.mp3"],
+    "evento-pierde-turno": ["v4-evento-pierde-turno-01.mp3"],
+    "evento-elige-categoria": ["v4-evento-elige-categoria-01.mp3"],
+    "evento-quiebra": ["v4-evento-quiebra-01.mp3"],
+    "evento-compra-vocal": ["v4-evento-compra-vocal-01.mp3"],
+    "evento-comodin": ["v4-evento-comodin-01.mp3"],
+    "evento-detiene-panel": ["v4-evento-detiene-panel-01.mp3"],
+    "evento-detiene-crono": ["v4-evento-detiene-crono-01.mp3"],
+    "evento-comienza-panel": ["v4-evento-comienza-panel-01.mp3"],
+    "evento-ruleta-final": ["v4-evento-ruleta-final-01.mp3"],
+    "evento-resuelve-correctamente": ["v4-evento-resuelve-correctamente-01.mp3"],
+    "evento-no-resuelve": ["v4-evento-no-resuelve-01.mp3"],
+    "evento-premio": ["v4-evento-premio-01.mp3"],
+    "evento-recupera-control": ["v4-evento-recupera-control-01.mp3"],
     "solucion-correcta": ["v4-solucion-correcta-01.mp3", "v4-solucion-correcta-02.mp3", "v4-ronda-correcta-01.mp3", "solucion-correcta.mp3", "solucion-correcta-01.mp3", "solucion-correcta-02.mp3", "solucion-correcta-03.mp3", "solucion-correcta-04.mp3"],
     "solucion-incorrecta": ["v4-solucion-incorrecta-01.mp3", "v4-solucion-incorrecta-02.mp3", "solucion-incorrecta.mp3", "solucion-incorrecta-01.mp3", "solucion-incorrecta-02.mp3", "solucion-incorrecta-03.mp3", "solucion-incorrecta-04.mp3"],
+    "resolucion-pulsa": ["v4-resolucion-pulsa-01.mp3"],
+    "resolucion-intenta": ["v4-resolucion-intenta-01.mp3"],
+    "resolucion-cree": ["v4-resolucion-cree-01.mp3"],
+    "resolucion-adelante": ["v4-resolucion-adelante-01.mp3"],
+    "resolucion-comprobar": ["v4-resolucion-comprobar-01.mp3"],
+    "resolucion-panel-detenido": ["v4-resolucion-panel-detenido-01.mp3"],
+    "resolucion-momento": ["v4-resolucion-momento-01.mp3"],
+    "resolucion-silencio": ["v4-resolucion-silencio-01.mp3"],
     "tiempo-agotado": ["v4-tiempo-agotado-01.mp3", "v4-tiempo-agotado-02.mp3", "tiempo-agotado.mp3", "tiempo-agotado-01.mp3", "tiempo-agotado-02.mp3", "tiempo-agotado-03.mp3"],
     "ronda-ganada": ["v4-ronda-ganada-01.mp3", "v4-ronda-ganada-02.mp3", "ronda-ganada.mp3", "ronda-ganada-01.mp3", "ronda-ganada-02.mp3", "ronda-ganada-03.mp3", "ronda-ganada-04.mp3"],
     "panel-sin-resolver": ["nadie-resuelve.mp3", "panel-sin-resolver-01.mp3", "panel-sin-resolver-02.mp3"],
@@ -236,6 +263,12 @@
   }
 
   function filesFor(intent) {
+    if (intent.startsWith("resolucion-nombre:")) {
+      return [`v4-resolucion-nombre-${intent.slice(18)}.mp3`];
+    }
+    if (intent.startsWith("resolucion-jugador:")) {
+      return [`v4-resolucion-jugador-${String(Number(intent.slice(19))).padStart(2, "0")}.mp3`];
+    }
     if (intent.startsWith("letra:")) {
       const letter = intent.slice(6).toLowerCase().replace("ñ", "enye");
       return [`letra-${letter}.mp3`, `v4-letra-${letter}-02.mp3`];
