@@ -599,9 +599,16 @@
         voice?.play(firstExplanation ? ["bonus-presentacion", "bonus-explicacion"] : "bonus-breve");
         challengeVoicePending = voice?.isEnabled() !== false;
       }
-      challengeReadyAt = Date.now() + (challengeVoicePending ? 30000 : duration);
+      challengeReadyAt = Date.now() + (challengeVoicePending ? 30000 : 450);
       clearTimeout(challengeUnlockTimer);
-      challengeUnlockTimer = setTimeout(() => { if (state && (state.phase === "CATEGORY_CHOICE" || state.phase === "QUESTION_BONUS")) render(); }, 2050);
+      const pendingChallengeKey = nextKey;
+      challengeUnlockTimer = setTimeout(() => {
+        if (!state || challengeKey !== pendingChallengeKey) return;
+        if (state.phase !== "CATEGORY_CHOICE" && state.phase !== "QUESTION_BONUS") return;
+        challengeVoicePending = false;
+        challengeReadyAt = Date.now();
+        render();
+      }, challengeVoicePending ? 22000 : 500);
     }
     const locked = Date.now() < challengeReadyAt;
     if (categoryChoice) {

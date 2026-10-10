@@ -92,7 +92,9 @@
   }
 
   function syncBasePlayback() {
-    if (overlay.hidden) base.pause();
+    const visible = !overlay.hidden;
+    presenter?.establecerActivo(visible);
+    if (!visible) base.pause();
     else playBaseVideo();
   }
 
@@ -102,13 +104,23 @@
         base.addEventListener("loadeddata", resolve, { once: true });
         base.addEventListener("error", reject, { once: true });
       });
+      const libraryHalf = {
+        ...global.BIBLIOTECA_BOCAS,
+        tile: {
+          w: Math.round(global.BIBLIOTECA_BOCAS.tile.w / 2),
+          h: Math.round(global.BIBLIOTECA_BOCAS.tile.h / 2)
+        }
+      };
       presenter = new PresentadorVisemas(canvas, base, {
         biblioteca: {
-          datos: global.BIBLIOTECA_BOCAS,
-          imagen: "assets/img/ocio/prometeo-biblioteca.webp?v=20261010-1"
+          datos: libraryHalf,
+          imagen: "assets/img/ocio/prometeo-biblioteca-50.webp?v=20261010-2"
         },
         refAncho: 1024,
         encaje: { escala: 0.8330, dx: -66.12, dy: 0.20 },
+        escalaRender: 0.5,
+        soloParche: true,
+        fpsMax: 30,
         balanceo: false,
         expresividad: 0.48,
         fundido: 62,

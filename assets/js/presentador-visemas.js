@@ -40,7 +40,10 @@ class PresentadorVisemas {
       expresividad: 0.5,
       biblioteca: null,                            // 'bocas/biblioteca' para el modo con fotogramas intermedios
       fundidoBiblioteca: 40,                       // ms de fundido entre fotogramas de la biblioteca
-      velocidadBoca: 0.020                         // velocidad máxima de la boca (medida en vídeo real)
+      velocidadBoca: 0.020,                        // velocidad máxima de la boca (medida en vídeo real)
+      escalaRender: 1,                             // resolución interna del canvas (0.5 = mitad)
+      soloParche: false,                           // true: el vídeo se muestra detrás y aquí solo se dibuja la boca
+      fpsMax: 60                                   // límite de refresco del canvas
     }, opciones);
 
     this.parches = {};
@@ -54,6 +57,8 @@ class PresentadorVisemas {
     this.intensidad = 0;          // para el balanceo, sube y baja suave
     this.cobertura = 0;           // 1 = parches visibles; 0 = se ve la boca de la base
     this.alTerminar = null;
+    this.activo = true;
+    this._ultimoDibujo = 0;
 
     this._bucle = this._bucle.bind(this);
   }
@@ -166,6 +171,12 @@ class PresentadorVisemas {
   /** Muestra una forma fija (útil para pruebas). */
   mostrar(forma) { this.hablando = false; this.cues = []; this._cambiarA(forma); }
 
+  /** Detiene el trabajo gráfico cuando el presentador no está visible. */
+  establecerActivo(activo) {
+    this.activo = !!activo;
+    if (this.activo) this._ultimoDibujo = 0;
+  }
+
   // ---------------------------------------------------------------------
 
   /** Normaliza cues de Rhubarb o de textoAVisemas y elimina formas demasiado cortas. */
@@ -264,14 +275,18 @@ class PresentadorVisemas {
   }
 
   _bucle(ahora) {
-    if (this.hablando && this.reloj) {
+    if (this.activo && this.hablando && this.reloj) {
       const t = this.reloj();
       const cue = this._formaEn(t);
       this._cambiarA(cue ? cue.dibujo : 'A', cue ? cue.entrada : 35);
       const ultimo = this.cues[this.cues.length - 1];
       if (this.autoFin && ultimo && t > ultimo.end + 0.15) this.detener();
     }
-    this._dibujar(ahora);
+    const intervalo = 1000 / Math.max(1, Number(this.op.fpsMax) || 60);
+    if (this.activo && (this._ultimoDibujo === 0 || ahora - this._ultimoDibujo >= intervalo)) {
+      this._ultimoDibujo = ahora;
+      this._dibujar(ahora);
+    }
     requestAnimationFrame(this._bucle);
   }
 
@@ -279,13 +294,23 @@ class PresentadorVisemas {
     const b = this.base;
     const bw = b.videoWidth || b.naturalWidth, bh = b.videoHeight || b.naturalHeight;
     if (!bw) return;
-    if (this.canvas.width !== bw) { this.canvas.width = bw; this.canvas.height = bh; }
+    const escalaRender = Math.max(0.1, Math.min(1, Number(this.op.escalaRender) || 1));
+    const cw = Math.max(1, Math.round(bw * escalaRender));
+    const ch = Math.max(1, Math.round(bh * escalaRender));
+    if (this.canvas.width !== cw || this.canvas.height !== ch) {
+      this.canvas.width = cw;
+      this.canvas.height = ch;
+    }
     const ctx = this.ctx, r = this.lib ? this.lib.datos.rect : this.op.rect, e = this.op.encaje;
     const s = e ? e.escala : bw / this.op.refAncho, ox = e ? e.dx : 0, oy = e ? e.dy : 0;
-    const x = r.x * s + ox, y = r.y * s + oy, w = r.w * s, h = r.h * s;
+    const x = (r.x * s + ox) * escalaRender;
+    const y = (r.y * s + oy) * escalaRender;
+    const w = r.w * s * escalaRender;
+    const h = r.h * s * escalaRender;
 
     ctx.globalAlpha = 1;
-    ctx.drawImage(b, 0, 0);
+    ctx.clearRect(0, 0, cw, ch);
+    if (!this.op.soloParche) ctx.drawImage(b, 0, 0, cw, ch);
 
     if (this.lib) {
       this._pasoBiblioteca(ahora);

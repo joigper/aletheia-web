@@ -4740,7 +4740,6 @@ html.aletheia-tv-phone #enable-remotes {
 
 .tv-transition-presenter-frame video, .tv-transition-presenter-frame canvas {
   position: absolute;
-  z-index: 2;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -4748,15 +4747,19 @@ html.aletheia-tv-phone #enable-remotes {
   object-position: center bottom;
 }
 
+.tv-transition-presenter-frame > #transition-presenter-base {
+  z-index: 2;
+}
+
 .tv-transition-presenter-frame > #transition-presenter-canvas {
+  z-index: 3;
   left: 50%;
   width: auto;
   max-width: 100%;
   height: 100%;
   transform: translateX(-50%);
   opacity: 0;
-  transition: opacity .35s ease;
-  filter: drop-shadow(0 18px 32px #0009);
+  transition: opacity .25s ease;
 }
 
 .tv-transition-presenter-frame.is-viseme-ready > #transition-presenter-canvas {

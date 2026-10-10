@@ -1,145 +1,80 @@
-<!DOCTYPE html>
-<html data-bs-theme="light" lang="es" class="aletheia-mando-root">
-
+<!doctype html>
+<html class="aletheia-mando-root" lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>ALÉTHEIA-TV | Mando móvil</title>
-    <meta name="theme-color" content="#03060d">
-    <meta name="aletheia-build" content="mando-tactil-resultados-20261010-1">
-    <meta name="description" content="Mando móvil de ALÉTHEIA-TV.">
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tektur:wght@500;700&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2:400,500,600,700&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur:500,600,700&amp;display=swap">
-    <link rel="stylesheet" href="assets/css/bss-overrides.css">
-    <link rel="stylesheet" href="assets/css/adelanto.css">
-    <link rel="stylesheet" href="assets/css/aletheia-books.css">
-    <link rel="stylesheet" href="assets/css/aletheia-earth.css">
-    <link rel="stylesheet" href="assets/css/cocina.css">
-    <link rel="stylesheet" href="assets/css/galaxy-button.css">
-    <link rel="stylesheet" href="assets/css/home.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/tripulacion.css">
-    <link rel="stylesheet" href="assets/css/zeus.css">
-    <link rel="stylesheet" href="assets/css/flota.css">
-    <link rel="stylesheet" href="assets/css/granja-carga.css">
-    <link rel="stylesheet" href="assets/css/hangar.css">
-    <link rel="stylesheet" href="assets/css/hospital.css">
-    <link rel="stylesheet" href="assets/css/jardines.css">
-    <link rel="stylesheet" href="assets/css/observatorio.css">
-    <link rel="stylesheet" href="assets/css/planetas.css">
-    <link rel="stylesheet" href="assets/css/granja-3d.css">
-    <link rel="stylesheet" href="assets/css/aletheia-mando.css">
-    <link rel="stylesheet" href="assets/css/aletheia-tv.css">
-    <link rel="stylesheet" href="assets/css/explorar.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#03060d">
+  <meta name="aletheia-build" content="mando-tactil-resultados-20261010-1">
+  <title>ALÉTHEIA-TV | Mando móvil</title>
+  <meta name="description" content="Mando móvil de ALÉTHEIA-TV.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Exo+2:400,500,600,700&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tektur:500,600,700&amp;display=swap">
+  <link rel="stylesheet" href="assets/css/aletheia-mando.css?v=mando-tactil-resultados-20261010-1">
 </head>
-
 <body>
-    <div id="remote-fullscreen-entry" class="remote-fullscreen-entry"><img src="assets/img/aletheia-tv-icon-transparente.svg" alt=""><strong>MANDO ALÉTHEIA-TV</strong>
-        <p>Utiliza el teléfono en horizontal.</p><button class="remote-button remote-primary" id="open-remote-fullscreen" type="button">ABRIR MANDO A PANTALLA COMPLETA</button>
-    </div>
-    <main id="remote-app" class="remote-shell">
-        <section class="remote-screen remote-config-landscape is-active" data-screen="config" aria-labelledby="config-title">
-            <div class="config-identity">
-                <div class="config-title-row"><img src="assets/img/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true">
-                    <div class="screen-heading"><span>PLAZA 1 · JUGADOR HUMANO</span>
-                        <h1 id="config-title">CONFIGURACIÓN</h1>
-                        <p>Elige cómo aparecerás en el plató.</p>
-                    </div>
-                </div><label class="remote-field">TU ALIAS<input autocomplete="nickname" id="remote-alias" maxlength="18" placeholder="Escribe tu nombre" value="Invitado"></label>
-                <div class="carousel-caption"><strong id="avatar-name">Cargando tripulación…</strong><span id="avatar-role">Archivo ALÉTHEIA</span></div><button class="remote-button remote-primary" id="confirm-player" type="button">CONFIRMAR JUGADOR</button>
-                <p class="privacy-note">El selfie se reduce y se envía temporalmente al plató. Se elimina con la sala.</p>
-            </div>
-            <fieldset class="avatar-carousel" aria-label="Selección de avatar">
-                <legend>DESLIZA PARA ELEGIR AVATAR</legend>
-                <div id="carousel-stage" class="carousel-stage"><button class="carousel-arrow carousel-prev" id="avatar-prev" type="button" aria-label="Avatar anterior">‹</button>
-                    <div id="avatar-track" class="carousel-track"></div><button class="carousel-arrow carousel-next" id="avatar-next" type="button" aria-label="Avatar siguiente">›</button>
-                </div>
-                <div id="avatar-dots" class="carousel-dots" aria-hidden="true"></div>
-                <div id="selfie-inline-actions" class="selfie-inline-actions" hidden=""><button id="selfie-cancel" type="button">CANCELAR</button><button id="selfie-capture" type="button">FOTO</button><button id="selfie-repeat" type="button" hidden="">REPETIR</button><button id="selfie-use" type="button" hidden="">ACEPTAR</button></div>
-            </fieldset>
-        </section>
-        <section class="remote-screen remote-lobby" data-screen="lobby" aria-labelledby="lobby-title" hidden="">
-            <div id="lobby-portrait" class="player-portrait"><span>ML</span></div>
-            <div class="lobby-identity">
-                <div class="screen-heading"><span>PLAZA 1 PREPARADA</span>
-                    <h1 id="lobby-title">MANDO CONECTADO</h1>
-                    <p><strong id="lobby-name">Invitado</strong> · <span id="lobby-avatar">Marcus Lowe</span></p>
-                </div>
-                <div class="signal-animation" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-            <div class="lobby-actions">
-                <div class="remote-notice"><small>ESTADO DEL PLATÓ</small><strong>Esperando a los demás jugadores…</strong></div><button class="remote-button remote-primary" id="controller-start" type="button" hidden="">COMENZAR PARTIDA</button><button class="remote-button remote-secondary" id="demo-start" type="button">SIMULAR COMIENZO</button>
-            </div>
-        </section>
-        <section class="remote-screen remote-game" data-screen="game" hidden="">
-            <div class="game-status">
-                <div><small>PLAZA 1</small><strong id="game-name">Invitado</strong></div>
-                <div id="game-clock" class="game-clock"><span>00:25</span></div>
-            </div>
-            <div class="score-strip">
-                <div><small>SALDO DE RONDA</small><strong id="round-score">150</strong></div>
-                <div><small>TOTAL</small><strong id="total-score">375</strong></div>
-            </div>
-            <section id="action-card" class="action-card" aria-live="polite"><small id="action-kicker">ES TU TURNO</small>
-                <h1 id="action-title">GIRA LA RULETA</h1>
-                <p id="action-copy">Pulsa cuando estés preparado.</p>
-                <div id="action-content" class="action-content"><button class="remote-button remote-spin" type="button" data-action="spin"><span>GIRAR</span><small>RULETA</small></button></div>
-            </section>
-            <div class="remote-toolbar"><button id="pause-demo" type="button">Ⅱ <span>PAUSA</span></button><button id="sound-demo" type="button">♪ <span>SONIDO</span></button></div>
-            <nav class="demo-nav" aria-label="Escenas de demostración"><small>VISTA PREVIA</small><button type="button" data-demo="spin">GIRAR</button><button type="button" data-demo="letters">LETRAS</button><button type="button" data-demo="wait">ESPERA</button><button type="button" data-demo="speed">VELOCIDAD</button></nav>
-        </section>
-    </main>
-    <div class="remote-orientation-lock" role="dialog" aria-modal="true">
-        <div class="orientation-phone"><span></span></div><small>ALÉTHEIA-TV · MANDO</small><strong>GIRA EL TELÉFONO</strong>
-        <p>El mando está diseñado para utilizarse en posición horizontal.</p>
-    </div>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/bs-init-1.js"></script>
-    <script src="assets/js/01naves.js"></script>
-    <script src="assets/js/02flota.js"></script>
-    <script src="assets/js/cocina.js"></script>
-    <script src="assets/js/contacto.js"></script>
-    <script src="assets/js/galaxy-button.js"></script>
-    <script src="assets/js/hospital.js"></script>
-    <script src="assets/js/tripulacion.js"></script>
-    <script src="assets/js/zeus.js"></script>
-    <script src="assets/js/hangar.js"></script>
-    <script src="assets/js/jardines.js"></script>
-    <script src="assets/js/navegador-estelar-datos.js"></script>
-    <script src="assets/js/planetas.js"></script>
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-    <script src="assets/js/home.js"></script>
-    <script src="assets/js/navegador-estelar.js"></script>
-    <script src="assets/js/observatorio.js"></script>
-    <script src="assets/js/granja-creditos.js"></script>
-    <script src="assets/js/granja-3d.js"></script>
-    <script src="assets/js/bs-init.js"></script>
-    <script src="assets/js/base-aletheia-001.js"></script>
-    <script src="assets/js/base-ciencia-001.js"></script>
-    <script src="assets/js/base-cotidiano-001.js"></script>
-    <script src="assets/js/base-cultura-001.js"></script>
-    <script src="assets/js/base-mundo-001.js"></script>
-    <script src="assets/js/aletheia-paneles.js"></script>
-    <script src="assets/js/base-ocio-001.js"></script>
-    <script src="assets/js/explorar.js"></script>
-    <script src="assets/js/personajes.js"></script>
-    <script src="assets/js/aletheia-firebase-config.js"></script>
-    <script src="assets/js/aletheia-pruebas.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="assets/js/aletheia-conexion.js"></script>
-    <script src="assets/js/aletheia-mando.js"></script>
-    <script src="assets/js/aletheia-engine.js"></script>
-    <script src="assets/js/aletheia-audio.js"></script>
-    <script src="assets/js/biblioteca.js"></script>
-    <script src="assets/js/aletheia-presentador.js"></script>
-    <script src="assets/js/aletheia-tv.js"></script>
-    <script src="assets/js/presentador-visemas.js"></script>
-</body>
+  <div class="remote-fullscreen-entry" id="remote-fullscreen-entry">
+    <img src="assets/img/aletheia-tv-icon-transparente.svg" alt="">
+    <strong>MANDO ALÉTHEIA-TV</strong>
+    <p>Utiliza el teléfono en horizontal.</p>
+    <button class="remote-button remote-primary" id="open-remote-fullscreen" type="button">ABRIR MANDO A PANTALLA COMPLETA</button>
+  </div>
+  <main class="remote-shell" id="remote-app">
+    <section class="remote-screen remote-config-landscape is-active" data-screen="config" aria-labelledby="config-title">
+      <div class="config-identity">
+        <div class="config-title-row">
+          <img src="assets/img/aletheia-tv-icon-transparente.svg" alt="" aria-hidden="true">
+          <div class="screen-heading"><span>PLAZA 1 · JUGADOR HUMANO</span><h1 id="config-title">CONFIGURACIÓN</h1><p>Elige cómo aparecerás en el plató.</p></div>
+        </div>
+        <label class="remote-field">TU ALIAS<input id="remote-alias" maxlength="18" autocomplete="nickname" value="Invitado" placeholder="Escribe tu nombre"></label>
+        <div class="carousel-caption"><strong id="avatar-name">Cargando tripulación…</strong><span id="avatar-role">Archivo ALÉTHEIA</span></div>
+        <button class="remote-button remote-primary" id="confirm-player" type="button">CONFIRMAR JUGADOR</button>
+        <p class="privacy-note">El selfie se reduce y se envía temporalmente al plató. Se elimina con la sala.</p>
+      </div>
+      <fieldset class="avatar-carousel" aria-label="Selección de avatar">
+        <legend>DESLIZA PARA ELEGIR AVATAR</legend>
+        <div class="carousel-stage" id="carousel-stage">
+          <button class="carousel-arrow carousel-prev" id="avatar-prev" type="button" aria-label="Avatar anterior">‹</button>
+          <div class="carousel-track" id="avatar-track"></div>
+          <button class="carousel-arrow carousel-next" id="avatar-next" type="button" aria-label="Avatar siguiente">›</button>
+        </div>
+        <div class="carousel-dots" id="avatar-dots" aria-hidden="true"></div>
+        <div class="selfie-inline-actions" id="selfie-inline-actions" hidden>
+          <button id="selfie-cancel" type="button">CANCELAR</button>
+          <button id="selfie-capture" type="button">FOTO</button>
+          <button id="selfie-repeat" type="button" hidden>REPETIR</button>
+          <button id="selfie-use" type="button" hidden>ACEPTAR</button>
+        </div>
+      </fieldset>
+    </section>
 
+    <section class="remote-screen remote-lobby" data-screen="lobby" aria-labelledby="lobby-title" hidden>
+      <div class="player-portrait" id="lobby-portrait"><span>ML</span></div>
+      <div class="lobby-identity"><div class="screen-heading"><span>PLAZA 1 PREPARADA</span><h1 id="lobby-title">MANDO CONECTADO</h1><p><strong id="lobby-name">Invitado</strong> · <span id="lobby-avatar">Marcus Lowe</span></p></div><div class="signal-animation" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="lobby-actions"><div class="remote-notice"><small>ESTADO DEL PLATÓ</small><strong>Esperando a los demás jugadores…</strong></div><button class="remote-button remote-primary" id="controller-start" type="button" hidden>COMENZAR PARTIDA</button><button class="remote-button remote-secondary" id="demo-start" type="button">SIMULAR COMIENZO</button></div>
+    </section>
+
+    <section class="remote-screen remote-game" data-screen="game" hidden>
+      <div class="game-status">
+        <div><small>PLAZA 1</small><strong id="game-name">Invitado</strong></div>
+        <div class="game-clock" id="game-clock">00:25</div>
+      </div>
+      <div class="score-strip"><div><small>SALDO DE RONDA</small><strong id="round-score">150</strong></div><div><small>TOTAL</small><strong id="total-score">375</strong></div></div>
+      <section class="action-card" id="action-card" aria-live="polite">
+        <small id="action-kicker">ES TU TURNO</small>
+        <h1 id="action-title">GIRA LA RULETA</h1>
+        <p id="action-copy">Pulsa cuando estés preparado.</p>
+        <div class="action-content" id="action-content">
+          <button class="remote-button remote-spin" type="button" data-action="spin"><span>GIRAR</span><small>RULETA</small></button>
+        </div>
+      </section>
+      <div class="remote-toolbar"><button id="pause-demo" type="button">Ⅱ <span>PAUSA</span></button><button id="sound-demo" type="button">♪ <span>SONIDO</span></button></div>
+      <nav class="demo-nav" aria-label="Escenas de demostración"><small>VISTA PREVIA</small><button type="button" data-demo="spin">GIRAR</button><button type="button" data-demo="letters">LETRAS</button><button type="button" data-demo="wait">ESPERA</button><button type="button" data-demo="speed">VELOCIDAD</button></nav>
+    </section>
+  </main>
+  <div class="remote-orientation-lock" role="dialog" aria-modal="true"><div class="orientation-phone"><span></span></div><small>ALÉTHEIA-TV · MANDO</small><strong>GIRA EL TELÉFONO</strong><p>El mando está diseñado para utilizarse en posición horizontal.</p></div>
+  <script src="assets/js/personajes.js?v=perfiles-cpu-1"></script>
+  <script src="assets/js/aletheia-mando.js?v=mando-tactil-resultados-20261010-1"></script>
+  <script src="assets/js/aletheia-firebase-config.js?v=bootstrap-studio-1"></script>
+  <script src="assets/js/aletheia-conexion.js?v=confirmacion-mando-1"></script>
+</body>
 </html>
