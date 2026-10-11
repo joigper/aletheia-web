@@ -362,11 +362,13 @@
     let duration = firstExplanation ? 10500 : 6500;
     if (state.round === 1) sequence.push("primer-panel");
     if (state.round === state.maxRounds) sequence.push("ultima-ronda");
+    // La categoría se anuncia al principio para que nunca quede relegada tras
+    // una explicación larga de la modalidad.
+    sequence.push("categoria-conector", `categoria-nombre:${state.puzzle.category}`);
     if (mode === "normal") sequence.push(firstExplanation ? "normal-explicacion" : "normal-breve", "panel-preparado");
     if (mode === "crono") sequence.push("crono-presentacion", "crono-inicio");
     if (mode === "palabra") sequence.push("panel-preparado");
     if (mode === "velocidad") sequence.push("velocidad-presentacion", firstExplanation ? "velocidad-explicacion" : "velocidad-breve", "velocidad-inicio");
-    sequence.push("categoria-conector", `categoria-nombre:${state.puzzle.category}`);
     voice?.play(sequence);
     if (voice?.isEnabled() !== false) {
       introVoicePending = true;
@@ -997,15 +999,16 @@
       announceLetterEvent(letter || vowel, Boolean(vowel), roundWon);
       return;
     }
+    const resolutionWasCorrect = resolution ? /^Correcta\b/i.test(String(resolution.detail || "").trim()) : false;
     if (resolution) {
       if (final?.type === "FINAL") {
-        voice.playEffect(/Correcta/i.test(resolution.detail) ? "respuesta-correcta" : "respuesta-incorrecta");
-        if (/Correcta/i.test(resolution.detail)) playRoundOutcomeEffects();
+        voice.playEffect(resolutionWasCorrect ? "respuesta-correcta" : "respuesta-incorrecta");
+        if (resolutionWasCorrect) playRoundOutcomeEffects();
         else voice.playEffect("publico-decepcion");
-        voice.play(/Correcta/i.test(resolution.detail) ? "final-correcta" : "final-incorrecta");
+        voice.play(resolutionWasCorrect ? "final-correcta" : "final-incorrecta");
         return;
       }
-      if (/Correcta/i.test(resolution.detail)) {
+      if (resolutionWasCorrect) {
         voice.playEffect("respuesta-correcta");
         if (roundWon) playRoundOutcomeEffects();
         voice.play([speedResolution ? "velocidad-correcta" : "solucion-correcta", roundWon && state.special?.type === "CRONO" ? "crono-ganado" : roundWon ? finalVoiceIntent() : null]);
@@ -1032,7 +1035,7 @@
         interactionLockedUntil = Math.max(interactionLockedUntil, finalVoiceLockUntil);
         render();
         voice.play(["final-presentacion", "final-explicacion", "final-letras"]);
-      } else voice.play(/Correcta/i.test(final.detail) ? "final-correcta" : "final-incorrecta");
+      } else voice.play(/^Correcta\b/i.test(String(final.detail || "").trim()) ? "final-correcta" : "final-incorrecta");
       return;
     }
     if (finalLetter) {
@@ -1098,7 +1101,7 @@
       if (previousPhase === "FINAL_SOLVE" && state.phase === "GAME_COMPLETE") {
         finalResultHoldUntil = Date.now() + 5000;
       }
-      const correctResolution = newEvents.some(event => event.type === "RESOLUCIÓN" && /Correcta/i.test(event.detail));
+      const correctResolution = newEvents.some(event => event.type === "RESOLUCIÓN" && /^Correcta\b/i.test(String(event.detail || "").trim()));
       if (newEvents.length && voice?.isEnabled() !== false && !correctResolution) beginNarrationBarrier(presentationBefore);
       const roundJustClosed = previousPhase !== state.phase && ["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase);
       if (roundJustClosed) {
@@ -1342,7 +1345,8 @@
     }
     if (state.phase === "FINAL_SOLVE") {
       const progress = puzzleProgress();
-      const success = Math.random() * 100 < Math.min(94, profile.conocimiento * .65 + progress * 45);
+      // Incluso la CPU más preparada puede fallar la final: nunca supera el 90 %.
+      const success = Math.random() * 100 < Math.min(90, profile.conocimiento * .65 + progress * 45);
       stageResolutionAttempt(success ? state.puzzle.solution : "RESPUESTA INCORRECTA", state.active);
       return;
     }
