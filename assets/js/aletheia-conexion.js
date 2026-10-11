@@ -16,7 +16,7 @@ const [firebaseAppModule, firebaseAuthModule, firebaseDatabaseModule] = await Pr
 ]);
 const { initializeApp, getApps } = firebaseAppModule;
 const { getAuth, signInAnonymously } = firebaseAuthModule;
-const { getDatabase, onDisconnect, onValue, ref, remove, serverTimestamp, set, update } = firebaseDatabaseModule;
+const { getDatabase, onDisconnect, onValue, ref, remove, runTransaction, serverTimestamp, set, update } = firebaseDatabaseModule;
 const { connectionSettings, firebaseConfig } = settings;
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
@@ -445,6 +445,25 @@ async function sendControllerCommand(command) {
   const invitation = controllerState.invitation;
   if (!invitation || !auth.currentUser) return;
   controllerState.commandSeq = Math.max(Date.now(), controllerState.commandSeq + 1);
+  if (command.type === "chrono-buzz") {
+    const claimRef = ref(database, `rooms/${invitation.roomId}/chronoClaims/${controllerState.gameRevision}`);
+    try {
+      const claim = await runTransaction(claimRef, current => current || {
+        controllerUid: auth.currentUser.uid,
+        slot: invitation.slot,
+        seq: controllerState.commandSeq,
+        createdAt: Date.now() + controllerState.serverOffset
+      }, { applyLocally: false });
+      if (!claim.committed || Number(claim.snapshot.val()?.slot) !== invitation.slot) {
+        window.dispatchEvent(new CustomEvent("aletheia:mando-ack", { detail: { seq: controllerState.commandSeq, accepted: false, message: "Otro concursante se ha adelantado." } }));
+        return;
+      }
+    } catch (error) {
+      // Compatibilidad con reglas antiguas: el plató seguirá resolviendo el
+      // conflicto de forma secuencial hasta que se publiquen las reglas nuevas.
+      console.warn("No se pudo arbitrar el pulsador en Firebase; se usa el arbitraje del plató.", error);
+    }
+  }
   await set(ref(database, `rooms/${invitation.roomId}/commands/${invitation.slot}`), {
     controllerUid: auth.currentUser.uid,
     seq: controllerState.commandSeq,

@@ -208,7 +208,6 @@
     button.classList.toggle("is-vowel", vowels.has(letter));
     button.setAttribute("aria-label", vowels.has(letter) ? `Comprar vocal ${letter} por ${AletheiaGame.vowelPrice}` : `Elegir consonante ${letter}`);
     button.addEventListener("click", () => act(() => {
-      if (state.phase === "SPECIAL_LETTER") return engine.specialLetter(state, letter);
       if (state.phase === "FINAL_PICK") return engine.finalLetter(state, letter);
       return vowels.has(letter) ? engine.buyVowel(state, letter) : engine.letter(state, letter);
     }));
@@ -218,6 +217,7 @@
   const panelRowSizes = [12, 14, 14, 12];
   let previousPanelKey = "";
   let previousVisibleLetters = new Set();
+  let previousVisiblePositions = new Set();
   let panelJustChanged = false;
 
   function splitPanelText(text) {
@@ -258,13 +258,16 @@
   }
 
   function maskedPuzzle(viewState = state) {
-    const normalized = AletheiaGame.normalize(viewState.puzzle.solution);
+    const normalized = AletheiaGame.panelText ? AletheiaGame.panelText(viewState.puzzle.solution) : AletheiaGame.normalize(viewState.puzzle.solution);
     const panelKey = `${viewState.round}:${normalized}`;
     const samePanel = panelKey === previousPanelKey;
     panelJustChanged = !samePanel;
     const completed = ["ROUND_COMPLETE", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(viewState.phase);
     const visibleLetters = new Set(completed ? [...normalized].filter(char => char !== " ") : viewState.puzzle.revealed);
+    const chronoPanel = viewState.special?.type === "CRONO" && ["SPECIAL_LETTER", "SPECIAL_SOLVE"].includes(viewState.phase);
+    const visiblePositions = new Set(completed ? [...normalized].map((char, index) => /^[\p{L}\p{N}]$/u.test(char) ? index : -1).filter(index => index >= 0) : (viewState.puzzle.revealedPositions || []));
     const rows = splitPanelText(normalized);
+    let sourcePosition = 0;
 
     const html = panelRowSizes.map((size, rowIndex) => {
       const line = rows[rowIndex];
@@ -276,15 +279,19 @@
         if (lineIndex < 0 || lineIndex >= line.length) return `<span class="tile tile-inactive"${cellStyle} aria-hidden="true"></span>`;
         const char = line[lineIndex];
         if (char === " ") return `<span class="tile tile-space"${cellStyle} aria-hidden="true"></span>`;
-        const visible = visibleLetters.has(char);
-        const newlyRevealed = samePanel && !completed && visible && !previousVisibleLetters.has(char);
+        const absoluteIndex = normalized.indexOf(line, sourcePosition) + lineIndex;
+        const punctuation = !/^[\p{L}\p{N}]$/u.test(char);
+        const visible = punctuation || (chronoPanel ? visiblePositions.has(absoluteIndex) : visibleLetters.has(char));
+        const newlyRevealed = samePanel && !completed && visible && !punctuation && (chronoPanel ? !previousVisiblePositions.has(absoluteIndex) : !previousVisibleLetters.has(char));
         return `<span class="tile${visible ? " is-visible" : ""}${newlyRevealed ? " is-new" : ""}"${cellStyle}><span${newlyRevealed ? ` data-letter="${char}"` : ""}>${visible && !newlyRevealed ? char : ""}</span></span>`;
       }).join("");
+      if (line) sourcePosition = normalized.indexOf(line, sourcePosition) + line.length;
       return `<div class="letter-row" style="--columns:${size}">${cells}</div>`;
     }).join("");
 
     previousPanelKey = panelKey;
     previousVisibleLetters = visibleLetters;
+    previousVisiblePositions = visiblePositions;
     return html;
   }
 
@@ -353,7 +360,7 @@
     if (state.round === 1) sequence.push("primer-panel");
     if (state.round === state.maxRounds) sequence.push("ultima-ronda");
     if (mode === "normal") sequence.push(firstExplanation ? "normal-explicacion" : "normal-breve", "panel-preparado");
-    if (mode === "crono") sequence.push("crono-presentacion", firstExplanation ? "crono-explicacion" : "crono-breve", "crono-inicio");
+    if (mode === "crono") sequence.push("crono-presentacion", "crono-inicio");
     if (mode === "velocidad") sequence.push("velocidad-presentacion", firstExplanation ? "velocidad-explicacion" : "velocidad-breve", "velocidad-inicio");
     voice?.play(sequence);
     if (voice?.isEnabled() !== false) {
@@ -489,7 +496,7 @@
     const visibleFinalReady = viewState.phase === "FINAL_READY";
     const finalRound = state.phase === "FINAL_PICK" || state.phase === "FINAL_SOLVE";
     const specialRound = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE";
-    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
+    const forcedClock = state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
     const consonantsRemain = engine.hasAvailableConsonants(state);
     const humanTurn = !state.players[state.active].cpu;
     const interactionLocked = Date.now() < interactionLockedUntil;
@@ -530,7 +537,7 @@
     $("active-round-score").textContent = viewPlayer.round;
     $("active-total-score").textContent = viewPlayer.total;
     const visibleTransientMessage = Date.now() < transientMessageUntil ? transientMessage : "";
-    $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.` : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? `Panel con crono: elige una letra o pulsa RESOLVER YA. Premio: ${AletheiaGame.specialPrize}.` : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el crono. Tiene 30 segundos para resolver.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
+    $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? (state.special?.noWinner ? "CRONO termina sin ganador." : `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.`) : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? `CRONO en marcha: se descubre una posición cada 3 segundos. Pulsa RESOLVER cuando conozcas el panel. Premio: ${AletheiaGame.specialPrize}.` : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el panel y está escribiendo la solución.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
     $("spin").disabled = narrationBarrier || gamePaused || interactionLocked || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
     if (specialRound || finalRound) {
       $("wheel-result").textContent = finalRound ? "FINAL" : state.special.type === "SPEED" ? state.special.prize : "CRONO";
@@ -589,14 +596,14 @@
       const chronoBuzzer = state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO" && !player.cpu;
       const showBuzzer = speedBuzzer || chronoBuzzer;
       const buzzerLocked = showBuzzer && (speedBuzzer ? !engine.canStopSpeed(state, i) : !engine.canStopChrono(state, i));
-      const buzzer = showBuzzer ? `<button type="button" class="tv-speed-buzzer${chronoBuzzer ? " is-chrono" : ""}" data-${chronoBuzzer ? "chrono" : "speed"}-buzz-index="${i}" ${buzzerLocked ? "disabled" : ""}><b>${chronoBuzzer ? "RESOLVER YA" : "¡LA SÉ!"}</b><small>${buzzerLocked ? "ESPERA UNA LETRA" : escapeHtml(player.name)}</small></button>` : "";
+      const buzzer = showBuzzer ? `<button type="button" class="tv-speed-buzzer${chronoBuzzer ? " is-chrono" : ""}" data-${chronoBuzzer ? "chrono" : "speed"}-buzz-index="${i}" ${buzzerLocked ? "disabled" : ""}><b>${chronoBuzzer ? "RESOLVER YA" : "¡LA SÉ!"}</b><small>${buzzerLocked ? (chronoBuzzer ? "SIN MÁS INTENTOS" : "ESPERA UNA LETRA") : escapeHtml(player.name)}</small></button>` : "";
       const viewPlayerCard = viewState.players[i] || player;
       return `<article class="player ${i === viewState.active && !visibleRoundComplete && !visibleGameComplete ? "active" : ""}${showBuzzer ? " has-speed-buzzer" : ""}">${portrait}<div class="player-copy"><small>PLAZA ${i + 1} · ${player.cpu ? "TRIPULACIÓN" : "HUMANO"}</small><strong>${escapeHtml(player.name)}</strong><em>${escapeHtml(player.role || "Concursante")}</em>${viewPlayerCard.wildcards ? `<span>COMODÍN ${viewPlayerCard.wildcards}</span>` : ""}</div>${buzzer}<aside class="player-score"><small>RONDA</small><strong>${viewPlayerCard.round}</strong><span><i>TOTAL</i><b>${viewPlayerCard.total}</b></span></aside></article>`;
     }).join("");
     keyboard.querySelectorAll("button").forEach(button => {
       const vowel = vowels.has(button.dataset.letter);
       const unavailable = state.puzzle.revealed.includes(button.dataset.letter);
-      const specialAvailable = state.phase === "SPECIAL_LETTER";
+      const specialAvailable = false;
       const finalAvailable = state.phase === "FINAL_PICK" && (vowel ? state.final.vowels < 1 : state.final.consonants < 3);
       const normalAvailable = vowel ? state.phase === "AWAITING_SPIN" && state.players[state.active].round >= AletheiaGame.vowelPrice : state.phase === "AWAITING_LETTER";
       button.disabled = narrationBarrier || gamePaused || interactionLocked || !humanTurn || unavailable || (!specialAvailable && !finalAvailable && !normalAvailable);
@@ -604,19 +611,20 @@
     renderChallenge();
     $("event-log").innerHTML = state.events.slice().reverse().map(e => `<li><strong>${e.type}</strong> — ${e.detail}</li>`).join("");
     scheduleCpuTurn();
-    scheduleSpeedReveal();
+    scheduleSpecialReveal();
     publishPublicGameState();
   }
 
   function publishPublicGameState() {
     if (!state || !window.AletheiaPlayMode?.remoteActive) return;
-    const viewState = presentationState();
-    const forcedClock = state.phase === "SPECIAL_LETTER" || state.phase === "SPECIAL_SOLVE" || state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
+    // La elección de categoría debe llegar a todos los mandos inmediatamente;
+    // la locución de Prometeo solo bloquea la interacción, no la sincronización.
+    const viewState = ["CATEGORY_CHOICE", "CATEGORY_RESULT"].includes(state.phase) ? state : presentationState();
+    const forcedClock = state.phase === "SPEED_SOLVE" || state.phase === "FINAL_SOLVE";
     const timed = Boolean(timedGame || forcedClock);
     const current = viewState.players[viewState.active];
     const availableLetters = alphabet.filter(letter => {
       if (state.puzzle.revealed.includes(letter)) return false;
-      if (state.phase === "SPECIAL_LETTER") return true;
       if (state.phase === "FINAL_PICK") return vowels.has(letter) ? state.final.vowels < 1 : state.final.consonants < 3;
       return vowels.has(letter) ? state.phase === "AWAITING_SPIN" && current.round >= AletheiaGame.vowelPrice : state.phase === "AWAITING_LETTER";
     });
@@ -625,12 +633,13 @@
       status: state.phase === "GAME_COMPLETE" && !narrationBarrier ? "finished" : gamePaused ? "paused" : "playing",
       paused: gamePaused, phase: viewState.phase, round: state.round, maxRounds: state.maxRounds,
       activeSlot: viewState.active + 1, activeName: current.name, activeRole: current.role || "Concursante", activeImage: current.image || "", roundWinnerSlot: viewState.roundWinner == null ? 0 : viewState.roundWinner + 1, timed,
+      roundNoWinner: Boolean(state.special?.noWinner),
       interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
       speedReady: state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil,
       speedBuzzerSlot: state.phase === "SPEED_SOLVE" ? state.active + 1 : 0,
       chronoReady: state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO",
       chronoBuzzerSlot: state.phase === "SPECIAL_SOLVE" ? state.active + 1 : 0,
-      chronoBuzzLockedSlots: state.special?.type === "CRONO" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
+      chronoBuzzLockedSlots: state.special?.type === "CRONO" ? Object.keys(state.special.excludedPlayers || {}).filter(index => state.special.excludedPlayers[index]).map(index => Number(index) + 1) : [],
       finalSolveArmed: state.phase === "FINAL_SOLVE" ? finalSolveArmed : false,
       speedBuzzLockedSlots: state.special?.type === "SPEED" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
       resolutionPending: Boolean(pendingResolutionAttempt),
@@ -741,10 +750,10 @@
       clearTimeout(roundIntroTimer);
       const mode = roundVoiceMode();
       overlay.dataset.scene = mode === "velocidad" ? "speed" : mode;
-      const titles = { normal: "PANEL NORMAL", crono: "PANEL CONTRARRELOJ", velocidad: "PANEL DE VELOCIDAD" };
+      const titles = { normal: "PANEL NORMAL", crono: "PANEL CRONO", velocidad: "PANEL DE VELOCIDAD" };
       const instructions = {
         normal: "Gira la ruleta, elige consonantes y resuelve el panel.",
-        crono: "Sin ruleta: una letra por jugador antes de que termine el tiempo.",
+        crono: "Sin ruleta ni límite de tiempo: se descubre una posición cada 3 segundos. El primero que pulse RESOLVER detiene el panel.",
         velocidad: "Las letras aparecerán de una en una. Resuelve antes que tus rivales."
       };
       $("challenge-kicker").textContent = `${state.round === state.maxRounds ? "ÚLTIMA RONDA" : "NUEVO PANEL"} · RONDA ${state.round} DE ${state.maxRounds}`;
@@ -843,10 +852,27 @@
     }, 1400);
   }
 
-  function scheduleSpeedReveal() {
+  function scheduleSpecialReveal() {
     clearTimeout(speedTimer);
-    if (gamePaused || narrationBarrier || !state || state.phase !== "SPEED_RUNNING" || Date.now() < speedIntroUntil) return;
-    speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 4000);
+    if (gamePaused || narrationBarrier || !state || Date.now() < speedIntroUntil) return;
+    if (state.phase === "SPEED_RUNNING") {
+      speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 4000);
+      return;
+    }
+    if (state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO") {
+      speedTimer = setTimeout(() => {
+        const eligibleCpu = state.players.map((player, index) => ({ player, index }))
+          .filter(entry => entry.player.cpu && engine.canStopChrono(state, entry.index));
+        const progress = (state.puzzle.revealedPositions?.length || 0) / Math.max(1, [...AletheiaGame.panelText(state.puzzle.solution)].filter(char => /^[\p{L}\p{N}]$/u.test(char)).length);
+        const candidate = eligibleCpu.sort((a, b) => (b.player.cpuProfile?.rapidez || 50) - (a.player.cpuProfile?.rapidez || 50))[0];
+        const knowledge = candidate?.player.cpuProfile?.conocimiento || 0;
+        if (candidate && progress > .35 && Math.random() * 100 < knowledge * progress * .45) {
+          stopChronoForPlayer(candidate.index);
+          return;
+        }
+        act(() => engine.revealChronoPosition(state));
+      }, 3000);
+    }
   }
 
   function finalVoiceIntent() {
@@ -1014,10 +1040,6 @@
       if (previousPhase === "FINAL_SOLVE" && state.phase === "GAME_COMPLETE") {
         finalResultHoldUntil = Date.now() + 5000;
       }
-      if (previousPhase === "SPECIAL_SOLVE" && state.phase === "SPECIAL_LETTER") {
-        actionTimeRemaining = Math.max(1000, chronoHeldRemaining);
-        actionDeadline = Date.now() + actionTimeRemaining;
-      }
       if (newEvents.length && voice?.isEnabled() !== false) beginNarrationBarrier(presentationBefore);
       const roundJustClosed = previousPhase !== state.phase && ["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase);
       if (roundJustClosed) {
@@ -1049,7 +1071,7 @@
 
   function updateClock() {
     clearTimeout(clockTimer);
-    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
+    if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "CATEGORY_RESULT", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase)) return;
     if (!gamePaused && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
     else if (!gamePaused && Date.now() < interactionLockedUntil) actionDeadline = interactionLockedUntil + actionTimeRemaining;
@@ -1059,31 +1081,16 @@
       clockTimer = setTimeout(updateClock, 200);
       return;
     }
-    if (!gamePaused && Date.now() >= interactionLockedUntil && state.phase === "SPECIAL_LETTER" && actionTimeRemaining <= 20000 && actionTimeRemaining > 10000 && chronoWarningRound !== state.round) {
-      chronoWarningRound = state.round;
-      voice?.play("crono-poco-tiempo");
-    }
-    if (!gamePaused && Date.now() >= interactionLockedUntil && state.phase === "SPECIAL_LETTER" && actionTimeRemaining <= 10000 && chronoTenSecondRound !== state.round) {
-      chronoTenSecondRound = state.round;
-      voice?.play("crono-diez-segundos");
-    }
     if (!gamePaused && actionTimeRemaining > 0 && actionTimeRemaining <= 10000) voice?.startLoop("reloj");
     else voice?.stopLoop("reloj");
     if (!gamePaused && Date.now() >= interactionLockedUntil && actionTimeRemaining <= 0 && state.phase !== "ROUND_COMPLETE" && state.phase !== "GAME_COMPLETE") {
       const presentationBefore = capturePresentationState();
-      const chronoSolveExpired = state.phase === "SPECIAL_SOLVE";
       voice?.stopLoop("reloj");
       if (state.phase === "FINAL_SOLVE") state = engine.failFinal(state);
-      else if (state.phase === "SPECIAL_SOLVE") {
-        state = engine.resumeChrono(state, state.active, "Tiempo de respuesta agotado");
-        actionTimeRemaining = Math.max(1000, chronoHeldRemaining);
-        actionDeadline = Date.now() + actionTimeRemaining;
-      }
-      else if (state.phase === "SPECIAL_LETTER") state = engine.expireSpecial(state);
       else if (state.phase === "SPEED_SOLVE") state = engine.resumeSpeed(state, state.active, "Tiempo agotado");
       else state = engine.yieldTurn(state);
       beginNarrationBarrier(presentationBefore);
-      if (!chronoSolveExpired && state.phase !== "GAME_COMPLETE" && state.phase !== "ROUND_COMPLETE") resetActionClock();
+      if (state.phase !== "GAME_COMPLETE" && state.phase !== "ROUND_COMPLETE") resetActionClock();
       render(state.phase === "GAME_COMPLETE" ? "Tiempo agotado en la Ruleta Final." : state.phase === "ROUND_COMPLETE" ? "Tiempo agotado. La prueba termina sin premio." : state.phase === "SPEED_RUNNING" ? "Tiempo agotado. El panel de velocidad continúa." : "Tiempo agotado. El turno pasa al siguiente concursante.");
       voice?.playEffect("respuesta-incorrecta");
       voice?.play("tiempo-agotado");
@@ -1094,9 +1101,9 @@
   }
 
   function resetActionClock() {
-    if (!state || (!timedGame && state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE" && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
+    if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     voice?.stopLoop("reloj");
-    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPEED_SOLVE" || state.phase === "SPECIAL_SOLVE" ? 30000 : state.phase === "SPECIAL_LETTER" ? 60000 : 25000;
+    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPEED_SOLVE" ? 30000 : 25000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
   }
@@ -1275,9 +1282,8 @@
       return;
     }
     if (state.phase === "SPECIAL_LETTER") {
-      if (cpuAttemptsSolution(player)) return;
-      const letter = pickCpuLetter(player, Math.random() < .28);
-      if (letter) act(() => engine.specialLetter(state, letter));
+      // CRONO es simultáneo: la revelación automática y los intentos de CPU
+      // se coordinan desde scheduleSpecialReveal, no mediante el turno activo.
       return;
     }
     if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") {
@@ -1628,11 +1634,9 @@
     if (!state || gamePaused || narrationBarrier || state.phase !== "SPECIAL_LETTER") return false;
     try {
       const presentationBefore = capturePresentationState();
-      chronoHeldRemaining = Math.max(1000, actionDeadline - Date.now());
       state = engine.stopChrono(state, playerIndex);
       beginNarrationBarrier(presentationBefore);
-      resetActionClock();
-      render(`${state.players[playerIndex].name} ha detenido el crono. Tiene 30 segundos para resolver.`);
+      render(`${state.players[playerIndex].name} ha detenido el panel. Escribe la solución.`);
       voice?.play([playerIdentityVoice(state.players[playerIndex], playerIndex), "evento-detiene-crono", "velocidad-escribe"]);
       if (narrationBarrier && !voice?.isSpeaking()) releaseNarrationBarrier();
       return true;
@@ -1754,7 +1758,7 @@
     if (type === "next") {
       const winner = state.roundWinner == null ? null : state.players[state.roundWinner];
       const controller = state.players[slot - 1];
-      const allowedController = winner?.cpu ? controller && !controller.cpu : slot === state.roundWinner + 1;
+      const allowedController = state.special?.noWinner ? controller && !controller.cpu : winner?.cpu ? controller && !controller.cpu : slot === state.roundWinner + 1;
       const allowed = allowedController && ["ROUND_COMPLETE", "FINAL_READY"].includes(state.phase);
       if (!allowed) { remoteAck(slot, seq, false, "Este mando no puede continuar la ronda."); return; }
       advanceRound(); remoteAck(slot, seq, true, "Preparando el siguiente panel."); return;
@@ -1778,7 +1782,7 @@
     if (type === "chrono-buzz") {
       const playerIndex = slot - 1;
       const accepted = engine.canStopChrono(state, playerIndex) && stopChronoForPlayer(playerIndex);
-      remoteAck(slot, seq, accepted, accepted ? "Has detenido el crono. Tienes 30 segundos para escribir la solución." : "El pulsador todavía no está disponible.");
+      remoteAck(slot, seq, accepted, accepted ? "Has detenido el panel. Escribe la solución." : "Otro concursante se ha adelantado o ya no puedes participar en este panel.");
       return;
     }
     if (type === "final-buzz") {
@@ -1797,7 +1801,6 @@
     if (type === "letter" && value.length === 1) {
       const beforeEvents = state.events.length;
       act(() => {
-        if (state.phase === "SPECIAL_LETTER") return engine.specialLetter(state, value);
         if (state.phase === "FINAL_PICK") return engine.finalLetter(state, value);
         return vowels.has(value) ? engine.buyVowel(state, value) : engine.letter(state, value);
       });

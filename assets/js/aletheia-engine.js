@@ -52,6 +52,12 @@
       .replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ");
   }
 
+  function panelText(value) {
+    return String(value || "").toLocaleUpperCase("es").normalize("NFD").replace(/N\u0303/g, "\uE000")
+      .replace(/\p{Diacritic}/gu, "").replace(/\uE000/g, "Ñ")
+      .replace(/[^\p{L}\p{N}\s.,;:¡!¿?()'\-]/gu, " ").trim().replace(/\s+/g, " ");
+  }
+
   function significantWordCount(value) {
     return normalize(value).split(" ").filter(word => word && !NON_SIGNIFICANT_WORDS.has(word)).length;
   }
@@ -119,6 +125,29 @@
       const pool = [...uniqueSolutions.values()];
       const selected = pool[Math.floor(this.random() * pool.length)];
       return selected;
+    }
+    pickChronoPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "") {
+      const library = Array.isArray(global.aletheiaPaneles) ? global.aletheiaPaneles : [];
+      const excluded = new Set(excludedIds);
+      const excludedCategorySet = new Set(excludedCategories);
+      const excludedSolutionSet = new Set(excludedSolutions.map(normalize));
+      const eligible = library.filter(panel => panel?.id && panel?.categoria && panel?.solucion)
+        .filter(panel => !excluded.has(panel.id) && !excludedSolutionSet.has(normalize(panel.solucion)))
+        .filter(panel => requiredCategory ? panel.categoria === requiredCategory : !excludedCategorySet.has(panel.categoria));
+      const countWords = panel => significantWordCount(panel.solucion);
+      const preferred = eligible.filter(panel => countWords(panel) >= 3 && countWords(panel) <= 6 && panelText(panel.solucion).length >= 12);
+      const valid = eligible.filter(panel => countWords(panel) >= 2 && panelText(panel.solucion).length >= 8);
+      const validFallback = library.filter(panel => panel?.id && panel?.categoria && panel?.solucion)
+        .filter(panel => countWords(panel) >= 2 && panelText(panel.solucion).length >= 8)
+        .filter(panel => !excludedSolutionSet.has(normalize(panel.solucion)));
+      const validAnywhere = library.filter(panel => panel?.id && panel?.categoria && panel?.solucion)
+        .filter(panel => countWords(panel) >= 2 && panelText(panel.solucion).length >= 8);
+      const source = preferred.length ? preferred : valid.length ? valid : validFallback.length ? validFallback : validAnywhere;
+      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions, previousSolution);
+      const unique = new Map();
+      source.forEach(panel => { const key = normalize(panel.solucion); if (!unique.has(key)) unique.set(key, panel); });
+      const pool = [...unique.values()];
+      return pool[Math.floor(this.random() * pool.length)];
     }
     categoryChoices(state, count = 2) {
       const used = new Set(state.usedPuzzleCategories || []);
@@ -198,26 +227,26 @@
       if (result === "COMODÍN") { state.pending = result; state.phase = "AWAITING_LETTER"; return state; }
       state.pending = result; state.phase = "AWAITING_LETTER"; return state;
     }
-    specialLetter(state, raw) {
-      if (state.phase !== "SPECIAL_LETTER") throw new Error("Esta acción no está disponible ahora.");
-      const letter = normalize(raw);
-      if (!/^\p{L}$/u.test(letter) || state.puzzle.revealed.includes(letter)) throw new Error("Esa letra no está disponible.");
-      const count = [...normalize(state.puzzle.solution)].filter(char => char === letter).length;
-      state.puzzle.revealed.push(letter);
-      const player = state.players[state.active];
-      if (VOWELS.has(letter)) player.stats.vowelsBought += 1;
-      else if (count) player.stats.correctConsonants += 1;
-      else player.stats.incorrectConsonants += 1;
-      state.events.push({ type: "LETRA RÁPIDA", detail: `${letter}: ${count} coincidencia(s)` });
+    revealChronoPosition(state) {
+      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "CRONO") return state;
+      const text = panelText(state.puzzle.solution);
+      state.puzzle.revealedPositions ||= [];
+      const shown = new Set(state.puzzle.revealedPositions);
+      const available = [...text].map((char, index) => ({ char, index }))
+        .filter(item => /^[\p{L}\p{N}]$/u.test(item.char) && !shown.has(item.index));
+      if (!available.length) return this.finishChronoWithoutWinner(state, "Panel descubierto sin ganador");
+      const selected = available[Math.floor(this.random() * available.length)];
+      state.puzzle.revealedPositions.push(selected.index);
       state.special.reveals = Number(state.special.reveals || 0) + 1;
-      if (this.isPuzzleComplete(state)) { player.round += SPECIAL_PRIZE; return this.completeRound(state, "Panel con crono completado", "ultima-letra"); }
-      state.active = (state.active + 1) % 3;
+      state.events.push({ type: "CRONO REVELA", detail: `${selected.char} en posición ${selected.index + 1}` });
+      if (state.puzzle.revealedPositions.length >= [...text].filter(char => /^[\p{L}\p{N}]$/u.test(char)).length) {
+        return this.finishChronoWithoutWinner(state, "Panel descubierto sin ganador");
+      }
       return state;
     }
     canStopChrono(state, playerIndex) {
-      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "CRONO" || !state.players[playerIndex] || state.players[playerIndex].cpu) return false;
-      const lockedAt = Number(state.special?.lockedPlayers?.[playerIndex]);
-      return !Number.isFinite(lockedAt) || state.special.reveals > lockedAt;
+      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "CRONO" || !state.players[playerIndex]) return false;
+      return !state.special?.excludedPlayers?.[playerIndex];
     }
     stopChrono(state, playerIndex) {
       if (!this.canStopChrono(state, playerIndex)) throw new Error("Ese pulsador todavía no está disponible.");
@@ -229,12 +258,22 @@
     }
     resumeChrono(state, playerIndex = state.active, reason = "Intento fallido") {
       if (state.phase !== "SPECIAL_SOLVE") return state;
-      state.special.lockedPlayers ||= {};
-      state.special.lockedPlayers[playerIndex] = state.special.reveals;
+      state.special.excludedPlayers ||= {};
+      state.special.excludedPlayers[playerIndex] = true;
       state.special.buzzerPlayer = null;
       state.phase = "SPECIAL_LETTER";
-      state.active = (playerIndex + 1) % state.players.length;
-      state.events.push({ type: "CRONO", detail: `${reason}. El cronómetro continúa` });
+      state.events.push({ type: "INTENTO CRONO", detail: `${reason}. ${state.players[playerIndex].name} queda fuera de este panel` });
+      if (state.players.every((player, index) => state.special.excludedPlayers[index])) return this.finishChronoWithoutWinner(state, "Todos los concursantes han agotado su intento");
+      return state;
+    }
+    finishChronoWithoutWinner(state, reason) {
+      state.special.noWinner = true;
+      state.special.buzzerPlayer = null;
+      state.roundWinner = state.active;
+      state.players.forEach(player => { player.round = 0; });
+      state.phase = "ROUND_COMPLETE";
+      state.pending = null;
+      state.events.push({ type: "CRONO SIN GANADOR", detail: reason });
       return state;
     }
     revealSpeedLetter(state) {
@@ -418,13 +457,17 @@
       return this.startRound(state, state.usedPuzzleCategories, state.selectedCategory);
     }
     startRound(state, usedCategories, category = null) {
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution);
+      const chronoRound = state.roundMode === "SPECIAL" && state.specialRotation === "CRONO";
+      const selectedPuzzle = chronoRound
+        ? this.pickChronoPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution)
+        : this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution);
       state.puzzle = {
         id: selectedPuzzle.id,
         category: selectedPuzzle.categoria,
         clue: selectedPuzzle.pista || "",
         solution: selectedPuzzle.solucion,
-        revealed: []
+        revealed: [],
+        revealedPositions: []
       };
       state.usedPuzzleIds.push(selectedPuzzle.id);
       state.usedPuzzleSolutions.push(normalize(selectedPuzzle.solucion));
@@ -433,7 +476,7 @@
       state.selectedCategory = null;
       state.special = null;
       if (state.roundMode === "SPECIAL") {
-        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0, buzzerPlayer: null, stoppedPrize: null, lockedPlayers: {} };
+        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0, buzzerPlayer: null, stoppedPrize: null, lockedPlayers: {}, excludedPlayers: {}, noWinner: false };
         state.phase = state.specialRotation === "SPEED" ? "SPEED_RUNNING" : "SPECIAL_LETTER";
       } else state.phase = "AWAITING_SPIN";
       state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds} · ${state.roundMode}` });
@@ -502,11 +545,7 @@
     }
     expireSpecial(state) {
       if (state.phase !== "SPECIAL_LETTER" && state.phase !== "SPECIAL_SOLVE") return state;
-      state.roundWinner = state.active;
-      state.players.forEach(player => { player.round = 0; });
-      state.phase = "ROUND_COMPLETE";
-      state.events.push({ type: "CRONO", detail: "Tiempo agotado: prueba sin premio" });
-      return state;
+      return this.finishChronoWithoutWinner(state, "Prueba terminada sin premio");
     }
     pass(state, reason) {
       state.active = (state.active + 1) % 3; state.phase = "AWAITING_SPIN"; state.pending = null;
@@ -514,5 +553,5 @@
     }
   }
 
-  global.AletheiaGame = { Engine, normalize, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE, roundModes: ROUND_MODES, specialPrize: SPECIAL_PRIZE, questionBonus: QUESTION_BONUS, finalPrize: FINAL_PRIZE };
+  global.AletheiaGame = { Engine, normalize, panelText, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE, roundModes: ROUND_MODES, specialPrize: SPECIAL_PRIZE, questionBonus: QUESTION_BONUS, finalPrize: FINAL_PRIZE };
 })(window);
