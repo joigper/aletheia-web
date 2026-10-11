@@ -94,7 +94,7 @@
   function roundConfiguration(humanCount) {
     if (phoneStandalone) return { playMode: "mobile-standalone", roundModes: ["NORMAL", "NORMAL", "NORMAL", "NORMAL", "NORMAL"] };
     if (window.AletheiaPlayMode.remoteActive) return { playMode: "studio-remotes", roundModes: [...AletheiaGame.roundModes] };
-    if (humanCount > 1) return { playMode: "desktop-shared", roundModes: ["NORMAL", "CHOOSE", "NORMAL", "NORMAL", "QUESTION"] };
+    if (humanCount > 1) return { playMode: "desktop-shared", roundModes: ["NORMAL", "CHOOSE", "NORMAL", "NORMAL", "NORMAL"] };
     return { playMode: "desktop-solo", roundModes: [...AletheiaGame.roundModes] };
   }
 
@@ -264,7 +264,7 @@
     panelJustChanged = !samePanel;
     const completed = ["ROUND_COMPLETE", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(viewState.phase);
     const visibleLetters = new Set(completed ? [...normalized].filter(char => char !== " ") : viewState.puzzle.revealed);
-    const chronoPanel = viewState.special?.type === "CRONO" && ["SPECIAL_LETTER", "SPECIAL_SOLVE"].includes(viewState.phase);
+    const chronoPanel = ["CRONO", "WORD"].includes(viewState.special?.type) && ["SPECIAL_LETTER", "SPECIAL_SOLVE"].includes(viewState.phase);
     const visiblePositions = new Set(completed ? [...normalized].map((char, index) => /^[\p{L}\p{N}]$/u.test(char) ? index : -1).filter(index => index >= 0) : (viewState.puzzle.revealedPositions || []));
     const rows = splitPanelText(normalized);
     let sourcePosition = 0;
@@ -348,7 +348,7 @@
 
   function roundVoiceMode() {
     if (state.roundMode !== "SPECIAL") return "normal";
-    return state.special?.type === "SPEED" ? "velocidad" : "crono";
+    return state.special?.type === "SPEED" ? "velocidad" : state.special?.type === "WORD" ? "palabra" : "crono";
   }
 
   function announceRoundIntroduction() {
@@ -361,6 +361,7 @@
     if (state.round === state.maxRounds) sequence.push("ultima-ronda");
     if (mode === "normal") sequence.push(firstExplanation ? "normal-explicacion" : "normal-breve", "panel-preparado");
     if (mode === "crono") sequence.push("crono-presentacion", "crono-inicio");
+    if (mode === "palabra") sequence.push("panel-preparado");
     if (mode === "velocidad") sequence.push("velocidad-presentacion", firstExplanation ? "velocidad-explicacion" : "velocidad-breve", "velocidad-inicio");
     voice?.play(sequence);
     if (voice?.isEnabled() !== false) {
@@ -521,7 +522,7 @@
     $("next-round").hidden = !visibleRoundComplete && !visibleFinalReady;
     $("next-round").disabled = narrationBarrier;
     $("next-round").textContent = finalReady ? "JUGAR RULETA FINAL" : "SIGUIENTE RONDA";
-    $("round-label").textContent = finalRound ? "RULETA FINAL" : `RONDA ${state.round} DE ${state.maxRounds}${state.roundMode === "CHOOSE" ? " · TÚ ELIGES" : state.roundMode === "QUESTION" ? " · PREGUNTA" : state.roundMode === "SPECIAL" ? ` · ${state.special?.type === "SPEED" ? "VELOCIDAD" : "CRONO"}` : ""}`;
+    $("round-label").textContent = finalRound ? "RULETA FINAL" : `RONDA ${state.round} DE ${state.maxRounds}${state.roundMode === "CHOOSE" ? " · TÚ ELIGES" : state.roundMode === "QUESTION" ? " · REVANCHA" : state.roundMode === "SPECIAL" ? ` · ${state.special?.type === "SPEED" ? "VELOCIDAD" : state.special?.type === "WORD" ? "PALABRA" : "CRONO"}` : ""}`;
     $("category").textContent = state.puzzle.category;
     $("clue").textContent = state.puzzle.clue;
     $("letter-board").innerHTML = maskedPuzzle(viewState);
@@ -537,7 +538,7 @@
     $("active-round-score").textContent = viewPlayer.round;
     $("active-total-score").textContent = viewPlayer.total;
     const visibleTransientMessage = Date.now() < transientMessageUntil ? transientMessage : "";
-    $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? (state.special?.noWinner ? "CRONO termina sin ganador." : `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.`) : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? `CRONO en marcha: se descubre una posición cada 3 segundos. Pulsa RESOLVER cuando conozcas el panel. Premio: ${AletheiaGame.specialPrize}.` : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el panel y está escribiendo la solución.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
+      $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? (state.special?.noWinner ? `${state.special?.type === "WORD" ? "La Palabra" : "CRONO"} termina sin ganador.` : `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.`) : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? (state.special?.type === "WORD" ? "Memoriza las letras fugaces y pulsa RESOLVER cuando conozcas la palabra. Premio: 150." : `CRONO en marcha: se descubre una posición cada 3 segundos. Pulsa RESOLVER cuando conozcas el panel. Premio: ${AletheiaGame.specialPrize}.`) : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el panel y está escribiendo la solución.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
     $("spin").disabled = narrationBarrier || gamePaused || interactionLocked || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
     if (specialRound || finalRound) {
       $("wheel-result").textContent = finalRound ? "FINAL" : state.special.type === "SPEED" ? state.special.prize : "CRONO";
@@ -593,7 +594,7 @@
         ? `<img src="${encodeURI(player.image)}" alt="Retrato de ${escapeHtml(player.name)}">`
         : `<span class="player-initials" aria-hidden="true">${escapeHtml(player.name.slice(0, 2).toUpperCase())}</span>`;
       const speedBuzzer = state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil && !player.cpu;
-      const chronoBuzzer = state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO" && !player.cpu;
+      const chronoBuzzer = state.phase === "SPECIAL_LETTER" && ["CRONO", "WORD"].includes(state.special?.type) && !player.cpu;
       const showBuzzer = speedBuzzer || chronoBuzzer;
       const buzzerLocked = showBuzzer && (speedBuzzer ? !engine.canStopSpeed(state, i) : !engine.canStopChrono(state, i));
       const buzzer = showBuzzer ? `<button type="button" class="tv-speed-buzzer${chronoBuzzer ? " is-chrono" : ""}" data-${chronoBuzzer ? "chrono" : "speed"}-buzz-index="${i}" ${buzzerLocked ? "disabled" : ""}><b>${chronoBuzzer ? "RESOLVER YA" : "¡LA SÉ!"}</b><small>${buzzerLocked ? (chronoBuzzer ? "SIN MÁS INTENTOS" : "ESPERA UNA LETRA") : escapeHtml(player.name)}</small></button>` : "";
@@ -632,14 +633,19 @@
       revision: ++remoteStateRevision,
       status: state.phase === "GAME_COMPLETE" && !narrationBarrier ? "finished" : gamePaused ? "paused" : "playing",
       paused: gamePaused, phase: viewState.phase, round: state.round, maxRounds: state.maxRounds,
-      activeSlot: viewState.active + 1, activeName: current.name, activeRole: current.role || "Concursante", activeImage: current.image || "", roundWinnerSlot: viewState.roundWinner == null ? 0 : viewState.roundWinner + 1, timed,
+      activeSlot: viewState.active + 1, activeName: current.name, activeRole: current.role || "Concursante", activeImage: current.image || "", roundWinnerSlot: viewState.roundWinner == null ? 0 : viewState.roundWinner + 1,
+      roundWinnerName: viewState.roundWinner == null ? "" : viewState.players[viewState.roundWinner]?.name || "",
+      roundWinnerRole: viewState.roundWinner == null ? "" : viewState.players[viewState.roundWinner]?.role || (viewState.players[viewState.roundWinner]?.cpu ? "Tripulación" : "Jugador humano"),
+      roundWinnerImage: viewState.roundWinner == null ? "" : viewState.players[viewState.roundWinner]?.image || "",
+      timed,
       roundNoWinner: Boolean(state.special?.noWinner),
       interactionLockedMs: Math.max(0, interactionLockedUntil - Date.now()),
       speedReady: state.phase === "SPEED_RUNNING" && Date.now() >= speedIntroUntil,
       speedBuzzerSlot: state.phase === "SPEED_SOLVE" ? state.active + 1 : 0,
-      chronoReady: state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO",
+      chronoReady: state.phase === "SPECIAL_LETTER" && ["CRONO", "WORD"].includes(state.special?.type),
+      wordChallenge: state.special?.type === "WORD",
       chronoBuzzerSlot: state.phase === "SPECIAL_SOLVE" ? state.active + 1 : 0,
-      chronoBuzzLockedSlots: state.special?.type === "CRONO" ? Object.keys(state.special.excludedPlayers || {}).filter(index => state.special.excludedPlayers[index]).map(index => Number(index) + 1) : [],
+      chronoBuzzLockedSlots: ["CRONO", "WORD"].includes(state.special?.type) ? Object.keys(state.special.excludedPlayers || {}).filter(index => state.special.excludedPlayers[index]).map(index => Number(index) + 1) : [],
       finalSolveArmed: state.phase === "FINAL_SOLVE" ? finalSolveArmed : false,
       speedBuzzLockedSlots: state.special?.type === "SPEED" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
       resolutionPending: Boolean(pendingResolutionAttempt),
@@ -657,7 +663,8 @@
       availableLetters,
       categoryChoices: state.phase === "CATEGORY_CHOICE" || state.phase === "CATEGORY_RESULT" ? [...state.categoryChoices] : [],
       selectedCategory: state.phase === "CATEGORY_RESULT" ? state.selectedCategory || "" : "",
-      question: ["QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase) && state.question ? { text: state.question.text, options: [...state.question.options], selected: state.question.selected ?? -1, wasCorrect: state.phase === "QUESTION_RESULT" ? Boolean(state.question.wasCorrect) : null } : null,
+      questionReady: state.phase === "QUESTION_BONUS" && Date.now() >= challengeReadyAt,
+      question: ["QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase) && state.question ? { text: state.question.text, options: [...state.question.options], selected: state.question.selected ?? -1, wasCorrect: state.phase === "QUESTION_RESULT" ? Boolean(state.question.wasCorrect) : null, responder: state.question.responder ?? -1, responderName: state.question.responderName || "" } : null,
       players: Object.fromEntries(state.players.map((player,index) => [String(index + 1), { slot:index+1,name:player.name,round:player.round,total:player.total,cpu:player.cpu }]))
     } }));
   }
@@ -750,10 +757,11 @@
       clearTimeout(roundIntroTimer);
       const mode = roundVoiceMode();
       overlay.dataset.scene = mode === "velocidad" ? "speed" : mode;
-      const titles = { normal: "PANEL NORMAL", crono: "PANEL CRONO", velocidad: "PANEL DE VELOCIDAD" };
+      const titles = { normal: "PANEL NORMAL", crono: "PANEL CRONO", palabra: "PANEL DE LA PALABRA", velocidad: "PANEL DE VELOCIDAD" };
       const instructions = {
         normal: "Gira la ruleta, elige consonantes y resuelve el panel.",
         crono: "Sin ruleta ni límite de tiempo: se descubre una posición cada 3 segundos. El primero que pulse RESOLVER detiene el panel.",
+        palabra: "Memoriza cada letra: aparece un instante y vuelve a ocultarse. El primero que pulse RESOLVER detiene el panel.",
         velocidad: "Las letras aparecerán de una en una. Resuelve antes que tus rivales."
       };
       $("challenge-kicker").textContent = `${state.round === state.maxRounds ? "ÚLTIMA RONDA" : "NUEVO PANEL"} · RONDA ${state.round} DE ${state.maxRounds}`;
@@ -830,11 +838,11 @@
       return;
     }
     overlay.dataset.scene = "question";
-    $("challenge-kicker").textContent = "PREGUNTA DE BONIFICACIÓN";
-    setAnimatedChallengeTitle(state.phase === "QUESTION_RESULT" ? (state.question.wasCorrect ? `RESPUESTA CORRECTA · +${AletheiaGame.questionBonus}` : "RESPUESTA INCORRECTA") : state.phase === "QUESTION_SELECTION" ? `${state.players[state.roundWinner].name} ELIGE…` : `RESPONDE Y GANA ${AletheiaGame.questionBonus} CRÉDITOS ADICIONALES`);
+    $("challenge-kicker").textContent = "PREGUNTA DE LA REVANCHA";
+    setAnimatedChallengeTitle(state.phase === "QUESTION_RESULT" ? (state.question.wasCorrect ? `${state.question.responderName} GANA LA REVANCHA` : `${state.question.responderName} FALLA`) : state.phase === "QUESTION_SELECTION" ? `${state.question.responderName} SE HA ADELANTADO` : `PRIMERO EN RESPONDER · +${AletheiaGame.questionBonus}`);
     $("challenge-text").textContent = state.question.text;
     if (state.phase === "QUESTION_RESULT") {
-      $("challenge-options").innerHTML = `<strong class="tv-question-result ${state.question.wasCorrect ? "is-correct" : "is-wrong"}">${state.question.wasCorrect ? `+${AletheiaGame.questionBonus} CRÉDITOS` : `LA RESPUESTA ERA: ${escapeHtml(state.question.options[state.question.correct])}`}</strong>`;
+      $("challenge-options").innerHTML = `<strong class="tv-question-result ${state.question.wasCorrect ? "is-correct" : "is-wrong"}">${state.question.wasCorrect ? `${escapeHtml(state.question.responderName)} +${AletheiaGame.questionBonus} · RIVALES −${AletheiaGame.questionBonus}` : `${escapeHtml(state.question.responderName)} −${AletheiaGame.questionBonus} · ERA: ${escapeHtml(state.question.options[state.question.correct])}`}</strong>`;
       if (!questionResultTimer) questionResultTimer = setTimeout(() => {
         questionResultTimer = null;
         if (state?.phase === "QUESTION_RESULT") act(() => engine.continueAfterQuestion(state));
@@ -857,6 +865,24 @@
     if (gamePaused || narrationBarrier || !state || Date.now() < speedIntroUntil) return;
     if (state.phase === "SPEED_RUNNING") {
       speedTimer = setTimeout(() => act(() => engine.revealSpeedLetter(state)), 4000);
+      return;
+    }
+    if (state.phase === "SPECIAL_LETTER" && state.special?.type === "WORD") {
+      speedTimer = setTimeout(() => {
+        if (state.special?.flashVisible) {
+          act(() => engine.hideWordPosition(state));
+          return;
+        }
+        const eligibleCpu = state.players.map((player, index) => ({ player, index }))
+          .filter(entry => entry.player.cpu && engine.canStopChrono(state, entry.index));
+        const candidate = eligibleCpu.sort((a, b) => (b.player.cpuProfile?.rapidez || 50) - (a.player.cpuProfile?.rapidez || 50))[0];
+        const progress = Math.min(1, Number(state.special?.reveals || 0) / Math.max(6, AletheiaGame.normalize(state.puzzle.solution).length));
+        if (candidate && state.special.reveals >= 4 && Math.random() * 100 < (candidate.player.cpuProfile?.conocimiento || 50) * progress * .38) {
+          stopChronoForPlayer(candidate.index);
+          return;
+        }
+        act(() => engine.revealWordPosition(state));
+      }, state.special?.flashVisible ? 900 : 1500);
       return;
     }
     if (state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO") {
@@ -1264,9 +1290,12 @@
       return;
     }
     if (state.phase === "QUESTION_BONUS") {
-      const knowsAnswer = Math.random() * 100 < profile.conocimiento;
+      const candidates = state.players.map((candidate, index) => ({ candidate, index })).filter(entry => entry.candidate.cpu);
+      const entry = candidates[Math.floor(Math.random() * candidates.length)];
+      if (!entry) return;
+      const knowsAnswer = Math.random() * 100 < (entry.candidate.cpuProfile?.conocimiento || 50);
       const option = knowsAnswer ? state.question.correct : Math.floor(Math.random() * state.question.options.length);
-      act(() => engine.answerQuestion(state, option));
+      act(() => engine.answerQuestion(state, option, entry.index));
       return;
     }
     if (state.phase === "FINAL_PICK") {
@@ -1284,6 +1313,13 @@
     if (state.phase === "SPECIAL_LETTER") {
       // CRONO es simultáneo: la revelación automática y los intentos de CPU
       // se coordinan desde scheduleSpecialReveal, no mediante el turno activo.
+      return;
+    }
+    if (state.phase === "SPECIAL_SOLVE") {
+      const positionsSeen = state.special?.type === "WORD" ? Number(state.special.reveals || 0) : Number(state.puzzle.revealedPositions?.length || 0);
+      const totalPositions = Math.max(1, [...AletheiaGame.normalize(state.puzzle.solution)].filter(char => /^\p{L}$/u.test(char)).length);
+      const success = Math.random() * 100 < Math.min(96, profile.conocimiento * .55 + positionsSeen / totalPositions * 55);
+      stageResolutionAttempt(success ? state.puzzle.solution : "RESPUESTA INCORRECTA", state.active);
       return;
     }
     if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") {
@@ -1311,8 +1347,8 @@
 
   function scheduleCpuTurn() {
     clearTimeout(cpuTimer);
-    if (initialDrawPhase !== "done" || gamePaused || narrationBarrier || !state || Date.now() < speedIntroUntil || !state.players[state.active]?.cpu || ["ROUND_COMPLETE", "CATEGORY_RESULT", "QUESTION_SELECTION", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase)) return;
-    const player = state.players[state.active];
+    if (initialDrawPhase !== "done" || gamePaused || narrationBarrier || !state || Date.now() < speedIntroUntil || (state.phase !== "QUESTION_BONUS" && !state.players[state.active]?.cpu) || ["ROUND_COMPLETE", "CATEGORY_RESULT", "QUESTION_SELECTION", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase)) return;
+    const player = state.phase === "QUESTION_BONUS" ? state.players.find(candidate => candidate.cpu) || state.players[state.active] : state.players[state.active];
     const sceneMinimum = Math.max(interactionLockedUntil, roundIntroUntil, state.phase === "CATEGORY_CHOICE" ? challengeReadyAt + 1000 : state.phase === "QUESTION_BONUS" ? challengeReadyAt + 3000 : 0);
     const wait = Math.max(cpuDelay(player), cpuNotBefore - Date.now(), sceneMinimum - Date.now());
     $("message").textContent = `${player.name} está pensando…`;
@@ -1637,7 +1673,7 @@
       state = engine.stopChrono(state, playerIndex);
       beginNarrationBarrier(presentationBefore);
       render(`${state.players[playerIndex].name} ha detenido el panel. Escribe la solución.`);
-      voice?.play([playerIdentityVoice(state.players[playerIndex], playerIndex), "evento-detiene-crono", "velocidad-escribe"]);
+      voice?.play([playerIdentityVoice(state.players[playerIndex], playerIndex), state.special?.type === "WORD" ? "evento-detiene-panel" : "evento-detiene-crono", "velocidad-escribe"]);
       if (narrationBarrier && !voice?.isSpeaking()) releaseNarrationBarrier();
       return true;
     } catch (error) {
@@ -1694,7 +1730,10 @@
     const category = event.target.closest("[data-category-choice]");
     if (category) { act(() => engine.chooseCategory(state, category.dataset.categoryChoice)); return; }
     const answer = event.target.closest("[data-question-choice]");
-    if (answer) act(() => engine.answerQuestion(state, Number(answer.dataset.questionChoice)));
+    if (answer) {
+      const humanIndex = state.players.findIndex(player => !player.cpu);
+      act(() => engine.answerQuestion(state, Number(answer.dataset.questionChoice), humanIndex < 0 ? state.active : humanIndex));
+    }
   });
   $("pass-turn").addEventListener("click", () => act(() => engine.yieldTurn(state)));
   function setGamePaused(paused) {
@@ -1769,8 +1808,9 @@
     }
     if (type === "question") {
       const option = Number(event.detail?.value);
-      if (slot !== (state.roundWinner == null ? 0 : state.roundWinner + 1) || state.phase !== "QUESTION_BONUS" || !Number.isInteger(option) || option < 0 || option >= state.question.options.length) { remoteAck(slot, seq, false, "Esa respuesta no está disponible."); return; }
-      act(() => engine.answerQuestion(state, option)); remoteAck(slot, seq, true, "Respuesta registrada."); return;
+      const claimSlot = Number(event.detail?.claimSlot || 0);
+      if ((claimSlot && claimSlot !== slot) || state.phase !== "QUESTION_BONUS" || Date.now() < challengeReadyAt || state.players[slot - 1]?.cpu || !Number.isInteger(option) || option < 0 || option >= state.question.options.length) { remoteAck(slot, seq, false, claimSlot && claimSlot !== slot ? "Otro concursante se ha adelantado." : "Esa respuesta todavía no está disponible."); return; }
+      act(() => engine.answerQuestion(state, option, slot - 1)); remoteAck(slot, seq, true, "Respuesta registrada."); return;
     }
     if (type === "buzz") {
       const playerIndex = slot - 1;

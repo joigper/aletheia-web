@@ -3,6 +3,7 @@
   if(!document.getElementById("remote-app"))return;
   const $=selector=>document.querySelector(selector);
   const $$=selector=>[...document.querySelectorAll(selector)];
+  const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
   let selectedAvatar={id:"",name:"Sin seleccionar",initials:"—",image:null};
   let clockTimer=null;
   let carouselIndex=0;
@@ -187,10 +188,10 @@
     chrono:{kicker:"PANEL CRONO",title:"¿CONOCES LA SOLUCIÓN?",copy:"Todos los concursantes pueden pulsar.",content:'<button class="remote-button remote-danger remote-nuclear" type="button" data-action="chrono-solve-now"><i aria-hidden="true"></i><span>RESOLVER YA</span><small>DETENER EL PANEL</small></button>'},
     finalStop:{kicker:"RULETA FINAL",title:"¿CONOCES LA SOLUCIÓN?",copy:"Pulsa para detener el tiempo. Después tendrás 30 segundos para escribir.",content:'<button class="remote-button remote-danger remote-nuclear" type="button" data-action="final-solve-now"><i aria-hidden="true"></i><span>RESOLVER AHORA</span><small>DETENER EL TIEMPO</small></button>'},
     solve:{kicker:"HAS DETENIDO EL PANEL",title:"RESPONDE AHORA",copy:"Escribe la solución completa.",content:'<form class="solve-form speed-solve-form"><input class="solve-input" maxlength="80" autocomplete="off" enterkeyhint="done" placeholder="Solución completa"><button class="remote-button solve-submit" type="submit">COMPROBAR RESPUESTA</button></form>'},
-    next:{kicker:"PANEL COMPLETADO",title:"HAS GANADO LA RONDA",copy:"Cuando estés preparado, continúa la partida.",content:'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>'},
+    next:{kicker:"PANEL COMPLETADO",title:"RONDA COMPLETADA",copy:"Cuando estés preparado, continúa la partida.",content:'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>'},
     vowels:{kicker:"NO QUEDAN CONSONANTES",title:"COMPRA UNA VOCAL O RESUELVE",copy:"Cada vocal cuesta 50 créditos.",content:`<div class="letter-grid vowel-only">${[...vowels].map(letter=>`<button type="button" class="vowel">${letter}</button>`).join("")}</div><form class="solve-form"><input class="solve-input" maxlength="80" autocomplete="off" placeholder="Solución completa"><button class="remote-button solve-submit" type="submit">RESOLVER PANEL</button></form>`},
     category:{kicker:"RONDA 2 · TÚ ELIGES",title:"ELIGE CATEGORÍA",copy:"La categoría determinará el siguiente panel.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'},
-    question:{kicker:"PREGUNTA DE BONIFICACIÓN",title:"RESPONDE Y GANA 100 CRÉDITOS",copy:"Selecciona una respuesta.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'}
+    question:{kicker:"PREGUNTA DE LA REVANCHA",title:"SÉ EL PRIMERO",copy:"Acierta: +100 para ti y −100 para cada rival.",content:'<div class="remote-choice-grid" id="remote-choice-grid"></div>'}
   };
   function renderWheelOutcome(outcome){
     const result=String(outcome?.result||"").toUpperCase();
@@ -227,6 +228,30 @@
     if(detail.activeImage){photo.innerHTML='<img alt="">';photo.querySelector("img").src=detail.activeImage}
     else photo.innerHTML=`<span>${name.split(/\s+/).slice(0,2).map(part=>part[0]||"").join("")}</span>`;
   }
+  function renderRoundWinner(detail){
+    const noWinner=Boolean(detail.roundNoWinner);
+    const winnerSlot=Number(detail.roundWinnerSlot||0);
+    const winner=detail.players?.[String(winnerSlot)]||{};
+    const name=String(detail.roundWinnerName||winner.name||"CONCURSANTE");
+    const role=String(detail.roundWinnerRole||(winner.cpu?"Tripulación":"Jugador humano"));
+    const image=String(detail.roundWinnerImage||"");
+    const authorized=noWinner||winner.cpu||winnerSlot===Number(detail.slot);
+    renderScene("wait");
+    $("#action-card").classList.add("is-turn-waiting");
+    $("#action-kicker").textContent=noWinner?"PANEL SIN GANADOR":"RONDA COMPLETADA";
+    $("#action-title").textContent=noWinner?"CONTINÚA LA PARTIDA":`${name.toUpperCase()} HA GANADO`;
+    $("#action-copy").textContent=noWinner?"Ningún concursante ha resuelto el panel.":`${name} gana la ronda.`;
+    if(noWinner){
+      $("#action-content").innerHTML=authorized?'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>':"";
+    }else{
+      const initials=name.split(/\s+/).slice(0,2).map(part=>part[0]||"").join("");
+      $("#action-content").innerHTML=`<div class="active-player-card"><div class="active-player-photo" id="round-winner-photo"><span>${escapeHtml(initials)}</span></div><div class="active-player-data"><small>GANADOR DE LA RONDA</small><strong>${escapeHtml(name)}</strong><span>${escapeHtml(role)}</span>${authorized?'<button class="remote-button remote-primary" type="button" data-action="next">SIGUIENTE RONDA</button>':""}</div></div>`;
+      if(image){const photo=$("#round-winner-photo");photo.innerHTML='<img alt="">';photo.querySelector("img").src=image}
+    }
+    const next=$("#action-content [data-action='next']");
+    if(next){next.textContent=detail.phase==="FINAL_READY"?"JUGAR RULETA FINAL":"SIGUIENTE RONDA";next.addEventListener("click",event=>{event.currentTarget.disabled=true;sendCommand("next")})}
+    requestAnimationFrame(fitWaitingTitle);
+  }
   function fitWaitingTitle(){
     const title=$("#action-card.is-turn-waiting #action-title");
     if(!title)return;
@@ -261,12 +286,12 @@
     else if(detail.phase==="SPEED_SOLVE"&&Number(detail.speedBuzzerSlot)===Number(detail.slot)){renderScene("solve");setTimeout(()=>$(".solve-input")?.focus(),50)}
     else if(detail.phase==="SPEED_SOLVE"){renderScene("wait");$("#action-kicker").textContent=`${String(detail.activeName||"OTRO JUGADOR").toUpperCase()} HA PULSADO`;$("#action-title").textContent="PANEL DETENIDO";$("#action-copy").textContent="El concursante dispone de 30 segundos para responder."}
     else if(detail.phase==="SPECIAL_LETTER"&&detail.chronoReady&&(detail.chronoBuzzLockedSlots||[]).map(Number).includes(Number(detail.slot))){renderScene("wait");$("#action-kicker").textContent="INTENTO INCORRECTO";$("#action-title").textContent="SIN MÁS INTENTOS";$("#action-copy").textContent="Observa el panel mientras continúan los demás concursantes."}
-    else if(detail.phase==="SPECIAL_LETTER"&&detail.chronoReady){renderScene("chrono");$("#action-copy").textContent="Pulsa en cuanto conozcas la solución. El primero detiene el panel."}
+    else if(detail.phase==="SPECIAL_LETTER"&&detail.chronoReady){renderScene("chrono");$("#action-kicker").textContent=detail.wordChallenge?"PANEL DE LA PALABRA":"PANEL CRONO";$("#action-copy").textContent=detail.wordChallenge?"Memoriza las letras fugaces. Pulsa cuando conozcas la palabra.":"Pulsa en cuanto conozcas la solución. El primero detiene el panel."}
     else if(detail.phase==="SPECIAL_SOLVE"&&Number(detail.chronoBuzzerSlot)===Number(detail.slot)){renderScene("solve");$("#action-kicker").textContent="HAS DETENIDO EL PANEL";setTimeout(()=>$(".solve-input")?.focus(),50)}
     else if(detail.phase==="SPECIAL_SOLVE"){renderScene("wait");$("#action-kicker").textContent=`${String(detail.activeName||"OTRO JUGADOR").toUpperCase()} HA PULSADO`;$("#action-title").textContent="PANEL DETENIDO";$("#action-copy").textContent="El concursante está escribiendo la solución."}
     else if(detail.phase==="FINAL_SOLVE"&&mine&&Number(detail.interactionLockedMs||0)<=0&&!detail.finalSolveArmed){renderScene("finalStop")}
     else if(detail.phase==="FINAL_SOLVE"&&mine&&Number(detail.interactionLockedMs||0)<=0&&detail.finalSolveArmed){renderScene("solve");$("#action-kicker").textContent="TIEMPO DETENIDO";$("#action-title").textContent="ESCRIBE LA SOLUCIÓN";$("#action-copy").textContent="Dispones de 30 segundos.";setTimeout(()=>$(".solve-input")?.focus(),50)}
-    else if(["ROUND_COMPLETE","FINAL_READY"].includes(detail.phase)&&(detail.roundNoWinner||Number(detail.roundWinnerSlot)===Number(detail.slot)||detail.players?.[String(detail.roundWinnerSlot)]?.cpu)){renderScene("next");$("#action-kicker").textContent=detail.roundNoWinner?"PANEL SIN GANADOR":"PANEL COMPLETADO";$("#action-title").textContent=detail.roundNoWinner?"CONTINÚA LA PARTIDA":"HAS GANADO LA RONDA";$("#action-content [data-action='next']").textContent=detail.phase==="FINAL_READY"?"JUGAR RULETA FINAL":"SIGUIENTE RONDA"}
+    else if(["ROUND_COMPLETE","FINAL_READY"].includes(detail.phase)){renderRoundWinner(detail)}
     else if(detail.phase==="CATEGORY_CHOICE"){const choices=Array.isArray(detail.categoryChoices)?detail.categoryChoices:Object.values(detail.categoryChoices||{});renderScene("category");$("#action-kicker").textContent=mine?"RONDA 2 · TÚ ELIGES":`${String(detail.activeName||"OTRO JUGADOR").toUpperCase()} ELIGE`;$("#action-title").textContent=mine?"ELIGE CATEGORÍA":"CATEGORÍAS DISPONIBLES";$("#remote-choice-grid").innerHTML=choices.map(category=>`<button class="remote-button remote-secondary" type="button" data-category="${String(category).replace(/&/g,"&amp;").replace(/\"/g,"&quot;")}" ${mine?"":"disabled"}>${category}</button>`).join("");if(mine)$$("#action-content [data-category]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-category]").forEach(item=>item.disabled=true);sendCommand("category",button.dataset.category)}))}
     else if(!mine){renderScene("wait");$("#action-kicker").textContent=`TURNO DE ${String(detail.activeName||"OTRO JUGADOR").toUpperCase()}`;$("#action-copy").textContent="Sigue el panel en la pantalla principal.";renderWaitingPlayer(detail)}
     else if(Number(detail.interactionLockedMs||0)>0){renderScene("wait");$("#action-kicker").textContent="JUGADA EN CURSO";$("#action-title").textContent="ESPERA A LA RULETA";$("#action-copy").textContent="Tu control se activará al terminar la animación del plató."}
@@ -274,7 +299,8 @@
     else if(detail.phase==="AWAITING_SPIN")renderScene("spin");
     else if(["AWAITING_LETTER","SPECIAL_LETTER","FINAL_PICK"].includes(detail.phase)){renderScene("letters");$("#action-kicker").textContent=detail.pending?`PREMIO: ${detail.pending} POR COINCIDENCIA`:$("#action-kicker").textContent;const available=new Set(detail.availableLetters||[]);$$("#action-content .letter-grid button").forEach(button=>button.disabled=!available.has(button.textContent))}
     else if(detail.phase==="CATEGORY_RESULT"){renderScene("wait");$("#action-title").textContent=detail.selectedCategory||"CATEGORÍA ELEGIDA";$("#action-copy").textContent="El plató está preparando el panel."}
-    else if(detail.phase==="QUESTION_BONUS"&&Number(detail.roundWinnerSlot)===Number(detail.slot)){renderScene("question");$("#action-copy").textContent=detail.question?.text||"Selecciona una respuesta.";$("#remote-choice-grid").innerHTML=(detail.question?.options||[]).map((option,index)=>`<button class="remote-button remote-secondary" type="button" data-question="${index}">${option}</button>`).join("");$$("#action-content [data-question]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-question]").forEach(item=>item.disabled=true);sendCommand("question",button.dataset.question)}))}
+    else if(detail.phase==="QUESTION_BONUS"&&!detail.questionReady){renderScene("wait");$("#action-kicker").textContent="PREGUNTA DE LA REVANCHA";$("#action-title").textContent="ESCUCHA A PROMETEO";$("#action-copy").textContent="Las respuestas se activarán al terminar la explicación."}
+    else if(detail.phase==="QUESTION_BONUS"){renderScene("question");$("#action-copy").textContent=detail.question?.text||"Selecciona una respuesta.";$("#remote-choice-grid").innerHTML=(detail.question?.options||[]).map((option,index)=>`<button class="remote-button remote-secondary" type="button" data-question="${index}">${option}</button>`).join("");$$("#action-content [data-question]").forEach(button=>button.addEventListener("click",()=>{$$("#action-content [data-question]").forEach(item=>item.disabled=true);sendCommand("question",button.dataset.question)}))}
     else if(["QUESTION_SELECTION","QUESTION_RESULT"].includes(detail.phase)){renderScene("wait");$("#action-title").textContent=detail.phase==="QUESTION_RESULT"?(detail.question?.wasCorrect?"RESPUESTA CORRECTA":"RESPUESTA INCORRECTA"):"RESPUESTA REGISTRADA";$("#action-copy").textContent="Consulta el resultado en el plató."}
     else if(["ROUND_COMPLETE","FINAL_READY","GAME_COMPLETE","CATEGORY_CHOICE","CATEGORY_RESULT","QUESTION_BONUS","QUESTION_SELECTION","QUESTION_RESULT"].includes(detail.phase)){renderScene("wait");$("#action-kicker").textContent="EL PLATÓ PREPARA EL SIGUIENTE PASO";$("#action-title").textContent=detail.phase==="GAME_COMPLETE"?"PARTIDA TERMINADA":"ESPERA UN MOMENTO";$("#action-copy").textContent=detail.message||"La pantalla principal indicará cómo continuar."}
     else renderScene("solve");

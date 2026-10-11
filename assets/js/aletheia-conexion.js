@@ -16,7 +16,7 @@ const [firebaseAppModule, firebaseAuthModule, firebaseDatabaseModule] = await Pr
 ]);
 const { initializeApp, getApps } = firebaseAppModule;
 const { getAuth, signInAnonymously } = firebaseAuthModule;
-const { getDatabase, onDisconnect, onValue, ref, remove, runTransaction, serverTimestamp, set, update } = firebaseDatabaseModule;
+const { get, getDatabase, onDisconnect, onValue, ref, remove, runTransaction, serverTimestamp, set, update } = firebaseDatabaseModule;
 const { connectionSettings, firebaseConfig } = settings;
 
 const app = getApps()[0] || initializeApp(firebaseConfig);
@@ -137,11 +137,16 @@ function observeCommands() {
   state.unsubscribeCommands?.();
   state.unsubscribeCommands = onValue(ref(database, `rooms/${state.roomId}/commands`), snapshot => {
     const commands = snapshot.val() || {};
-    Object.entries(commands).forEach(([slotText, command]) => {
+    Object.entries(commands).forEach(async ([slotText, command]) => {
       const slot = Number(slotText), seq = Number(command?.seq || 0);
       if (!seq || seq <= Number(state.commandSeq[slot] || 0)) return;
       state.commandSeq[slot] = seq;
-      window.dispatchEvent(new CustomEvent("aletheia:remote-command", { detail: { slot, seq, type: command.type, value: command.value || "" } }));
+      let claimSlot = 0;
+      if (command.type === "question") {
+        const claim = await get(ref(database, `rooms/${state.roomId}/questionClaims/${state.publishedRevision}`)).catch(() => null);
+        claimSlot = Number(claim?.val()?.slot || 0);
+      }
+      window.dispatchEvent(new CustomEvent("aletheia:remote-command", { detail: { slot, seq, type: command.type, value: command.value || "", claimSlot } }));
     });
   });
 }
@@ -301,7 +306,7 @@ function initHost() {
     if (!state.active || !state.roomId) { window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready")); return; }
     try {
       state.commandSeq = {}; state.publishedRevision = 0; state.publishQueue = Promise.resolve();
-      await update(ref(database, `rooms/${state.roomId}`), { "meta/status": "restarting", game: null, commands: null, acks: null });
+      await update(ref(database, `rooms/${state.roomId}`), { "meta/status": "restarting", game: null, commands: null, acks: null, chronoClaims: null, questionClaims: null });
       window.dispatchEvent(new CustomEvent("aletheia:session-restart-ready"));
     } catch (error) { console.error("No se pudo preparar la revancha", error); }
   });
@@ -445,8 +450,9 @@ async function sendControllerCommand(command) {
   const invitation = controllerState.invitation;
   if (!invitation || !auth.currentUser) return;
   controllerState.commandSeq = Math.max(Date.now(), controllerState.commandSeq + 1);
-  if (command.type === "chrono-buzz") {
-    const claimRef = ref(database, `rooms/${invitation.roomId}/chronoClaims/${controllerState.gameRevision}`);
+  if (command.type === "chrono-buzz" || command.type === "question") {
+    const claimGroup = command.type === "question" ? "questionClaims" : "chronoClaims";
+    const claimRef = ref(database, `rooms/${invitation.roomId}/${claimGroup}/${controllerState.gameRevision}`);
     try {
       const claim = await runTransaction(claimRef, current => current || {
         controllerUid: auth.currentUser.uid,

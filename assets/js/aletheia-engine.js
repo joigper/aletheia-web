@@ -149,6 +149,27 @@
       const pool = [...unique.values()];
       return pool[Math.floor(this.random() * pool.length)];
     }
+    pickWordPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = []) {
+      const library = Array.isArray(global.aletheiaPaneles) ? global.aletheiaPaneles : [];
+      const excluded = new Set(excludedIds);
+      const excludedCategorySet = new Set(excludedCategories);
+      const excludedSolutionSet = new Set(excludedSolutions.map(normalize));
+      const validWord = panel => {
+        const solution = normalize(panel?.solucion || "");
+        return /^\p{L}{8,14}$/u.test(solution);
+      };
+      const eligible = library.filter(panel => panel?.id && panel?.categoria && validWord(panel))
+        .filter(panel => !excluded.has(panel.id) && !excludedSolutionSet.has(normalize(panel.solucion)))
+        .filter(panel => requiredCategory ? panel.categoria === requiredCategory : !excludedCategorySet.has(panel.categoria));
+      const fallback = library.filter(panel => panel?.id && panel?.categoria && validWord(panel))
+        .filter(panel => !excludedSolutionSet.has(normalize(panel.solucion)));
+      const source = eligible.length ? eligible : fallback;
+      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions);
+      const unique = new Map();
+      source.forEach(panel => { const key = normalize(panel.solucion); if (!unique.has(key)) unique.set(key, panel); });
+      const pool = [...unique.values()];
+      return pool[Math.floor(this.random() * pool.length)];
+    }
     categoryChoices(state, count = 2) {
       const used = new Set(state.usedPuzzleCategories || []);
       const previousWasShort = significantWordCount(state.puzzle?.solution || "") <= 1;
@@ -188,7 +209,7 @@
       const startingPlayer = Math.floor(this.random() * 3);
       return {
         phase: "AWAITING_SPIN", active: startingPlayer, startingPlayer, round: 1, maxRounds: 5, pending: null, lastSpin: null,
-        roundModes, roundMode: roundModes[0], specialRotation: this.random() < .5 ? "SPEED" : "CRONO", special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
+        roundModes, roundMode: roundModes[0], specialRotation: ["SPEED", "CRONO", "WORD"][Math.floor(this.random() * 3)], special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
         playMode: String(options.playMode || "desktop-local"),
         players: [
           { id: "human", name: alias || "Invitado", cpu: false, image: primaryAvatar?.image || null, role: primaryAvatar?.name ? `Avatar · ${primaryAvatar.name}` : "Concursante" },
@@ -244,8 +265,34 @@
       }
       return state;
     }
+    revealWordPosition(state) {
+      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "WORD") return state;
+      const text = panelText(state.puzzle.solution);
+      state.special.seenPositions ||= [];
+      let available = [...text].map((char, index) => ({ char, index }))
+        .filter(item => /^\p{L}$/u.test(item.char) && !state.special.seenPositions.includes(item.index));
+      if (!available.length) {
+        state.special.seenPositions = [];
+        available = [...text].map((char, index) => ({ char, index })).filter(item => /^\p{L}$/u.test(item.char));
+      }
+      if (!available.length) return this.finishChronoWithoutWinner(state, "Palabra agotada sin ganador");
+      const selected = available[Math.floor(this.random() * available.length)];
+      state.special.seenPositions.push(selected.index);
+      state.puzzle.revealedPositions = [selected.index];
+      state.special.flashVisible = true;
+      state.special.reveals = Number(state.special.reveals || 0) + 1;
+      state.events.push({ type: "PALABRA REVELA", detail: `${selected.char} en posición ${selected.index + 1}` });
+      return state;
+    }
+    hideWordPosition(state) {
+      if (state.phase === "SPECIAL_LETTER" && state.special?.type === "WORD") {
+        state.puzzle.revealedPositions = [];
+        state.special.flashVisible = false;
+      }
+      return state;
+    }
     canStopChrono(state, playerIndex) {
-      if (state.phase !== "SPECIAL_LETTER" || state.special?.type !== "CRONO" || !state.players[playerIndex]) return false;
+      if (state.phase !== "SPECIAL_LETTER" || !["CRONO", "WORD"].includes(state.special?.type) || !state.players[playerIndex]) return false;
       return !state.special?.excludedPlayers?.[playerIndex];
     }
     stopChrono(state, playerIndex) {
@@ -253,7 +300,7 @@
       state.active = playerIndex;
       state.special.buzzerPlayer = playerIndex;
       state.phase = "SPECIAL_SOLVE";
-      state.events.push({ type: "PULSADOR CRONO", detail: `${state.players[playerIndex].name} detiene el cronómetro` });
+      state.events.push({ type: state.special.type === "WORD" ? "PULSADOR PALABRA" : "PULSADOR CRONO", detail: `${state.players[playerIndex].name} detiene el panel` });
       return state;
     }
     resumeChrono(state, playerIndex = state.active, reason = "Intento fallido") {
@@ -389,7 +436,7 @@
       }
       if (speedRound) state.active = validSolver;
       state.players[state.active].stats.solvedPanels += 1;
-      if (state.phase === "SPECIAL_LETTER" || chronoSolve) state.players[state.active].round += SPECIAL_PRIZE;
+      if (state.phase === "SPECIAL_LETTER" || chronoSolve) state.players[state.active].round += Number(state.special?.prize || SPECIAL_PRIZE);
       if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
       return this.completeRound(state, "Panel resuelto", "resolucion-correcta");
     }
@@ -458,7 +505,10 @@
     }
     startRound(state, usedCategories, category = null) {
       const chronoRound = state.roundMode === "SPECIAL" && state.specialRotation === "CRONO";
-      const selectedPuzzle = chronoRound
+      const wordRound = state.roundMode === "SPECIAL" && state.specialRotation === "WORD";
+      const selectedPuzzle = wordRound
+        ? this.pickWordPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions)
+        : chronoRound
         ? this.pickChronoPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution)
         : this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution);
       state.puzzle = {
@@ -476,20 +526,25 @@
       state.selectedCategory = null;
       state.special = null;
       if (state.roundMode === "SPECIAL") {
-        state.special = { type: state.specialRotation, prize: SPECIAL_PRIZE, reveals: 0, buzzerPlayer: null, stoppedPrize: null, lockedPlayers: {}, excludedPlayers: {}, noWinner: false };
+        state.special = { type: state.specialRotation, prize: state.specialRotation === "WORD" ? 150 : SPECIAL_PRIZE, reveals: 0, buzzerPlayer: null, stoppedPrize: null, lockedPlayers: {}, excludedPlayers: {}, seenPositions: [], flashVisible: false, noWinner: false };
         state.phase = state.specialRotation === "SPEED" ? "SPEED_RUNNING" : "SPECIAL_LETTER";
       } else state.phase = "AWAITING_SPIN";
       state.events.push({ type: "NUEVA RONDA", detail: `Ronda ${state.round} de ${state.maxRounds} · ${state.roundMode}` });
       return state;
     }
-    answerQuestion(state, optionIndex) {
+    answerQuestion(state, optionIndex, playerIndex = state.active) {
       if (state.phase !== "QUESTION_BONUS") throw new Error("No hay ninguna pregunta activa.");
+      const responder = Number.isInteger(playerIndex) && state.players[playerIndex] ? playerIndex : state.active;
       const correct = Number(optionIndex) === state.question.correct;
-      if (correct) state.players[state.roundWinner].total += QUESTION_BONUS;
+      if (correct) {
+        state.players.forEach((player, index) => { player.total += index === responder ? QUESTION_BONUS : -QUESTION_BONUS; });
+      } else state.players[responder].total -= QUESTION_BONUS;
       state.question.selected = Number(optionIndex);
       state.question.answered = true;
       state.question.wasCorrect = correct;
-      state.events.push({ type: "PREGUNTA", detail: correct ? `Correcta: +${QUESTION_BONUS}` : "Incorrecta" });
+      state.question.responder = responder;
+      state.question.responderName = state.players[responder].name;
+      state.events.push({ type: "PREGUNTA DE LA REVANCHA", detail: correct ? `${state.players[responder].name}: +${QUESTION_BONUS}; rivales: -${QUESTION_BONUS}` : `${state.players[responder].name}: respuesta incorrecta, -${QUESTION_BONUS}` });
       state.phase = "QUESTION_SELECTION";
       return state;
     }
