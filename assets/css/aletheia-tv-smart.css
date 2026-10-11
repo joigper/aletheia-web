@@ -78,6 +78,15 @@ html.aletheia-tv-smart-root body {
 
 .aletheia-tv-smart-root .tv-transition-presenter-frame {
   box-shadow: 0 16px 40px #000a,0 0 18px rgba(var(--scene-accent-rgb),.18)!important;
+  background-color: #050912!important;
+  background-image: url("../img/ocio/prometeo-visemas-base.webp")!important;
+  background-repeat: no-repeat!important;
+  background-position: center top!important;
+  background-size: cover!important;
+}
+
+.aletheia-tv-smart-root .tv-prometheus-stage {
+  background: #050912 url("../img/ocio/prometeo-visemas-base.webp") center top/cover no-repeat!important;
 }
 
 .aletheia-tv-smart-root .tv-transition-scan, .aletheia-tv-smart-root .tv-transition-presenter-frame::after {

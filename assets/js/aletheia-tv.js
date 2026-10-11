@@ -19,6 +19,9 @@
   }
   const engine = new AletheiaGame.Engine();
   const voice = window.AletheiaAudio;
+  const smartTvMode = Boolean(window.AletheiaTVSmart);
+  const smartPostVoiceDelay = smartTvMode ? 1600 : 0;
+  const smartCpuDelay = smartTvMode ? 1800 : 0;
   let state = null;
   let selectedRivals = [];
   const selectedBySlot = { 2: null, 3: null };
@@ -84,6 +87,7 @@
   let initialDrawHighlight = 0;
   let initialDrawTimer = null;
   let initialDrawFallbackTimer = null;
+  let smartVoiceIdleTimer = null;
   const cpuResolutionVoiceById = Object.freeze({
     "jean-pierre": "jean-pierre-bernard",
     akama: "akama-takahashi",
@@ -113,7 +117,13 @@
   let prometeoActive = $("prometeo-video-a");
   let prometeoStandby = $("prometeo-video-b");
   let prometeoSwitching = false;
-  [prometeoActive, prometeoStandby].forEach(video => video?.removeAttribute("poster"));
+  [prometeoActive, prometeoStandby].forEach(video => {
+    if (!video) return;
+    if (smartTvMode) {
+      video.poster = `${prometeoBasePath}prometeo-visemas-base.webp`;
+      video.preload = "metadata";
+    } else video.removeAttribute("poster");
+  });
   let lastPrometeoGesture = null;
 
   function choosePrometeoGesture() {
@@ -125,6 +135,7 @@
   }
 
   function preloadNextPrometeo() {
+    if (smartTvMode) return;
     if (!prometeoStandby || prometeoStandby.dataset.prepared === "true") return;
     prometeoStandby.src = prometeoBasePath + choosePrometeoGesture();
     prometeoStandby.muted = true;
@@ -134,6 +145,7 @@
   }
 
   function playNextPrometeo() {
+    if (smartTvMode) return;
     if (!prometeoActive || !prometeoStandby || prometeoSwitching) return;
     prometeoSwitching = true;
     preloadNextPrometeo();
@@ -437,7 +449,7 @@
     });
   }
 
-  window.addEventListener("aletheia-voice-idle", () => {
+  function processVoiceIdle() {
     const now = Date.now();
     if (initialDrawPhase === "running") {
       showInitialDrawResult();
@@ -487,6 +499,20 @@
       finalResultHoldUntil = Math.max(finalResultHoldUntil, now + 4000);
     }
     releaseNarrationBarrier();
+  }
+
+  window.addEventListener("aletheia-voice-idle", () => {
+    clearTimeout(smartVoiceIdleTimer);
+    if (!smartPostVoiceDelay) {
+      processVoiceIdle();
+      return;
+    }
+    // Los navegadores de televisión necesitan tiempo para pintar el estado
+    // anunciado antes de que el motor permita la siguiente acción.
+    smartVoiceIdleTimer = setTimeout(() => {
+      smartVoiceIdleTimer = null;
+      if (!voice?.isSpeaking()) processVoiceIdle();
+    }, smartPostVoiceDelay);
   });
 
   function render(message) {
@@ -1192,7 +1218,7 @@
 
   function cpuDelay(player) {
     const profile = player.cpuProfile || AletheiaGame.defaultCpuProfile;
-    return 650 + (100 - profile.rapidez) * 12 + Math.random() * profile.variabilidad * 10;
+    return 650 + (100 - profile.rapidez) * 12 + Math.random() * profile.variabilidad * 10 + smartCpuDelay;
   }
 
   function availableLetters(filter) {
@@ -1571,7 +1597,7 @@
     clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer); clearTimeout(finalResultHoldTimer);
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
-    clearInitialDrawTimers(); initialDrawPhase = "idle"; initialDrawHighlight = 0;
+    clearInitialDrawTimers(); clearTimeout(smartVoiceIdleTimer); smartVoiceIdleTimer = null; initialDrawPhase = "idle"; initialDrawHighlight = 0;
     gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; clockSuspendedForInteraction = false; transientWheelOutcome = null;
     explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
     chronoWarningRound = 0; chronoTenSecondRound = 0; chronoHeldRemaining = 0;

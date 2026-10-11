@@ -20,12 +20,21 @@
   video.autoplay = false;
   video.playsInline = true;
   video.preload = global.AletheiaTVSmart ? "metadata" : "auto";
+  video.poster = "assets/img/ocio/prometeo-visemas-base.webp";
   video.hidden = false;
   video.removeAttribute("hidden");
   video.setAttribute("aria-hidden", "true");
 
   function playWhenVisible() {
     if (overlay.hidden) {
+      video.pause();
+      return;
+    }
+
+    // En Smart TV se prioriza una imagen estable. Evita reservar memoria para
+    // un vídeo en bucle durante cada transición y sirve de alternativa segura
+    // en navegadores que no reproducen MP4 correctamente.
+    if (global.AletheiaTVSmart) {
       video.pause();
       return;
     }
