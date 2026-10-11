@@ -406,7 +406,8 @@ function observeControllerRoom() {
     const playerCollection = game.players || {};
     const player = playerCollection[String(invitation.slot)] || Object.values(playerCollection).find(item => Number(item?.slot) === invitation.slot) || null;
     const elapsed = Math.max(0, Date.now() + controllerState.serverOffset - Number(game.publishedAt || 0));
-    const remaining = Math.max(0, Number(game.remainingMs || 0) - elapsed);
+    const clockFrozen = Boolean(game.paused || game.normalSolveArmed) || Number(game.interactionLockedMs || 0) > 0;
+    const remaining = Math.max(0, Number(game.remainingMs || 0) - (clockFrozen ? 0 : elapsed));
     const seconds = Math.ceil(remaining / 1000);
     window.dispatchEvent(new CustomEvent("aletheia:mando-game-state", { detail: { ...game, slot: invitation.slot, player, clock: `${String(Math.floor(seconds / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}` } }));
   }, error => console.error("No se pudo leer la partida", error));

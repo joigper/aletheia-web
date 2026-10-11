@@ -36,6 +36,7 @@
   let selectedDifficultyMode = "ADULTO";
   let actionTimeRemaining = 30000;
   let actionDeadline = 0;
+  let clockSuspendedForInteraction = false;
   let clockTimer = null;
   let speedTimer = null;
   let speedIntroStartedAt = 0;
@@ -689,7 +690,7 @@
       initialDrawWinnerSlot: state.startingPlayer + 1,
       initialDrawWinnerName: state.players[state.startingPlayer]?.name || "",
       finalRevealHolding: state.phase === "GAME_COMPLETE" && Date.now() < finalResultHoldUntil,
-      remainingMs: timed ? Math.max(0, gamePaused || normalSolveArmed ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
+      remainingMs: timed ? Math.max(0, gamePaused || normalSolveArmed || clockSuspendedForInteraction ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       wheelOutcome: transientWheelOutcome && Date.now() < transientMessageUntil ? { ...transientWheelOutcome, remainingMs: Math.max(0, transientMessageUntil - Date.now()) } : null,
       consonantsRemain: engine.hasAvailableConsonants(state),
@@ -1135,9 +1136,17 @@
     clearTimeout(clockTimer);
     if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "CATEGORY_RESULT", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase)) return;
-    if (!gamePaused && !normalSolveArmed && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
-    else if (!gamePaused && normalSolveArmed) actionDeadline = Date.now() + actionTimeRemaining;
-    else if (!gamePaused && Date.now() < interactionLockedUntil) actionDeadline = interactionLockedUntil + actionTimeRemaining;
+    const now = Date.now();
+    const interactionIsLocked = now < interactionLockedUntil;
+    if (!gamePaused && interactionIsLocked && !clockSuspendedForInteraction) {
+      actionTimeRemaining = Math.max(0, actionDeadline - now);
+      clockSuspendedForInteraction = true;
+    } else if (!gamePaused && !interactionIsLocked && clockSuspendedForInteraction) {
+      actionDeadline = now + actionTimeRemaining;
+      clockSuspendedForInteraction = false;
+    }
+    if (!gamePaused && !normalSolveArmed && !interactionIsLocked) actionTimeRemaining = Math.max(0, actionDeadline - now);
+    else if (!gamePaused && normalSolveArmed) actionDeadline = now + actionTimeRemaining;
     $("game-clock").textContent = formatClock(actionTimeRemaining);
     $("game-clock").classList.toggle("is-urgent", actionTimeRemaining <= 10000);
     if (narrationBarrier) {
@@ -1166,6 +1175,7 @@
   function resetActionClock() {
     if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     voice?.stopLoop("reloj");
+    clockSuspendedForInteraction = false;
     actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : 30000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
@@ -1562,7 +1572,7 @@
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
     clearInitialDrawTimers(); initialDrawPhase = "idle"; initialDrawHighlight = 0;
-    gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
+    gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; clockSuspendedForInteraction = false; transientWheelOutcome = null;
     explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
     chronoWarningRound = 0; chronoTenSecondRound = 0; chronoHeldRemaining = 0;
     introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; normalSolveArmed = false; normalSolveInputFocused = false; finalResultHoldUntil = 0; finalResultHoldTimer = null; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0; pendingResolutionAttempt = null;
@@ -1728,6 +1738,7 @@
     finalSolveInputFocused = false;
     clearTimeout(clockTimer);
     voice?.stopLoop("reloj");
+    clockSuspendedForInteraction = false;
     actionTimeRemaining = 30000;
     actionDeadline = Date.now() + actionTimeRemaining;
     render("Tiempo detenido. Escribe la solución: dispones de 30 segundos.");
@@ -1738,7 +1749,10 @@
     if (!state || !["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase) || normalSolveArmed || state.players[state.active]?.cpu || gamePaused || narrationBarrier || Date.now() < interactionLockedUntil) return false;
     normalSolveArmed = true;
     normalSolveInputFocused = false;
-    actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    if (clockSuspendedForInteraction) {
+      actionDeadline = Date.now() + actionTimeRemaining;
+      clockSuspendedForInteraction = false;
+    } else actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
     clearTimeout(clockTimer);
     voice?.stopLoop("reloj");
     render("Tiempo detenido. Escribe la solución y pulsa COMPROBAR.");
@@ -1805,7 +1819,7 @@
     voice?.stopEffects();
     if (paused) {
       pauseStartedAt = Date.now();
-      if (timedGame) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+      if (timedGame && !clockSuspendedForInteraction) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
       $("message").textContent = "Partida en pausa.";
       voice?.pauseMusic();
       voice?.playEffect("partida-pausa");
@@ -1818,6 +1832,7 @@
       pauseStartedAt = 0;
     }
     if (timedGame) {
+      clockSuspendedForInteraction = false;
       actionDeadline = Date.now() + actionTimeRemaining;
       updateClock();
     }

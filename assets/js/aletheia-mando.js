@@ -272,7 +272,7 @@
     $("#game-name").textContent=detail.player?.name||$("#lobby-name").textContent;
     $("#round-score").textContent=detail.player?.round??0;$("#total-score").textContent=detail.player?.total??0;
     $("#game-clock").hidden=!detail.timed;$("#game-clock").textContent=detail.clock||"00:00";
-    if(detail.timed&&!detail.paused){let remaining=Number(detail.remainingMs||0);const paint=()=>{const seconds=Math.max(0,Math.ceil(remaining/1000));$("#game-clock").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;remaining=Math.max(0,remaining-1000)};paint();clockTimer=setInterval(paint,1000)}
+    if(detail.timed&&!detail.paused&&Number(detail.interactionLockedMs||0)<=0&&!detail.normalSolveArmed){let remaining=Number(detail.remainingMs||0);const paint=()=>{const seconds=Math.max(0,Math.ceil(remaining/1000));$("#game-clock").textContent=`${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}`;remaining=Math.max(0,remaining-1000)};paint();clockTimer=setInterval(paint,1000)}
     const mine=Number(detail.slot)===Number(detail.activeSlot);
     if(detail.initialDrawPhase==="running"){renderScene("wait");$("#action-kicker").textContent="SORTEO INICIAL";$("#action-title").textContent="¿QUIÉN COMIENZA?";$("#action-copy").textContent="El azar está eligiendo quién abrirá el primer panel."}
     else if(detail.initialDrawPhase==="result"){renderScene("wait");$("#action-kicker").textContent="EL AZAR HA DECIDIDO";$("#action-title").textContent=`COMIENZA ${String(detail.initialDrawWinnerName||"UN CONCURSANTE").toUpperCase()}`;$("#action-copy").textContent="Abrirá el primer panel."}

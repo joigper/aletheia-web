@@ -466,7 +466,10 @@
       const validSolver = Number.isInteger(solverIndex) && solverIndex >= 0 && solverIndex < state.players.length ? solverIndex : state.active;
       const outOfTurnSpeedAttempt = speedRound && validSolver !== state.active;
       const correct = normalize(answer) === normalize(state.puzzle.solution);
-      state.events.push({ type: "RESOLUCIÓN", detail: correct ? "Correcta" : "Incorrecta" });
+      const pendingWheelAward = correct && state.phase === "AWAITING_LETTER" && Number.isFinite(Number(state.pending))
+        ? Math.max(0, Number(state.pending))
+        : 0;
+      state.events.push({ type: "RESOLUCIÓN", detail: correct ? `Correcta${pendingWheelAward ? ` · +${pendingWheelAward} de la ruleta` : ""}` : "Incorrecta" });
       if (state.phase === "FINAL_SOLVE") return this.finishFinal(state, correct);
       if (!correct) {
         state.players[validSolver].stats.wrongSolutions += 1;
@@ -479,6 +482,10 @@
         return this.pass(state, "Respuesta incorrecta");
       }
       if (speedRound) state.active = validSolver;
+      // Si resuelve justo después de girar, el premio numérico de la ruleta se
+      // cobra una sola vez. Elegir una consonante ya consume `pending` antes de
+      // llegar aquí, por lo que no puede duplicarse el importe.
+      if (pendingWheelAward) state.players[state.active].round += pendingWheelAward;
       state.players[state.active].stats.solvedPanels += 1;
       if (state.phase === "SPECIAL_LETTER" || chronoSolve) state.players[state.active].round += Number(state.special?.prize || SPECIAL_PRIZE);
       if (state.phase === "SPEED_RUNNING" || state.phase === "SPEED_SOLVE") state.players[state.active].round += state.special.prize;
