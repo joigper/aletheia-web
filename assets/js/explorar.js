@@ -1,4 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
+    function usarSalidaSmartTV() {
+        const opcion = new URLSearchParams(window.location.search).get("aletheia-tv");
+        if (opcion === "smart") return true;
+        if (opcion === "pc") return false;
+
+        const agente = `${navigator.userAgent || ""} ${navigator.platform || ""}`;
+        return /SMART[- ]?TV|SmartTV|Tizen|Web0S|webOS|NetCast|HbbTV|BRAVIA|Viera|VIDAA|Hisense|Android TV|AFT[A-Z0-9]+|Fire TV/i.test(agente);
+    }
+
+    function enlaceAdaptado(datos) {
+        return datos.enlaceSmart && usarSalidaSmartTV()
+            ? datos.enlaceSmart
+            : datos.enlace;
+    }
+
     const svg = document.querySelector("#mapa-aletheia svg");
 
     const fichaModulo = document.getElementById("ficha-modulo");
@@ -590,6 +605,7 @@ L1_017: {
     nombre: "OCIO",
     area: "Comercio, restauración y servicios",
     enlace: "ALETHEIA-TV.html",
+    enlaceSmart: "ALETHEIA-TV-SMART.html",
     textoEnlace: "JUGAR A ALÉTHEIA-TV",
             imagenes: [
     {
@@ -1310,7 +1326,7 @@ L1_033: {
   const esZeus = datos.nombre?.startsWith("ZEUS-");
 
 const enlaceSaberMas =
-    datos.enlace ||
+    enlaceAdaptado(datos) ||
     (datos.nombre?.startsWith("HOME-")
         ? "home.html"
         : esZeus

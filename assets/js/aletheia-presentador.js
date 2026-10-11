@@ -19,7 +19,7 @@
   video.loop = true;
   video.autoplay = false;
   video.playsInline = true;
-  video.preload = "auto";
+  video.preload = global.AletheiaTVSmart ? "metadata" : "auto";
   video.hidden = false;
   video.removeAttribute("hidden");
   video.setAttribute("aria-hidden", "true");
