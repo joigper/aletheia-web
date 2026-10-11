@@ -2838,10 +2838,18 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 }
 
 .tv-puzzle-context #clue {
-  max-width: 44vw;
-  color: #d8e3f7;
-  font: 500 clamp(13px,1vw,17px) "Exo 2",sans-serif;
-  letter-spacing: 0;
+  display: -webkit-box;
+  max-width: min(58vw,980px);
+  min-height: 2.45em;
+  max-height: 2.45em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #f4f8ff;
+  font: 600 clamp(15px,1.28vw,24px)/1.22 "Exo 2",sans-serif;
+  letter-spacing: .01em;
+  text-wrap: balance;
+  text-shadow: 0 0 18px rgba(70,220,255,.18);
 }
 
 .tv-puzzle-meta #category {
@@ -2919,7 +2927,7 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 
 @media (max-height:850px) {
   .tv-puzzle-context #clue {
-    font-size: 12px;
+    font-size: clamp(13px,1.8vw,18px);
   }
 }
 
@@ -3697,8 +3705,8 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
   .tv-puzzle-context #clue {
-    max-width: 45vw;
-    font-size: 11px;
+    max-width: 58vw;
+    font-size: clamp(12px,1.65vw,17px);
   }
 }
 

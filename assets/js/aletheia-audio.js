@@ -73,6 +73,7 @@
     "categoria-explicacion": ["v4-categoria-explicacion-01.mp3", "v4-categoria-explicacion-02.mp3"],
     "categoria-elige": ["v4-categoria-elige-01.mp3"],
     "categoria-confirmada": ["v4-categoria-confirmada-01.mp3", "v4-categoria-confirmada-02.mp3"],
+    "categoria-conector": ["v4-categoria-conector-la-categoria-es-01.mp3", "v4-categoria-conector-jugamos-con-01.mp3", "v4-categoria-conector-siguiente-panel-01.mp3"],
     "crono-presentacion": ["v4-crono-presentacion-01.mp3"],
     "crono-explicacion": ["v4-crono-explicacion-01.mp3"],
     "crono-breve": ["v4-crono-breve-01.mp3"],
@@ -263,6 +264,10 @@
   }
 
   function filesFor(intent) {
+    if (intent.startsWith("categoria-nombre:")) {
+      const value = intent.slice(17).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      return [`v4-categoria-${value}-01.mp3`];
+    }
     if (intent.startsWith("resolucion-nombre:")) {
       return [`v4-resolucion-nombre-${intent.slice(18)}.mp3`];
     }

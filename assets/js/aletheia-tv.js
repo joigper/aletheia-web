@@ -33,7 +33,7 @@
   let pauseStartedAt = 0;
   let remoteStateRevision = 0;
   let experienceStarted = false;
-  let actionTimeRemaining = 25000;
+  let actionTimeRemaining = 30000;
   let actionDeadline = 0;
   let clockTimer = null;
   let speedTimer = null;
@@ -66,6 +66,8 @@
   let finalVoicePending = false;
   let finalVoiceLockUntil = 0;
   let finalSolveArmed = false;
+  let normalSolveArmed = false;
+  let normalSolveInputFocused = false;
   let finalSolveInputFocused = false;
   let finalResultHoldUntil = 0;
   let finalResultHoldTimer = null;
@@ -363,6 +365,7 @@
     if (mode === "crono") sequence.push("crono-presentacion", "crono-inicio");
     if (mode === "palabra") sequence.push("panel-preparado");
     if (mode === "velocidad") sequence.push("velocidad-presentacion", firstExplanation ? "velocidad-explicacion" : "velocidad-breve", "velocidad-inicio");
+    sequence.push("categoria-conector", `categoria-nombre:${state.puzzle.category}`);
     voice?.play(sequence);
     if (voice?.isEnabled() !== false) {
       introVoicePending = true;
@@ -416,6 +419,20 @@
     };
   }
 
+  function fitClueText() {
+    const clue = $("clue");
+    if (!clue) return;
+    clue.style.fontSize = "";
+    requestAnimationFrame(() => {
+      let size = Math.min(24, Math.max(15, parseFloat(getComputedStyle(clue).fontSize) || 20));
+      clue.style.fontSize = `${size}px`;
+      while ((clue.scrollHeight > clue.clientHeight || clue.scrollWidth > clue.clientWidth) && size > 13) {
+        size -= 1;
+        clue.style.fontSize = `${size}px`;
+      }
+    });
+  }
+
   window.addEventListener("aletheia-voice-idle", () => {
     const now = Date.now();
     if (initialDrawPhase === "running") {
@@ -456,6 +473,8 @@
     if (pendingResolutionAttempt) {
       const attempt = pendingResolutionAttempt;
       pendingResolutionAttempt = null;
+      normalSolveArmed = false;
+      normalSolveInputFocused = false;
       releaseNarrationBarrier(false);
       act(() => engine.solve(state, attempt.answer, attempt.playerIndex));
       return;
@@ -469,6 +488,10 @@
   function render(message) {
     const viewState = presentationState();
     const phaseChanged = renderedPhase !== state.phase;
+    if (phaseChanged && !["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase)) {
+      normalSolveArmed = false;
+      normalSolveInputFocused = false;
+    }
     if (phaseChanged && state.phase === "FINAL_SOLVE") {
       finalSolveArmed = Boolean(state.players[state.active]?.cpu);
       finalSolveInputFocused = false;
@@ -525,6 +548,7 @@
     $("round-label").textContent = finalRound ? "RULETA FINAL" : `RONDA ${state.round} DE ${state.maxRounds}${state.roundMode === "CHOOSE" ? " · TÚ ELIGES" : state.roundMode === "QUESTION" ? " · REVANCHA" : state.roundMode === "SPECIAL" ? ` · ${state.special?.type === "SPEED" ? "VELOCIDAD" : state.special?.type === "WORD" ? "PALABRA" : "CRONO"}` : ""}`;
     $("category").textContent = state.puzzle.category;
     $("clue").textContent = state.puzzle.clue;
+    fitClueText();
     $("letter-board").innerHTML = maskedPuzzle(viewState);
     $("letter-board").classList.toggle("is-completing", visibleRoundComplete);
     $("letter-board").classList.toggle("is-opening", panelJustChanged && !visibleRoundComplete);
@@ -539,7 +563,7 @@
     $("active-total-score").textContent = viewPlayer.total;
     const visibleTransientMessage = Date.now() < transientMessageUntil ? transientMessage : "";
       $("message").textContent = narrationBarrier ? (narrationSnapshot.message || "Escucha a Prometeo…") : message || visibleTransientMessage || (finalReady ? "La partida regular ha terminado. El ganador jugará la Ruleta Final." : roundComplete ? (state.special?.noWinner ? `${state.special?.type === "WORD" ? "La Palabra" : "CRONO"} termina sin ganador.` : `${state.players[state.roundWinner].name} gana la ronda. Los saldos de ronda vuelven a cero.`) : state.phase === "FINAL_PICK" ? "Elige tres consonantes y una vocal para la final." : state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución. Dispones de 30 segundos." : "Piensa la solución y pulsa RESOLVER AHORA cuando la sepas.") : state.phase === "SPECIAL_LETTER" ? (state.special?.type === "WORD" ? "Memoriza las letras fugaces y pulsa RESOLVER cuando conozcas la palabra. Premio: 150." : `CRONO en marcha: se descubre una posición cada 3 segundos. Pulsa RESOLVER cuando conozcas el panel. Premio: ${AletheiaGame.specialPrize}.`) : state.phase === "SPECIAL_SOLVE" ? `${state.players[state.active].name} ha detenido el panel y está escribiendo la solución.` : state.phase === "SPEED_RUNNING" ? `Panel de velocidad: pulsa ¡LA SÉ! para detenerlo. Premio actual: ${state.special.prize}.` : state.phase === "SPEED_SOLVE" ? `${state.players[state.active].name} ha detenido el panel. Tiene 30 segundos para resolver.` : state.phase === "AWAITING_LETTER" ? (state.pending === "COMODÍN" ? "Acierta una consonante para conseguir el comodín." : `Premio pendiente: ${state.pending} por coincidencia.`) : !consonantsRemain ? (state.players[state.active].round >= AletheiaGame.vowelPrice ? "No quedan consonantes: compra una vocal o resuelve el panel." : "No quedan consonantes y no tienes saldo: resuelve o pasa el turno.") : `Gira la ruleta para elegir consonante. Las vocales cuestan ${AletheiaGame.vowelPrice}${state.players[state.active].round >= AletheiaGame.vowelPrice ? " y ya puedes comprar una" : ""}.`);
-    $("spin").disabled = narrationBarrier || gamePaused || interactionLocked || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
+    $("spin").disabled = narrationBarrier || gamePaused || interactionLocked || normalSolveArmed || !humanTurn || state.phase !== "AWAITING_SPIN" || !consonantsRemain;
     if (specialRound || finalRound) {
       $("wheel-result").textContent = finalRound ? "FINAL" : state.special.type === "SPEED" ? state.special.prize : "CRONO";
       $("wheel-action").hidden = false;
@@ -554,11 +578,13 @@
     const chronoHumanCanSolve = state.phase === "SPECIAL_SOLVE" && !state.players[state.active]?.cpu;
     const speedInputBlocked = speedRound && !speedHumanCanSolve;
     const finalWaitingToSolve = state.phase === "FINAL_SOLVE" && !finalSolveArmed && humanTurn;
+    const normalRound = ["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase);
+    const normalWaitingToSolve = normalRound && humanTurn && !normalSolveArmed;
     const solveButton = $("solve-form").querySelector("button");
-    $("solution").disabled = narrationBarrier || gamePaused || interactionLocked || finalWaitingToSolve || speedInputBlocked || (!humanTurn && !speedHumanCanSolve && !chronoHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK" || state.phase === "SPECIAL_LETTER";
+    $("solution").disabled = narrationBarrier || gamePaused || interactionLocked || finalWaitingToSolve || normalWaitingToSolve || speedInputBlocked || (!humanTurn && !speedHumanCanSolve && !chronoHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK" || state.phase === "SPECIAL_LETTER";
     solveButton.disabled = narrationBarrier || gamePaused || interactionLocked || speedInputBlocked || (!humanTurn && !speedHumanCanSolve && !chronoHumanCanSolve) || roundComplete || finalReady || gameComplete || state.phase === "FINAL_PICK" || state.phase === "SPECIAL_LETTER";
-    solveButton.textContent = finalWaitingToSolve ? "RESOLVER AHORA" : "RESOLVER";
-    $("solution").placeholder = state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución: 30 segundos" : "Pulsa RESOLVER AHORA") : state.phase === "SPECIAL_SOLVE" ? "Escribe la solución: 30 segundos" : state.phase === "SPEED_SOLVE" ? "Escribe la solución: 30 segundos" : speedRound ? "Pulsa ¡LA SÉ! antes de responder" : "Escribe la solución";
+    solveButton.textContent = finalWaitingToSolve || normalWaitingToSolve ? "RESOLVER AHORA" : "COMPROBAR";
+    $("solution").placeholder = state.phase === "FINAL_SOLVE" ? (finalSolveArmed ? "Escribe la solución: 30 segundos" : "Pulsa RESOLVER AHORA") : normalRound ? (normalSolveArmed ? "Escribe la solución" : "Pulsa RESOLVER AHORA") : state.phase === "SPECIAL_SOLVE" ? "Escribe la solución: 30 segundos" : state.phase === "SPEED_SOLVE" ? "Escribe la solución: 30 segundos" : speedRound ? "Pulsa ¡LA SÉ! antes de responder" : "Escribe la solución";
     if (state.phase !== "SPEED_SOLVE" && state.phase !== "SPECIAL_SOLVE") speedInputFocused = false;
     if (speedHumanCanSolve && !speedInputFocused) {
       speedInputFocused = true;
@@ -570,6 +596,10 @@
     }
     if (state.phase === "FINAL_SOLVE" && finalSolveArmed && humanTurn && !finalSolveInputFocused) {
       finalSolveInputFocused = true;
+      requestAnimationFrame(() => $("solution").focus());
+    }
+    if (normalRound && normalSolveArmed && humanTurn && !normalSolveInputFocused) {
+      normalSolveInputFocused = true;
       requestAnimationFrame(() => $("solution").focus());
     }
     if (gameComplete) {
@@ -647,6 +677,7 @@
       chronoBuzzerSlot: state.phase === "SPECIAL_SOLVE" ? state.active + 1 : 0,
       chronoBuzzLockedSlots: ["CRONO", "WORD"].includes(state.special?.type) ? Object.keys(state.special.excludedPlayers || {}).filter(index => state.special.excludedPlayers[index]).map(index => Number(index) + 1) : [],
       finalSolveArmed: state.phase === "FINAL_SOLVE" ? finalSolveArmed : false,
+      normalSolveArmed: ["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase) ? normalSolveArmed : false,
       speedBuzzLockedSlots: state.special?.type === "SPEED" ? Object.keys(state.special.lockedPlayers || {}).filter(index => Number(state.special.lockedPlayers[index]) >= state.special.reveals).map(index => Number(index) + 1) : [],
       resolutionPending: Boolean(pendingResolutionAttempt),
       resolutionPlayerSlot: pendingResolutionAttempt ? pendingResolutionAttempt.playerIndex + 1 : 0,
@@ -655,7 +686,7 @@
       initialDrawWinnerSlot: state.startingPlayer + 1,
       initialDrawWinnerName: state.players[state.startingPlayer]?.name || "",
       finalRevealHolding: state.phase === "GAME_COMPLETE" && Date.now() < finalResultHoldUntil,
-      remainingMs: timed ? Math.max(0, gamePaused ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
+      remainingMs: timed ? Math.max(0, gamePaused || normalSolveArmed ? actionTimeRemaining : actionDeadline - Date.now()) : 0,
       pending: state.pending || "", message: $("message").textContent,
       wheelOutcome: transientWheelOutcome && Date.now() < transientMessageUntil ? { ...transientWheelOutcome, remainingMs: Math.max(0, transientMessageUntil - Date.now()) } : null,
       consonantsRemain: engine.hasAvailableConsonants(state),
@@ -747,7 +778,7 @@
       $("challenge-kicker").textContent = state.phase === "FINAL_PICK" ? "ÚLTIMO PANEL · RULETA FINAL" : "LETRAS ELEGIDAS";
       setAnimatedChallengeTitle(state.phase === "FINAL_PICK" ? "RULETA FINAL" : "PIENSA LA SOLUCIÓN");
       $("challenge-text").textContent = state.phase === "FINAL_PICK"
-        ? "El concursante finalista elige tres consonantes y una vocal."
+        ? "El panel entrega R, S, F, Y, O. Después eliges tres consonantes y una vocal adicionales."
         : "Cuando conozcas el panel, pulsa RESOLVER AHORA para detener el tiempo y escribir.";
       $("challenge-options").innerHTML = '<strong class="tv-round-intro-rule">ESCUCHA A PROMETEO…</strong>';
       roundIntroTimer = setTimeout(() => render(), Math.max(40, finalVoiceLockUntil - Date.now()));
@@ -882,7 +913,7 @@
           return;
         }
         act(() => engine.revealWordPosition(state));
-      }, state.special?.flashVisible ? 900 : 1500);
+      }, state.special?.flashVisible ? 1500 : 1000);
       return;
     }
     if (state.phase === "SPECIAL_LETTER" && state.special?.type === "CRONO") {
@@ -1066,7 +1097,8 @@
       if (previousPhase === "FINAL_SOLVE" && state.phase === "GAME_COMPLETE") {
         finalResultHoldUntil = Date.now() + 5000;
       }
-      if (newEvents.length && voice?.isEnabled() !== false) beginNarrationBarrier(presentationBefore);
+      const correctResolution = newEvents.some(event => event.type === "RESOLUCIÓN" && /Correcta/i.test(event.detail));
+      if (newEvents.length && voice?.isEnabled() !== false && !correctResolution) beginNarrationBarrier(presentationBefore);
       const roundJustClosed = previousPhase !== state.phase && ["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase);
       if (roundJustClosed) {
         clearTimeout(cpuTimer);
@@ -1099,7 +1131,8 @@
     clearTimeout(clockTimer);
     if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     if (["ROUND_COMPLETE", "FINAL_READY", "GAME_COMPLETE", "CATEGORY_CHOICE", "CATEGORY_RESULT", "QUESTION_BONUS", "QUESTION_SELECTION", "QUESTION_RESULT"].includes(state.phase)) return;
-    if (!gamePaused && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    if (!gamePaused && !normalSolveArmed && Date.now() >= interactionLockedUntil) actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    else if (!gamePaused && normalSolveArmed) actionDeadline = Date.now() + actionTimeRemaining;
     else if (!gamePaused && Date.now() < interactionLockedUntil) actionDeadline = interactionLockedUntil + actionTimeRemaining;
     $("game-clock").textContent = formatClock(actionTimeRemaining);
     $("game-clock").classList.toggle("is-urgent", actionTimeRemaining <= 10000);
@@ -1129,7 +1162,7 @@
   function resetActionClock() {
     if (!state || (!timedGame && state.phase !== "SPEED_SOLVE" && state.phase !== "FINAL_SOLVE")) return;
     voice?.stopLoop("reloj");
-    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : state.phase === "SPEED_SOLVE" ? 30000 : 25000;
+    actionTimeRemaining = state.phase === "FINAL_SOLVE" ? 10000 : 30000;
     actionDeadline = Date.now() + actionTimeRemaining;
     updateClock();
   }
@@ -1247,6 +1280,8 @@
   function stageResolutionAttempt(answer, playerIndex = state?.active) {
     if (!state || pendingResolutionAttempt || narrationBarrier || !Number.isInteger(playerIndex) || !state.players[playerIndex]) return false;
     if (voice?.isEnabled() === false) {
+      normalSolveArmed = false;
+      normalSolveInputFocused = false;
       act(() => engine.solve(state, answer, playerIndex));
       return true;
     }
@@ -1525,7 +1560,7 @@
     gamePaused = false; renderedPhase = null; introducedRound = 0; roundIntroUntil = 0; interactionLockedUntil = 0; transientWheelOutcome = null;
     explainedVoiceModes.clear(); announcedCategoryRound = 0; announcedQuestionRound = 0; announcedFinal = false;
     chronoWarningRound = 0; chronoTenSecondRound = 0; chronoHeldRemaining = 0;
-    introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; finalResultHoldUntil = 0; finalResultHoldTimer = null; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0; pendingResolutionAttempt = null;
+    introVoicePending = false; introVoiceLockUntil = 0; challengeVoicePending = false; finalVoicePending = false; finalVoiceLockUntil = 0; finalSolveArmed = false; finalSolveInputFocused = false; normalSolveArmed = false; normalSolveInputFocused = false; finalResultHoldUntil = 0; finalResultHoldTimer = null; narrationSnapshot = null; narrationBarrier = false; narrationLockUntil = 0; pendingResolutionAttempt = null;
     transientMessage = ""; transientMessageUntil = 0; speedInputFocused = false; challengeKey = "";
     $("pause-overlay").hidden = true; $("session-overlay").hidden = true; $("game-panel").classList.remove("is-paused");
     $("pause-game").textContent = "PAUSA"; $("pause-game").setAttribute("aria-pressed", "false");
@@ -1693,6 +1728,17 @@
     updateClock();
     return true;
   }
+  function armNormalSolve() {
+    if (!state || !["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase) || normalSolveArmed || state.players[state.active]?.cpu || gamePaused || narrationBarrier || Date.now() < interactionLockedUntil) return false;
+    normalSolveArmed = true;
+    normalSolveInputFocused = false;
+    actionTimeRemaining = Math.max(0, actionDeadline - Date.now());
+    clearTimeout(clockTimer);
+    voice?.stopLoop("reloj");
+    render("Tiempo detenido. Escribe la solución y pulsa COMPROBAR.");
+    updateClock();
+    return true;
+  }
   $("spin").addEventListener("click", performSpin);
   $("scoreboard").addEventListener("click", event => {
     const button = event.target.closest("[data-speed-buzz-index],[data-chrono-buzz-index]");
@@ -1705,6 +1751,10 @@
     event.preventDefault();
     if (state.phase === "FINAL_SOLVE" && !finalSolveArmed) {
       armFinalSolve();
+      return;
+    }
+    if (["AWAITING_SPIN", "AWAITING_LETTER"].includes(state.phase) && !normalSolveArmed) {
+      armNormalSolve();
       return;
     }
     const answer = $("solution").value;
@@ -1828,6 +1878,11 @@
     if (type === "final-buzz") {
       const accepted = slot === state.active + 1 && armFinalSolve();
       remoteAck(slot, seq, accepted, accepted ? "Tiempo detenido. Dispones de 30 segundos para escribir." : "El pulsador final no está disponible ahora.");
+      return;
+    }
+    if (type === "solve-buzz") {
+      const accepted = slot === state.active + 1 && armNormalSolve();
+      remoteAck(slot, seq, accepted, accepted ? "Tiempo detenido. Escribe la solución." : "No puedes resolver ahora.");
       return;
     }
     if (gamePaused) { remoteAck(slot, seq, false, "La partida está en pausa."); return; }
