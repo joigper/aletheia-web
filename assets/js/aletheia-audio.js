@@ -129,8 +129,8 @@
   music.preload = "none";
   music.loop = true;
   music.volume = 0;
-  const musicVolume = 0.16;
-  const duckedMusicVolume = 0.05;
+  const musicVolume = 0.25;
+  const duckedMusicVolume = 0.10;
   let musicRequested = false;
   let musicSuspended = false;
   let musicFadeTimer = null;
@@ -213,6 +213,7 @@
   function resumeMusic() {
     if (!musicRequested || !enabled) return;
     musicSuspended = false;
+    if (!music.src) music.src = effectsPath + musicFile;
     const playback = music.play();
     if (playback !== undefined) playback.then(() => fadeMusic(speaking ? duckedMusicVolume : musicVolume, 500)).catch(() => {});
   }

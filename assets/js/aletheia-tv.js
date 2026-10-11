@@ -33,6 +33,7 @@
   let pauseStartedAt = 0;
   let remoteStateRevision = 0;
   let experienceStarted = false;
+  let selectedDifficultyMode = "ADULTO";
   let actionTimeRemaining = 30000;
   let actionDeadline = 0;
   let clockTimer = null;
@@ -1571,6 +1572,7 @@
     timedGame = $("timed-game").checked;
     const humanCount = 1 + extraSlots.filter(slot => !slot.cpu).length;
     const mode = roundConfiguration(humanCount);
+    mode.difficultyMode = selectedDifficultyMode;
     state = engine.create(alias, selectedRivals, extraSlots, humanAvatarData(1), mode);
     state.statistics.startedAt = Date.now();
     pauseStartedAt = 0;
@@ -1968,6 +1970,7 @@
     if (experienceStarted) return;
     experienceStarted = true;
     setSoundEnabled(withSound);
+    if (withSound) voice?.startMusic();
     $("tv-entry").hidden = true;
     if (withSound) startPrometeoSpokenWelcome();
     else startPrometeoWelcome();
@@ -1984,6 +1987,25 @@
     document.documentElement.classList.toggle("aletheia-tv-phone", phoneStandalone);
     $("entry-desktop-info").hidden = phoneStandalone;
     $("entry-mobile-info").hidden = !phoneStandalone;
+    const startButton = $("start-game");
+    if (startButton && !$("difficulty-selector")) {
+      const selector = document.createElement("fieldset");
+      selector.id = "difficulty-selector";
+      selector.className = "tv-difficulty-selector";
+      selector.innerHTML = '<legend>DIFICULTAD</legend><button type="button" data-difficulty="INFANTIL"><b>INFANTIL</b><small>Nivel 1</small></button><button type="button" data-difficulty="FAMILIAR"><b>FAMILIAR</b><small>Niveles 1–2</small></button><button type="button" data-difficulty="ADULTO" class="is-selected"><b>ADULTO</b><small>Niveles 1–3</small></button>';
+      startButton.parentElement.insertBefore(selector, startButton);
+      selector.addEventListener("click", event => {
+        const button = event.target.closest("[data-difficulty]");
+        if (!button) return;
+        selectedDifficultyMode = button.dataset.difficulty;
+        selector.querySelectorAll("[data-difficulty]").forEach(item => item.classList.toggle("is-selected", item === button));
+        $("setup-message").textContent = selectedDifficultyMode === "INFANTIL"
+          ? "Modo infantil: paneles sencillos de nivel 1."
+          : selectedDifficultyMode === "FAMILIAR"
+            ? "Modo familiar: combina paneles sencillos e intermedios."
+            : "Modo adulto: combina los tres niveles, con mayor presencia de paneles exigentes.";
+      });
+    }
     if (phoneStandalone) {
       $("entry-mode-summary").textContent = "Esta versión está adaptada para jugar directamente en el teléfono.";
       $("enable-remotes").hidden = true;

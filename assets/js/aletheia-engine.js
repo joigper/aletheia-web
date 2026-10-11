@@ -10,6 +10,14 @@
   const SPECIAL_PRIZE = 300;
   const QUESTION_BONUS = 100;
   const FINAL_PRIZE = 500;
+  const DIFFICULTY_WEIGHTS = Object.freeze({
+    INFANTIL: Object.freeze([1, 0, 0]),
+    FAMILIAR: Object.freeze([0.35, 0.65, 0]),
+    ADULTO: Object.freeze([0.15, 0.35, 0.50])
+  });
+  const EASY_CATEGORIES = new Set(["ANIMALES", "ANIMACION", "ANIMACION TELEVISIVA", "COCINA", "CUENTOS", "CUERPO HUMANO", "DEPORTES", "EN CASA", "FIESTAS", "FUTBOL", "GEOGRAFIA", "INSTRUMENTOS", "NATURALEZA", "OBJETOS COTIDIANOS", "PLANTAS", "PROFESIONES", "PROGRAMAS DE TELEVISION"]);
+  const HARD_CATEGORIES = new Set(["ALETHEIA", "APODOS HISTORICOS", "ARQUITECTURA", "AUTORES Y AUTORAS", "BATALLAS Y GUERRAS", "CIVILIZACIONES", "EPOCAS HISTORICAS", "FIGURAS LITERARIAS", "HISTORIA", "HISTORIA DE ANDALUCIA", "HISTORIA DE ESPAÑA", "LOCUCIONES", "MOVIMIENTOS ARTISTICOS", "OBRAS UNIVERSALES", "ORTOGRAFIA Y GRAMATICA", "PALABRAS CURIOSAS", "PERSONAJES HISTORICOS", "TECNICAS ARTISTICAS"]);
+  const ADVANCED_CATEGORIES = new Set(["ARTE", "ASTRONOMIA", "BANDAS SONORAS", "CIENCIA", "CINE ESPAÑOL", "CULTURA TELEVISIVA", "DIRECTORES", "ESCULTURA", "FRASES CELEBRES", "GEOGRAFIA DE ESPAÑA", "HONGOS", "INVENTOS Y DESCUBRIMIENTOS", "LIBROS", "LITERATURA ESPAÑOLA", "MITOLOGIA", "MUSEOS", "MUSICA CLASICA", "PERSONAJES LITERARIOS", "PINTURA", "TEATRO", "TECNOLOGIA"]);
   const NON_SIGNIFICANT_WORDS = new Set([
     "EL", "LA", "LOS", "LAS", "UN", "UNA", "UNOS", "UNAS",
     "AL", "DEL", "DE", "EN", "A", "ANTE", "BAJO", "CON", "CONTRA",
@@ -62,6 +70,26 @@
     return normalize(value).split(" ").filter(word => word && !NON_SIGNIFICANT_WORDS.has(word)).length;
   }
 
+  function panelDifficulty(panel) {
+    const explicit = Number(panel?.nivel ?? panel?.dificultad);
+    if ([1, 2, 3].includes(explicit)) return explicit;
+    const category = normalize(panel?.categoria || "");
+    const solution = normalize(panel?.solucion || "");
+    const clue = normalize(panel?.pista || "");
+    const words = solution.split(" ").filter(Boolean);
+    const significant = words.filter(word => !NON_SIGNIFICANT_WORDS.has(word));
+    let score = 0;
+    if (EASY_CATEGORIES.has(category)) score -= 2;
+    if (HARD_CATEGORIES.has(category)) score += 2;
+    if (ADVANCED_CATEGORIES.has(category)) score += 1;
+    if (significant.length <= 2 && solution.length <= 18) score -= 1;
+    if (significant.length >= 4 || solution.length >= 30) score += 1;
+    if (significant.some(word => word.length >= 12)) score += 1;
+    if (clue.length >= 58) score += 1;
+    if (clue.length <= 34 && significant.length <= 3) score -= 1;
+    return score <= -2 ? 1 : score >= 1 || (ADVANCED_CATEGORIES.has(category) && score >= 0) ? 3 : 2;
+  }
+
   class Engine {
     constructor(random = Math.random) { this.random = random; }
     getRoster() {
@@ -91,7 +119,20 @@
       while (cpu.length < count) cpu.push(fallback[cpu.length]);
       return cpu;
     }
-    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "") {
+    difficultyLevel(mode = "ADULTO") {
+      const weights = DIFFICULTY_WEIGHTS[String(mode).toUpperCase()] || DIFFICULTY_WEIGHTS.ADULTO;
+      const draw = this.random();
+      return draw < weights[0] ? 1 : draw < weights[0] + weights[1] ? 2 : 3;
+    }
+    difficultyPool(panels, mode = "ADULTO") {
+      const normalizedMode = String(mode).toUpperCase();
+      const maximum = normalizedMode === "INFANTIL" ? 1 : normalizedMode === "FAMILIAR" ? 2 : 3;
+      const allowed = panels.filter(panel => panelDifficulty(panel) <= maximum);
+      const target = this.difficultyLevel(normalizedMode);
+      const exact = allowed.filter(panel => panelDifficulty(panel) === target);
+      return exact.length ? exact : allowed.length ? allowed : panels;
+    }
+    pickPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "", difficultyMode = "ADULTO") {
       const library = Array.isArray(global.aletheiaPaneles)
         ? global.aletheiaPaneles.filter(panel => panel.id && panel.categoria && panel.solucion)
         : [];
@@ -114,7 +155,7 @@
         : eligible;
       // La variedad nunca debe bloquear una partida ni contradecir una categoría
       // elegida. Solo se recupera el conjunto original si no existe alternativa.
-      const selectionPool = varied.length ? varied : eligible;
+      const selectionPool = this.difficultyPool(varied.length ? varied : eligible, difficultyMode);
       // Una misma solución puede existir en varios lotes. Para que no tenga más
       // probabilidades por estar duplicada, solo participa una vez en el sorteo.
       const uniqueSolutions = new Map();
@@ -126,7 +167,7 @@
       const selected = pool[Math.floor(this.random() * pool.length)];
       return selected;
     }
-    pickChronoPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "") {
+    pickChronoPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], previousSolution = "", difficultyMode = "ADULTO") {
       const library = Array.isArray(global.aletheiaPaneles) ? global.aletheiaPaneles : [];
       const excluded = new Set(excludedIds);
       const excludedCategorySet = new Set(excludedCategories);
@@ -142,14 +183,15 @@
         .filter(panel => !excludedSolutionSet.has(normalize(panel.solucion)));
       const validAnywhere = library.filter(panel => panel?.id && panel?.categoria && panel?.solucion)
         .filter(panel => countWords(panel) >= 2 && panelText(panel.solucion).length >= 8);
-      const source = preferred.length ? preferred : valid.length ? valid : validFallback.length ? validFallback : validAnywhere;
-      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions, previousSolution);
+      const candidates = preferred.length ? preferred : valid.length ? valid : validFallback.length ? validFallback : validAnywhere;
+      const source = this.difficultyPool(candidates, difficultyMode);
+      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions, previousSolution, difficultyMode);
       const unique = new Map();
       source.forEach(panel => { const key = normalize(panel.solucion); if (!unique.has(key)) unique.set(key, panel); });
       const pool = [...unique.values()];
       return pool[Math.floor(this.random() * pool.length)];
     }
-    pickWordPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = []) {
+    pickWordPuzzle(excludedIds = [], excludedCategories = [], requiredCategory = null, excludedSolutions = [], difficultyMode = "ADULTO") {
       const library = Array.isArray(global.aletheiaPaneles) ? global.aletheiaPaneles : [];
       const excluded = new Set(excludedIds);
       const excludedCategorySet = new Set(excludedCategories);
@@ -163,8 +205,8 @@
         .filter(panel => requiredCategory ? panel.categoria === requiredCategory : !excludedCategorySet.has(panel.categoria));
       const fallback = library.filter(panel => panel?.id && panel?.categoria && validWord(panel))
         .filter(panel => !excludedSolutionSet.has(normalize(panel.solucion)));
-      const source = eligible.length ? eligible : fallback;
-      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions);
+      const source = this.difficultyPool(eligible.length ? eligible : fallback, difficultyMode);
+      if (!source.length) return this.pickPuzzle(excludedIds, excludedCategories, requiredCategory, excludedSolutions, "", difficultyMode);
       const unique = new Map();
       source.forEach(panel => { const key = normalize(panel.solucion); if (!unique.has(key)) unique.set(key, panel); });
       const pool = [...unique.values()];
@@ -175,6 +217,7 @@
       const previousWasShort = significantWordCount(state.puzzle?.solution || "") <= 1;
       const categories = [...new Set((global.aletheiaPaneles || [])
         .filter(panel => panel && panel.categoria && panel.solucion)
+        .filter(panel => panelDifficulty(panel) <= (state.difficultyMode === "INFANTIL" ? 1 : state.difficultyMode === "FAMILIAR" ? 2 : 3))
         .filter(panel => !previousWasShort || significantWordCount(panel.solucion) >= 2)
         .map(panel => panel.categoria))]
         .filter(category => !used.has(category));
@@ -203,14 +246,15 @@
       const configuredSlots = Array.isArray(extraSlots) && extraSlots.length === 2
         ? extraSlots
         : cpu.map(person => ({ cpu: true, person }));
-      const selectedPuzzle = this.pickPuzzle();
+      const difficultyMode = ["INFANTIL", "FAMILIAR", "ADULTO"].includes(String(options.difficultyMode).toUpperCase()) ? String(options.difficultyMode).toUpperCase() : "ADULTO";
+      const selectedPuzzle = this.pickPuzzle([], [], null, [], "", difficultyMode);
       const requestedModes = Array.isArray(options.roundModes) && options.roundModes.length === 5 ? options.roundModes : ROUND_MODES;
       const roundModes = requestedModes.map(mode => ["NORMAL", "CHOOSE", "SPECIAL", "QUESTION"].includes(mode) ? mode : "NORMAL");
       const startingPlayer = Math.floor(this.random() * 3);
       return {
         phase: "AWAITING_SPIN", active: startingPlayer, startingPlayer, round: 1, maxRounds: 5, pending: null, lastSpin: null,
         roundModes, roundMode: roundModes[0], specialRotation: ["SPEED", "CRONO", "WORD"][Math.floor(this.random() * 3)], special: null, categoryChoices: [], selectedCategory: null, question: null, final: null,
-        playMode: String(options.playMode || "desktop-local"),
+        playMode: String(options.playMode || "desktop-local"), difficultyMode,
         players: [
           { id: "human", name: alias || "Invitado", cpu: false, image: primaryAvatar?.image || null, role: primaryAvatar?.name ? `Avatar · ${primaryAvatar.name}` : "Concursante" },
           ...configuredSlots.map((slot, index) => {
@@ -507,10 +551,10 @@
       const chronoRound = state.roundMode === "SPECIAL" && state.specialRotation === "CRONO";
       const wordRound = state.roundMode === "SPECIAL" && state.specialRotation === "WORD";
       const selectedPuzzle = wordRound
-        ? this.pickWordPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions)
+        ? this.pickWordPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.difficultyMode)
         : chronoRound
-        ? this.pickChronoPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution)
-        : this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution);
+        ? this.pickChronoPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution, state.difficultyMode)
+        : this.pickPuzzle(state.usedPuzzleIds, usedCategories, category, state.usedPuzzleSolutions, state.puzzle.solution, state.difficultyMode);
       state.puzzle = {
         id: selectedPuzzle.id,
         category: selectedPuzzle.categoria,
@@ -563,7 +607,7 @@
       const finalists = state.players.map((player, index) => ({ player, index })).filter(entry => entry.player.total === highest)
         .sort((a, b) => b.player.stats.roundsWon - a.player.stats.roundsWon || b.player.stats.solvedPanels - a.player.stats.solvedPanels || b.player.stats.correctConsonants - a.player.stats.correctConsonants || a.index - b.index);
       state.active = finalists[0].index;
-      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories, null, state.usedPuzzleSolutions, state.puzzle.solution);
+      const selectedPuzzle = this.pickPuzzle(state.usedPuzzleIds, state.usedPuzzleCategories, null, state.usedPuzzleSolutions, state.puzzle.solution, state.difficultyMode);
       state.puzzle = { id: selectedPuzzle.id, category: selectedPuzzle.categoria, clue: selectedPuzzle.pista || "", solution: selectedPuzzle.solucion, revealed: ["R", "S", "F", "Y", "O"] };
       state.final = { picks: [], consonants: 0, vowels: 0, prize: FINAL_PRIZE, correct: null };
       state.phase = "FINAL_PICK";
@@ -608,5 +652,5 @@
     }
   }
 
-  global.AletheiaGame = { Engine, normalize, panelText, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE, roundModes: ROUND_MODES, specialPrize: SPECIAL_PRIZE, questionBonus: QUESTION_BONUS, finalPrize: FINAL_PRIZE };
+  global.AletheiaGame = { Engine, normalize, panelText, panelDifficulty, difficultyWeights: DIFFICULTY_WEIGHTS, wheel: Object.freeze([...wheel]), vowelPrice: VOWEL_PRICE, defaultCpuProfile: DEFAULT_CPU_PROFILE, roundModes: ROUND_MODES, specialPrize: SPECIAL_PRIZE, questionBonus: QUESTION_BONUS, finalPrize: FINAL_PRIZE };
 })(window);
