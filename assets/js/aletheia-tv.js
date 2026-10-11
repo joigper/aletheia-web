@@ -100,6 +100,50 @@
   const missingThumbnails = new Set(["OSCAR2"]);
   const phoneStandalone = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent) && Math.min(screen.width, screen.height) <= 600;
   window.AletheiaPlayMode = { phoneStandalone, remoteActive: false };
+  let mobileWakeLock = null;
+
+  function mobileFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function updateMobileViewport() {
+    if (!phoneStandalone) return;
+    const height = Math.round(window.visualViewport?.height || window.innerHeight);
+    document.documentElement.style.setProperty("--aletheia-mobile-height", `${height}px`);
+  }
+
+  function updateMobileFullscreenButton() {
+    const button = $("mobile-fullscreen");
+    if (!button) return;
+    button.hidden = !experienceStarted || Boolean(mobileFullscreenElement());
+  }
+
+  async function keepMobileScreenAwake() {
+    if (!phoneStandalone || !experienceStarted || !navigator.wakeLock || document.visibilityState !== "visible" || (mobileWakeLock && !mobileWakeLock.released)) return;
+    try {
+      mobileWakeLock = await navigator.wakeLock.request("screen");
+      mobileWakeLock.addEventListener("release", () => { mobileWakeLock = null; }, { once: true });
+    } catch (error) {
+      console.info("El navegador no permite mantener la pantalla encendida", error);
+    }
+  }
+
+  async function enterMobileFullscreen() {
+    if (!phoneStandalone) return;
+    const root = document.documentElement;
+    try {
+      if (root.requestFullscreen) await root.requestFullscreen({ navigationUI: "hide" });
+      else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+    } catch (error) {
+      console.info("El navegador mantiene sus barras", error);
+    }
+    try {
+      if (screen.orientation?.lock) await screen.orientation.lock("landscape");
+    } catch (_) {}
+    updateMobileViewport();
+    updateMobileFullscreenButton();
+    void keepMobileScreenAwake();
+  }
 
   function roundConfiguration(humanCount) {
     if (phoneStandalone) return { playMode: "mobile-standalone", roundModes: ["NORMAL", "NORMAL", "NORMAL", "NORMAL", "NORMAL"] };
@@ -2056,6 +2100,7 @@
   function enterExperience(withSound) {
     if (experienceStarted) return;
     experienceStarted = true;
+    if (phoneStandalone) void enterMobileFullscreen();
     setSoundEnabled(withSound);
     if (withSound) voice?.startMusic();
     $("tv-entry").hidden = true;
@@ -2096,6 +2141,18 @@
     if (phoneStandalone) {
       $("entry-mode-summary").textContent = "Esta versión está adaptada para jugar directamente en el teléfono.";
       $("enable-remotes").hidden = true;
+      const fullscreenAvailable = Boolean(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+      if (fullscreenAvailable && !$("mobile-fullscreen")) {
+        const fullscreenButton = document.createElement("button");
+        fullscreenButton.id = "mobile-fullscreen";
+        fullscreenButton.className = "tv-mobile-fullscreen-button";
+        fullscreenButton.type = "button";
+        fullscreenButton.textContent = "⛶ PANTALLA COMPLETA";
+        fullscreenButton.hidden = true;
+        fullscreenButton.addEventListener("click", () => void enterMobileFullscreen());
+        document.body.append(fullscreenButton);
+      }
+      updateMobileViewport();
     }
     chooseHumanAvatar(1);
     $("human-avatar-slot-1").outerHTML = humanAvatarMarkup(1);
@@ -2109,4 +2166,19 @@
   } else {
     initializeSetup();
   }
+  document.addEventListener("fullscreenchange", updateMobileFullscreenButton);
+  document.addEventListener("webkitfullscreenchange", updateMobileFullscreenButton);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      updateMobileViewport();
+      void keepMobileScreenAwake();
+    }
+  });
+  window.visualViewport?.addEventListener("resize", updateMobileViewport);
+  window.addEventListener("resize", updateMobileViewport, { passive: true });
+  window.addEventListener("orientationchange", () => setTimeout(updateMobileViewport, 120), { passive: true });
+  window.addEventListener("pagehide", () => {
+    if (mobileWakeLock && !mobileWakeLock.released) void mobileWakeLock.release();
+    mobileWakeLock = null;
+  });
 })();

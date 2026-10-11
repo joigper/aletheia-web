@@ -4635,6 +4635,31 @@ html.aletheia-tv-phone #enable-remotes {
   display: none!important;
 }
 
+html.aletheia-tv-phone .aletheia-tv-page {
+  height: var(--aletheia-mobile-height,100dvh)!important;
+}
+
+.tv-mobile-fullscreen-button {
+  position: fixed;
+  z-index: 10020;
+  top: max(7px,env(safe-area-inset-top));
+  right: max(7px,env(safe-area-inset-right));
+  min-height: 34px;
+  padding: 6px 11px;
+  border: 1px solid #50ddff;
+  border-radius: 18px;
+  color: #ecfbff;
+  background: #09172fe8;
+  box-shadow: 0 0 16px #35d9ff45;
+  font: 700 9px "Tektur",sans-serif;
+  letter-spacing: .06em;
+  touch-action: manipulation;
+}
+
+.tv-mobile-fullscreen-button[hidden] {
+  display: none!important;
+}
+
 /* Transiciones escénicas de ronda y pruebas. El marco izquierdo recibirá los vídeos Rhubarb de Prometeo. */
 
 .tv-challenge-overlay {
