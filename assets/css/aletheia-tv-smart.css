@@ -89,6 +89,11 @@ html.aletheia-tv-smart-root body {
   background: #050912 url("../img/ocio/prometeo-visemas-base.webp") center top/cover no-repeat!important;
 }
 
+.aletheia-tv-smart-root.aletheia-smart-playing #setup-panel {
+  content-visibility: hidden!important;
+  contain: strict!important;
+}
+
 .aletheia-tv-smart-root .tv-transition-scan, .aletheia-tv-smart-root .tv-transition-presenter-frame::after {
   display: none!important;
 }

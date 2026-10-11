@@ -22,6 +22,7 @@
   const smartTvMode = Boolean(window.AletheiaTVSmart);
   const smartPostVoiceDelay = smartTvMode ? 1600 : 0;
   const smartCpuDelay = smartTvMode ? 1800 : 0;
+  const smartCpuWatchdogDelay = smartTvMode ? 12000 : 0;
   let state = null;
   let selectedRivals = [];
   const selectedBySlot = { 2: null, 3: null };
@@ -30,6 +31,7 @@
   const humanAvatars = { 1: null, 2: null, 3: null };
   let selectionRun = 0;
   let cpuTimer = null;
+  let smartCpuWatchdogTimer = null;
   let cpuNotBefore = 0;
   let timedGame = false;
   let gamePaused = false;
@@ -179,6 +181,28 @@
   function stopPrometeo() {
     prometeoActive?.pause();
     prometeoStandby?.pause();
+  }
+
+  function releaseSmartSetupResources() {
+    if (!smartTvMode) return;
+    [prometeoActive, prometeoStandby, $("transition-presenter-base")].forEach(video => {
+      if (!video) return;
+      video.pause();
+      video.removeAttribute("src");
+      video.querySelectorAll("source").forEach(source => source.removeAttribute("src"));
+      video.preload = "none";
+      video.poster = `${prometeoBasePath}prometeo-visemas-base.webp`;
+      try { video.load(); } catch (_) {}
+    });
+    // Los QR ya han cumplido su función. Un canvas de 320×320 puede conservar
+    // más de 400 KB de memoria gráfica aunque la configuración esté oculta.
+    document.querySelectorAll("#setup-panel .tv-remote-qr-image canvas").forEach(canvas => {
+      canvas.width = 1;
+      canvas.height = 1;
+      canvas.remove();
+    });
+    document.querySelectorAll("#setup-panel .tv-remote-slot-layer").forEach(layer => layer.remove());
+    document.documentElement.classList.add("aletheia-smart-playing");
   }
 
   function startPrometeoWelcome() {
@@ -1352,6 +1376,7 @@
   }
 
   function runCpuTurn() {
+    cpuTimer = null;
     if (gamePaused || narrationBarrier || !state || !state.players[state.active]?.cpu || state.phase === "ROUND_COMPLETE" || state.phase === "GAME_COMPLETE") return;
     if (voice?.isSpeaking()) {
       cpuTimer = setTimeout(runCpuTurn, 250);
@@ -1423,12 +1448,27 @@
 
   function scheduleCpuTurn() {
     clearTimeout(cpuTimer);
+    clearTimeout(smartCpuWatchdogTimer);
+    smartCpuWatchdogTimer = null;
     if (initialDrawPhase !== "done" || gamePaused || narrationBarrier || !state || Date.now() < speedIntroUntil || (state.phase !== "QUESTION_BONUS" && !state.players[state.active]?.cpu) || ["ROUND_COMPLETE", "CATEGORY_RESULT", "QUESTION_SELECTION", "QUESTION_RESULT", "FINAL_READY", "GAME_COMPLETE"].includes(state.phase)) return;
     const player = state.phase === "QUESTION_BONUS" ? state.players.find(candidate => candidate.cpu) || state.players[state.active] : state.players[state.active];
     const sceneMinimum = Math.max(interactionLockedUntil, roundIntroUntil, state.phase === "CATEGORY_CHOICE" ? challengeReadyAt + 1000 : state.phase === "QUESTION_BONUS" ? challengeReadyAt + 3000 : 0);
     const wait = Math.max(cpuDelay(player), cpuNotBefore - Date.now(), sceneMinimum - Date.now());
     $("message").textContent = `${player.name} está pensando…`;
     cpuTimer = setTimeout(runCpuTurn, wait);
+    if (smartCpuWatchdogDelay) {
+      const watchedState = state;
+      const watchedPhase = state.phase;
+      const watchedActive = state.active;
+      const watchedEvents = state.events.length;
+      smartCpuWatchdogTimer = setTimeout(() => {
+        smartCpuWatchdogTimer = null;
+        if (state !== watchedState || gamePaused || narrationBarrier || voice?.isSpeaking()) return;
+        if (state.phase !== watchedPhase || state.active !== watchedActive || state.events.length !== watchedEvents || !state.players[state.active]?.cpu) return;
+        clearTimeout(cpuTimer);
+        cpuTimer = setTimeout(runCpuTurn, 400);
+      }, wait + smartCpuWatchdogDelay);
+    }
   }
 
   const pause = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -1594,7 +1634,7 @@
   }
 
   function startConfiguredGame() {
-    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer); clearTimeout(finalResultHoldTimer);
+    clearTimeout(cpuTimer); clearTimeout(smartCpuWatchdogTimer); smartCpuWatchdogTimer = null; clearTimeout(clockTimer); clearTimeout(speedTimer); clearTimeout(speedIntroTimer); clearTimeout(finalResultHoldTimer);
     clearTimeout(roundIntroTimer); clearTimeout(interactionUnlockTimer); clearTimeout(challengeUnlockTimer);
     clearTimeout(categoryResultTimer); clearTimeout(questionSelectionTimer); clearTimeout(questionResultTimer);
     clearInitialDrawTimers(); clearTimeout(smartVoiceIdleTimer); smartVoiceIdleTimer = null; initialDrawPhase = "idle"; initialDrawHighlight = 0;
@@ -1618,6 +1658,7 @@
     pauseStartedAt = 0;
     stopPrometeo();
     $("setup-panel").hidden = true; $("game-panel").hidden = false;
+    releaseSmartSetupResources();
     voice?.startMusic();
     voice?.playEffect("prometeo-aparece");
     voice?.playEffect("ronda-inicio");
@@ -1968,9 +2009,10 @@
   function openSessionMenu() { $("session-overlay").hidden = false; }
   function closeSessionMenu() { $("session-overlay").hidden = true; }
   function returnToSetupAfterClose() {
-    clearTimeout(cpuTimer); clearTimeout(clockTimer); clearTimeout(speedTimer); voice?.stopEffects(); voice?.pauseMusic();
+    clearTimeout(cpuTimer); clearTimeout(smartCpuWatchdogTimer); smartCpuWatchdogTimer = null; clearTimeout(clockTimer); clearTimeout(speedTimer); voice?.stopEffects(); voice?.pauseMusic();
     gamePaused = false; state = null; $("session-overlay").hidden = true; $("pause-overlay").hidden = true;
     $("game-panel").hidden = true; $("setup-panel").hidden = false;
+    document.documentElement.classList.remove("aletheia-smart-playing");
     $("setup-message").textContent = "La sala anterior se ha cerrado. Puedes preparar una nueva partida.";
   }
   $("new-game").addEventListener("click", openSessionMenu);

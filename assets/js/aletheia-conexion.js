@@ -58,6 +58,7 @@ function qrTarget(slot) {
 function renderQr(slot, player = null) {
   const target = qrTarget(slot);
   if (!target || !state.active) return;
+  if (window.AletheiaTVSmart && document.getElementById("setup-panel")?.hidden) return;
   target.classList.add("tv-remote-host");
   target.querySelector(".tv-remote-slot-layer")?.remove();
   const layer = document.createElement("span");
