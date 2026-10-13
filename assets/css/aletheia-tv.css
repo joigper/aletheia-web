@@ -4635,8 +4635,24 @@ html.aletheia-tv-phone #enable-remotes {
   display: none!important;
 }
 
-html.aletheia-tv-phone .aletheia-tv-page {
+/* En el juego autónomo del teléfono, la pantalla completa pertenece al plató:
+   el membrete de escritorio no consume altura ni deja una fila vacía. */
+
+html.aletheia-tv-phone .aletheia-tv-header, html.aletheia-tv-phone .aletheia-tv-divider {
+  display: none!important;
+}
+
+html.aletheia-tv-phone .aletheia-tv-page, html.aletheia-tv-phone .aletheia-tv-page.container {
+  width: 100%!important;
+  max-width: none!important;
   height: var(--aletheia-mobile-height,100dvh)!important;
+  padding: 0!important;
+  grid-template-rows: minmax(0,1fr)!important;
+}
+
+html.aletheia-tv-phone .tv-app {
+  min-height: 0;
+  padding: 4px!important;
 }
 
 .tv-mobile-fullscreen-button {
