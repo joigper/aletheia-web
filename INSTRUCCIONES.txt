@@ -1,0 +1,20 @@
+RECUPERACIÓN DE GITHUB PAGES
+
+1. Copia CNAME, .nojekyll, robots.txt y sitemap.xml en la raíz del repositorio,
+   al mismo nivel que index.html. No los metas dentro de assets.
+
+2. En GitHub abre Settings > Pages.
+
+3. En Build and deployment selecciona:
+   Source: Deploy from a branch
+   Branch: main (o la rama que contiene index.html)
+   Folder: / (root)
+
+4. En Custom domain escribe universoaletheia.es y guarda.
+
+5. Espera a que GitHub indique que la publicación ha finalizado. El certificado
+   HTTPS puede tardar algo más en volver a validarse.
+
+El archivo que corrige el 404 del dominio personalizado es CNAME. sitemap.xml y
+robots.txt son para buscadores; .nojekyll evita que GitHub procese la web como
+un proyecto Jekyll.
