@@ -3791,7 +3791,7 @@ html.aletheia-tv-root, html.aletheia-tv-root body {
 }
 
 @media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .tv-wheel-panel {
+  .aletheia-tv-phone .tv-wheel-panel {
     padding: 4px;
   }
 }
@@ -5651,22 +5651,22 @@ html.aletheia-tv-phone .tv-app {
   display: none !important;
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .tv-game {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .tv-game {
     grid-template-rows: 40px minmax(146px,1fr) 148px 56px;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .tv-wheel-panel {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .tv-wheel-panel {
     padding: 4px;
     grid-template-rows: minmax(0,1fr) auto;
     align-items: center;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .mobile-turn-prompt {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .mobile-turn-prompt {
     display: block;
     align-self: end;
     width: 100%;
@@ -5682,29 +5682,29 @@ html.aletheia-tv-phone .tv-app {
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .tv-controls {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .tv-controls {
     padding: 5px 7px;
     gap: 4px;
     grid-template-rows: minmax(0,1fr) 42px;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .tv-control-heading {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .tv-control-heading {
     display: none;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .keyboard {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .keyboard {
     align-self: stretch;
     gap: 3px;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .keyboard button {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .keyboard button {
     min-height: 30px;
     padding: 0;
     font-size: 13px;
@@ -5713,8 +5713,8 @@ html.aletheia-tv-phone .tv-app {
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  #solve-form input, #solve-form .tv-button, #solve-form .tv-pass-button {
+@media (orientation:landscape) {
+  .aletheia-tv-phone #solve-form input, .aletheia-tv-phone #solve-form .tv-button, .aletheia-tv-phone #solve-form .tv-pass-button {
     min-height: 42px;
     height: 42px;
     padding: 5px 9px;
@@ -5722,15 +5722,15 @@ html.aletheia-tv-phone .tv-app {
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  #solve-form .tv-button {
+@media (orientation:landscape) {
+  .aletheia-tv-phone #solve-form .tv-button {
     min-width: 108px;
     touch-action: manipulation;
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .player.active {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .player.active {
     border-color: #74efff;
     border-top-color: #74efff;
     background: linear-gradient(145deg,#164e63,#112e47 58%,#0c1d32);
@@ -5738,8 +5738,8 @@ html.aletheia-tv-phone .tv-app {
   }
 }
 
-@media (max-width:1200px) and (max-height:650px) and (orientation:landscape) and (pointer:coarse) {
-  .player.active .player-copy small, .player.active .player-copy em, .player.active .player-score small, .player.active .player-score span i {
+@media (orientation:landscape) {
+  .aletheia-tv-phone .player.active .player-copy small, .aletheia-tv-phone .player.active .player-copy em, .aletheia-tv-phone .player.active .player-score small, .aletheia-tv-phone .player.active .player-score span i {
     color: #d3f8ff;
   }
 }
