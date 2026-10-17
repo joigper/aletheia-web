@@ -657,6 +657,10 @@
     }
     const viewPlayer = viewState.players[viewState.active];
     $("turn-label").textContent = narrationBarrier ? `Turno de ${viewPlayer.name}` : finalReady ? "Cinco rondas completadas" : roundComplete ? `Ronda ${state.round} terminada` : state.phase === "SPEED_SOLVE" ? `¡${state.players[state.active].name} HA PULSADO!` : finalRound ? `Final de ${state.players[state.active].name}` : `Turno de ${state.players[state.active].name}`;
+    const mobileTurnPrompt = $("mobile-turn-prompt");
+    const activeFirstName = String(viewPlayer.name || "").trim().split(/\s+/)[0] || "Jugador";
+    mobileTurnPrompt.textContent = `Tira ${activeFirstName}`;
+    mobileTurnPrompt.hidden = roundComplete || finalReady || gameComplete;
     $("active-round-score").textContent = viewPlayer.round;
     $("active-total-score").textContent = viewPlayer.total;
     const visibleTransientMessage = Date.now() < transientMessageUntil ? transientMessage : "";
