@@ -5768,6 +5768,7 @@ html.aletheia-tv-phone .tv-app {
     gap: 2px;
     padding: 0;
     align-content: stretch;
+    container-type: size;
   }
 }
 
@@ -5776,7 +5777,8 @@ html.aletheia-tv-phone .tv-app {
     min-height: 0;
     height: 100%;
     width: 100%;
-    grid-template-columns: repeat(var(--columns),minmax(0,1fr));
+    grid-template-columns: repeat(var(--columns),minmax(0,calc((100cqw - 39px) / 14)));
+    justify-content: center;
     gap: 3px;
     align-items: stretch;
   }
@@ -5791,6 +5793,7 @@ html.aletheia-tv-phone .tv-app {
     display: grid;
     place-items: center;
     line-height: 1;
+    font-size: min(calc((100cqw - 39px) / 14 * .85),calc((100cqh - 6px) / 4 * .85));
   }
 }
 
@@ -5864,6 +5867,28 @@ html.aletheia-tv-phone .tv-app {
 @media (orientation: landscape) and (max-height: 360px) {
   html.aletheia-tv-phone .scoreboard {
     height: 50px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .player {
+    min-height: 0;
+    height: 50px;
+  }
+}
+
+/* Reserva los bordes físicos del móvil y permite encoger los hijos del grid. */
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-app {
+    padding: max(4px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left)) !important;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-game > *, html.aletheia-tv-phone .scoreboard, html.aletheia-tv-phone .player {
+    min-width: 0;
+    min-height: 0;
   }
 }
 
