@@ -5653,7 +5653,9 @@ html.aletheia-tv-phone .tv-app {
 
 @media (orientation:landscape) {
   .aletheia-tv-phone .tv-game {
-    grid-template-rows: 40px minmax(146px,1fr) 148px 56px;
+    grid-template-rows: 40px minmax(0,1fr) 148px 56px;
+    grid-template-columns: minmax(0,29%) minmax(0,1fr);
+    gap: 4px;
   }
 }
 
@@ -5687,6 +5689,7 @@ html.aletheia-tv-phone .tv-app {
     padding: 5px 7px;
     gap: 4px;
     grid-template-rows: minmax(0,1fr) 42px;
+    align-content: stretch;
   }
 }
 
@@ -5699,6 +5702,8 @@ html.aletheia-tv-phone .tv-app {
 @media (orientation:landscape) {
   .aletheia-tv-phone .keyboard {
     align-self: stretch;
+    min-height: 0;
+    grid-template-rows: repeat(3,minmax(0,1fr));
     gap: 3px;
   }
 }
@@ -5741,6 +5746,130 @@ html.aletheia-tv-phone .tv-app {
 @media (orientation:landscape) {
   .aletheia-tv-phone .player.active .player-copy small, .aletheia-tv-phone .player.active .player-copy em, .aletheia-tv-phone .player.active .player-score small, .aletheia-tv-phone .player.active .player-score span i {
     color: #d3f8ff;
+  }
+}
+
+/* La altura útil manda: no imponer mínimos de escritorio a la escena móvil. */
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-puzzle {
+    min-width: 0;
+    min-height: 0;
+    grid-template-rows: auto minmax(0,1fr);
+    padding: 4px 9px 5px;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .letter-board {
+    min-height: 0;
+    height: 100%;
+    grid-template-rows: repeat(4,minmax(0,1fr));
+    gap: 2px;
+    padding: 0;
+    align-content: stretch;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .letter-row {
+    min-height: 0;
+    height: 100%;
+    width: 100%;
+    grid-template-columns: repeat(var(--columns),minmax(0,1fr));
+    gap: 3px;
+    align-items: stretch;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .letter-board .tile {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    max-height: 100%;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone #solve-form label {
+    display: block;
+    margin: 0;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-challenge-overlay {
+    inset: 44px 0 0;
+    overflow: auto;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-transition-stage {
+    min-height: 0;
+    grid-template-columns: minmax(0,30%) minmax(0,1fr);
+    padding: 12px 20px;
+    gap: 20px;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-transition-presenter-frame {
+    min-height: 0;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-transition-copy {
+    min-height: 0;
+    min-width: 0;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .tv-game {
+    grid-template-rows: 36px minmax(0,1fr) 132px 50px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .tv-message {
+    min-height: 0;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .tv-controls {
+    grid-template-rows: minmax(0,1fr) 36px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .keyboard button {
+    min-height: 24px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone #solve-form input, html.aletheia-tv-phone #solve-form .tv-button, html.aletheia-tv-phone #solve-form .tv-pass-button {
+    min-height: 36px;
+    height: 36px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .scoreboard {
+    height: 50px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 360px) {
+  html.aletheia-tv-phone .tv-challenge-overlay {
+    top: 40px;
   }
 }
 
