@@ -641,6 +641,7 @@
       finalResultHoldTimer = setTimeout(() => render(), Math.max(50, finalResultHoldUntil - Date.now()));
     }
     $("next-round").hidden = !visibleRoundComplete && !visibleFinalReady;
+    $("next-round").closest(".tv-controls").classList.toggle("is-round-finished", visibleRoundComplete || visibleFinalReady);
     $("next-round").disabled = narrationBarrier;
     $("next-round").textContent = finalReady ? "JUGAR RULETA FINAL" : "SIGUIENTE RONDA";
     $("round-label").textContent = finalRound ? "RULETA FINAL" : `RONDA ${state.round} DE ${state.maxRounds}${state.roundMode === "CHOOSE" ? " · TÚ ELIGES" : state.roundMode === "QUESTION" ? " · REVANCHA" : state.roundMode === "SPECIAL" ? ` · ${state.special?.type === "SPEED" ? "VELOCIDAD" : state.special?.type === "WORD" ? "PALABRA" : "CRONO"}` : ""}`;

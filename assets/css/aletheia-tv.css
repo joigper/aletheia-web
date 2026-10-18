@@ -5898,3 +5898,47 @@ html.aletheia-tv-phone .tv-app {
   }
 }
 
+/* Al terminar la ronda, el avance ocupa el espacio del teclado móvil. */
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .tv-controls.is-round-finished {
+    grid-template-rows: minmax(0,1fr);
+    align-content: stretch;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .is-round-finished .tv-control-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 0;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .is-round-finished .tv-control-heading > div:first-child, html.aletheia-tv-phone .is-round-finished .tv-turn-title {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .is-round-finished .tv-control-heading > div:first-child > small, html.aletheia-tv-phone .is-round-finished #turn-label, html.aletheia-tv-phone .is-round-finished .tv-active-money, html.aletheia-tv-phone .is-round-finished .keyboard, html.aletheia-tv-phone .is-round-finished #solve-form {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) {
+  html.aletheia-tv-phone .is-round-finished #next-round {
+    min-height: 44px;
+    max-width: 100%;
+    padding: 8px 18px;
+    font-size: clamp(13px,2vw,18px);
+    white-space: normal;
+    touch-action: manipulation;
+  }
+}
+
